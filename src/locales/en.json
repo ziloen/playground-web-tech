@@ -1,5 +1,0 @@
-{
-  "loading": "Loading...",
-  "placeholder": "What's your name?",
-  "useI18nTest": "<link>here</link> to test the tag, and {{name}} to test the variable."
-}

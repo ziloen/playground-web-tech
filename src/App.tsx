@@ -1,3 +1,4 @@
+import { ConfigProvider, theme } from 'antd'
 import { Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import routes from '~react-pages'
@@ -12,13 +13,14 @@ const routeElements = routes.map(route => (
 ))
 
 export default function App() {
-
   return (
-    <Suspense>
-      <Routes>
-        {routeElements}
-      </Routes>
-    </Suspense>
+    <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
+      <Suspense>
+        <Routes>
+          {routeElements}
+        </Routes>
+      </Suspense>
+    </ConfigProvider>
   )
 }
 
