@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "module": "ESNext",
+    "target": "ESNext",
+    // type checking
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    // resolve / build
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "incremental": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "noUnusedLocals": false,
+    "forceConsistentCasingInFileNames": true,
+    "lib": [
+      "DOM",
+      "ESNext",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "vite/client",
+      "vite-plugin-pages/client-react",
+      "typescript-lib-enhancer",
+      "typescript-lib-enhancer/highlight",
+      "typescript-lib-enhancer/view-transition",
+    ],
+    "paths": {
+      "~/*": [
+        "src/*"
+      ],
+      "~cwd/*": [
+        "./*"
+      ],
+    }
+  },
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
