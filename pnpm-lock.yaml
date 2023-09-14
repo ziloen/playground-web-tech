@@ -12,11 +12,11 @@ dependencies:
     specifier: ^3.3.4
     version: 3.3.4
   '@wai-ri/core':
-    specifier: ^0.0.100
-    version: 0.0.100
+    specifier: ^0.0.101
+    version: 0.0.101
   '@wai-ri/react':
-    specifier: ^0.0.100
-    version: 0.0.100(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^0.0.101
+    version: 0.0.101(react-dom@18.2.0)(react@18.2.0)
   antd:
     specifier: ^5.9.0
     version: 5.9.0(react-dom@18.2.0)(react@18.2.0)
@@ -2922,29 +2922,29 @@ packages:
     resolution: {integrity: sha512-7OjdcV8vQ74eiz1TZLzZP4JwqM5fA94K6yntPS5Z25r9HDuGNzaGdgvwKYq6S+MxwF0TFRwe50fIR/MYnakdkQ==}
     dev: false
 
-  /@wai-ri/core@0.0.100:
-    resolution: {integrity: sha512-9JmLb03erJng8X0iOuy9OJrCfJLC81ohNl7nHxYGqbYfC/tPZBayu4+ss6iB4+qMRl5OnScXAZ8RqCOiR9c3rg==}
+  /@wai-ri/core@0.0.101:
+    resolution: {integrity: sha512-i2iEFYk2SZdJWapLxC2HtZ5qb8kN8dNX/ZvMGajdQRO/2gBn5H6u8zfJhZzgET8dXcc20O1W2nItoeY+SbkyrQ==}
     dependencies:
-      '@wai-ri/shared': 0.0.100
+      '@wai-ri/shared': 0.0.101
       typescript: 5.2.2
     dev: false
 
-  /@wai-ri/react@0.0.100(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Ndb8d22ApPNFuV//tsA1qVL3OfeZJ25DYBZ4v8IuGcR64HoKszS3RMEYiTCnciVW0dgXjSU31ez56piQndMbdQ==}
+  /@wai-ri/react@0.0.101(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-mxhdjWCXjH4v4G4knjK2oWEkEpEPPIUk0s5bWnNQorXYy98gKW3etIXW3UfJbf3023YmeJmjQvnQHTknTJowxA==}
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
     dependencies:
       '@types/react': 18.2.21
       '@types/react-dom': 18.2.7
-      '@wai-ri/shared': 0.0.100
+      '@wai-ri/shared': 0.0.101
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       rxjs: 7.8.1
     dev: false
 
-  /@wai-ri/shared@0.0.100:
-    resolution: {integrity: sha512-3RBB5lexb+IvPYAfG8AQWXvOkH3xWHQ47KGphN9CbOoncX8AsX9hQJHfUR4Udp+wk+zywFBlk9/eF9iwRwhFpQ==}
+  /@wai-ri/shared@0.0.101:
+    resolution: {integrity: sha512-vxU/QIFJjYvdvoP8StzIC0BxzSQzZdpPQkAOUvKiUSbqz12P13ALvfC8TPYFfCyzbT/XYywvusAnIl2Na+fpVw==}
     dependencies:
       typescript: 5.2.2
     dev: false
