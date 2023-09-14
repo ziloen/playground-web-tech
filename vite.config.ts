@@ -16,6 +16,7 @@ export default defineConfig(({ command, mode }) => {
   const IS_BUILD = command === 'build'
 
   return {
+    base: '/playground-web-tech/',
     resolve: {
       alias: {
         '~': r('src'),

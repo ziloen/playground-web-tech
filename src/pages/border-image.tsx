@@ -4,6 +4,8 @@
 export default function BorderImage() {
 
   return (
-    <div></div>
+    <div className='w-full h-full'>
+
+    </div>
   )
 }
