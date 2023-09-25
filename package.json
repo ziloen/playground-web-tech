@@ -13,6 +13,7 @@
     "@vue/reactivity": "^3.3.4",
     "@wai-ri/core": "^0.0.101",
     "@wai-ri/react": "^0.0.101",
+    "ahooks": "^3.7.8",
     "antd": "^5.9.2",
     "clsx": "^2.0.0",
     "framer-motion": "^10.16.4",
