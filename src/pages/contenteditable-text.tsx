@@ -6,21 +6,39 @@ export default function ContentEditableText() {
   const ref = useRef<HTMLDivElement>(null!)
 
   useEventListener('beforeinput', e => {
-    const inputType = e.inputType as InputType
+    const { inputType, dataTransfer, data } = e
 
     // 取消所有 fomat 相关的 input
-    if (inputType.startsWith('format')) e.preventDefault()
+    if (inputType.startsWith('format')) return e.preventDefault()
 
-    const { data, dataTransfer } = e
-    const range = e.getTargetRanges()
-    console.log(range)
-    console.log('beforeinput', inputType, data, dataTransfer)
+    console.log('beforeinput', e)
+
+    if (data || !dataTransfer) return
+
+    if (inputType === 'insertFromPaste' || inputType === 'insertFromDrop') {
+      const html = dataTransfer.getData('text/html')
+      const text = dataTransfer.getData('text/plain')
+      if (!text) return e.preventDefault()
+
+      if (html) {
+        e.preventDefault()
+
+        // insertNode 不能使用 undo redo，只有 execCommand 可以
+        // const targetRange = e.getTargetRanges()[0]
+        // const newRange = document.createRange()
+        // newRange.setStart(targetRange.startContainer, targetRange.startOffset)
+        // newRange.setEnd(targetRange.endContainer, targetRange.endOffset)
+        // newRange.deleteContents()
+        // newRange.insertNode(document.createTextNode(text))
+
+        document.execCommand('insertText', false, text)
+      }
+    }
   }, { target: ref })
 
   useEventListener('input', (e: InputEvent) => {
-    const type = e.inputType as InputType
-
-
+    const inputType = e.inputType as InputType
+    // console.log('onInput', inputType)
   }, { target: ref })
 
   return (
