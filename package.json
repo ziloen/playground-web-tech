@@ -47,6 +47,7 @@
     "typescript": "^5.2.2",
     "typescript-lib-enhancer": "^1.0.12",
     "unocss": "^0.56.4",
+    "unocss-preset-ziloen": "^0.0.2",
     "unplugin-auto-import": "^0.16.6",
     "vite": "^4.4.9",
     "vite-plugin-pages": "^0.31.0",

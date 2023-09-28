@@ -115,6 +115,9 @@ devDependencies:
   unocss:
     specifier: ^0.56.4
     version: 0.56.4(postcss@8.4.30)(vite@4.4.9)
+  unocss-preset-ziloen:
+    specifier: ^0.0.2
+    version: 0.0.2(@unocss/core@0.56.4)
   unplugin-auto-import:
     specifier: ^0.16.6
     version: 0.16.6
@@ -7330,6 +7333,14 @@ packages:
   /universalify@0.2.0:
     resolution: {integrity: sha512-CJ1QgKmNg3CwvAv/kOFmtnEN05f0D/cn9QntgNOQlQF9dgvVTHj3t+8JPdjqawCHk7V/KA+fbUqzZ9XWhcqPUg==}
     engines: {node: '>= 4.0.0'}
+    dev: true
+
+  /unocss-preset-ziloen@0.0.2(@unocss/core@0.56.4):
+    resolution: {integrity: sha512-vsrOinxI3LvaEhLzf9CM7HH5gOzRgW/ZBfUUduH8+tmPd2C+gDpf1qO+WTl0bDMMeaPBZcKQ9mPNE5RU+zYyYA==}
+    peerDependencies:
+      '@unocss/core': < 1
+    dependencies:
+      '@unocss/core': 0.56.4
     dev: true
 
   /unocss@0.56.4(postcss@8.4.30)(vite@4.4.9):
