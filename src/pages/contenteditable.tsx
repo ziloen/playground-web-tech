@@ -150,3 +150,16 @@ const useMessageStore = defineStore(() => {
     messages,
   }
 })
+
+
+function getSelectionStartPosition() {
+  
+}
+
+function getSelectionEndPosition() {
+  
+}
+
+function getCaretPosition() {
+  
+}
