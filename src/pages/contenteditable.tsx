@@ -1,31 +1,47 @@
-import { LiteralUnion } from '@wai-ri/core'
+import { LiteralUnion, patternMatching } from '@wai-ri/core'
 import { useEventListener } from '~/hooks'
+import { defineStore, reactivity, ref } from '~/stores'
 
 
-export default function ContentEditableText() {
-  const ref = useRef<HTMLDivElement>(null!)
 
-  useEventListener('beforeinput', onBeforeInput, { target: ref })
+export default reactivity(function ContentEditableText() {
+  const inputRef = useRef<HTMLDivElement>(null!)
+  const messageStore = useMessageStore()
+  const messages = messageStore.messages
+
+  useEventListener('beforeinput', onBeforeInput, { target: inputRef })
 
   useEventListener('input', (e: InputEvent) => {
     const inputType = e.inputType as InputType
-  }, { target: ref })
+    if (inputType === 'insertParagraph') {
+      const text = transformContent(inputRef.current.children)
+      if (!text) return
+      messages.push({ text })
+      inputRef.current.innerHTML = ""
+    }
+  }, { target: inputRef })
+
+  useEffect(() => {
+    document.execCommand('defaultParagraphSeparator', false, 'br')
+  }, [])
 
   return (
     <div
       className='grid h-full w-full'
       style={{
-        gridTemplateRows: 'auto minmax(0, 1fr) max-content',
+        gridTemplateRows: 'minmax(0, 1fr) max-content',
         gridTemplateColumns: '1fr',
       }}
     >
       {/* add backdrop-filter blur */}
-      <div className='border-b '>
-        Chat room
-      </div>
 
-      <div className=''>
-        chat content
+      <div className='overflow-y-auto'>
+        <div className='border-b sticky top-0 backdrop-blur-md'>Chat room</div>
+        {
+          messages.map((m, i) => (
+            <Message key={i} text={m.text} />
+          ))
+        }
       </div>
 
       {/* [ ] drag to resize the height */}
@@ -35,16 +51,47 @@ export default function ContentEditableText() {
       {/* [ ] focus({ cursor: "start" | "end" | "all" | undefined }) */}
       {/* [ ] overflow issue when input */}
       <div
-        ref={ref}
+        ref={inputRef}
         contentEditable
         suppressContentEditableWarning
         autoFocus
         tabIndex={0}
-        style={{ wordBreak: 'break-word' }}
-        className='min-h-34px whitespace-pre-wrap overflow-y-auto box-border leading-17px border-t text-14px outline-none max-w-full'>
+        className='min-h-34px whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-17px border-t text-14px outline-none max-w-full'>
       </div>
     </div>
   )
+})
+
+
+
+function Message({ text }: { text: string }) {
+  return (
+    <div className='rounded-4px bg-blue-4 w-max whitespace-pre-wrap word-wrap-break my-12px mx-12px p-10px'>
+      {text}
+    </div>
+  )
+}
+
+type MessageType = {
+  text: string
+}
+
+function transformContent(children: HTMLCollection) {
+  const text = Array
+    .from(children)
+    .map(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent
+      }
+      if (node.nodeType === Node.ELEMENT_NODE && node.nodeName === 'BR') {
+        return '\n'
+      } else {
+        return ''
+      }
+    })
+    .join('')
+
+  return text
 }
 
 
@@ -80,8 +127,6 @@ function onBeforeInput(e: InputEvent) {
   }
 }
 
-
-
 // 具体参见 InputEvent.inputType 标准文档 https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
 type InputType = LiteralUnion<
   // 纯文本输入，输入内容在 data 属性中
@@ -96,3 +141,12 @@ type InputType = LiteralUnion<
   // formatXxxx 均为修改文本样式 input
   | 'formatBold'
 >
+
+
+const useMessageStore = defineStore(() => {
+  const messages = ref<MessageType[]>([])
+
+  return {
+    messages,
+  }
+})
