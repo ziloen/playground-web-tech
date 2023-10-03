@@ -3,8 +3,8 @@ import {
   presetIcons,
   presetUno,
   presetWebFonts,
-  transformerDirectives
-  // transformerVariantGroup,
+  transformerDirectives,
+  transformerVariantGroup,
 } from 'unocss'
 import { presetZiloen } from 'unocss-preset-ziloen'
 
@@ -33,7 +33,7 @@ export default defineConfig({
   ],
   transformers: [
     // support @apply
-    transformerDirectives()
-    // transformerVariantGroup(),
+    transformerDirectives(),
+    transformerVariantGroup(),
   ]
 })

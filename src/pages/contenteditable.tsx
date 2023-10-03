@@ -14,10 +14,10 @@ export default reactivity(function ContentEditableText() {
   useEventListener('input', (e: InputEvent) => {
     const inputType = e.inputType as InputType
     if (inputType === 'insertParagraph') {
-      const text = transformContent(inputRef.current.children)
+      const text = transformContent(inputRef.current)
       if (!text) return
       messages.push({ text })
-      inputRef.current.innerHTML = ""
+      inputRef.current.innerHTML = ''
     }
   }, { target: inputRef })
 
@@ -34,9 +34,12 @@ export default reactivity(function ContentEditableText() {
       }}
     >
       {/* add backdrop-filter blur */}
+      <div className='overflow-y-auto w-full relative'>
+        <div className='sticky top-0 flex-col flex w-full top-0 left-0 right-0 border-b border-b-white/20'>
+          <div className='backdrop-blur-8 bg-black/20 shrink-0 px-10px py-8px'>Chat room</div>
+          <div className='h-2px backdrop-blur-90 backdrop-saturate-105 backdrop-brightness-105'></div>
+        </div>
 
-      <div className='overflow-y-auto'>
-        <div className='border-b sticky top-0 backdrop-blur-md'>Chat room</div>
         {
           messages.map((m, i) => (
             <Message key={i} text={m.text} />
@@ -56,7 +59,7 @@ export default reactivity(function ContentEditableText() {
         suppressContentEditableWarning
         autoFocus
         tabIndex={0}
-        className='min-h-34px whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-17px border-t text-14px outline-none max-w-full'>
+        className='min-h-54px px-8px py-10px whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-17px border-t border-t-white/20 text-14px outline-none max-w-full'>
       </div>
     </div>
   )
@@ -66,7 +69,9 @@ export default reactivity(function ContentEditableText() {
 
 function Message({ text }: { text: string }) {
   return (
-    <div className='rounded-4px bg-blue-4 w-max whitespace-pre-wrap word-wrap-break my-12px mx-12px p-10px'>
+    <div
+      className='rounded-4px bg-blue-4 max-w-fit whitespace-pre-wrap word-wrap-break my-12px mx-12px p-10px'
+    >
       {text}
     </div>
   )
@@ -76,11 +81,11 @@ type MessageType = {
   text: string
 }
 
-function transformContent(children: HTMLCollection) {
-  const text = Array
-    .from(children)
+function transformContent(element: HTMLElement) {
+  return Array
+    .from(element.childNodes)
     .map(node => {
-      if (node.nodeType === Node.TEXT_NODE) {
+      if (node.nodeType === Node.TEXT_NODE && node.textContent) {
         return node.textContent
       }
       if (node.nodeType === Node.ELEMENT_NODE && node.nodeName === 'BR') {
@@ -90,8 +95,6 @@ function transformContent(children: HTMLCollection) {
       }
     })
     .join('')
-
-  return text
 }
 
 
@@ -153,13 +156,13 @@ const useMessageStore = defineStore(() => {
 
 
 function getSelectionStartPosition() {
-  
+
 }
 
 function getSelectionEndPosition() {
-  
+
 }
 
 function getCaretPosition() {
-  
+
 }

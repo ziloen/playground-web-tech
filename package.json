@@ -14,7 +14,7 @@
     "@wai-ri/core": "^0.0.101",
     "@wai-ri/react": "^0.0.101",
     "ahooks": "^3.7.8",
-    "antd": "^5.9.3",
+    "antd": "^5.9.4",
     "clsx": "^2.0.0",
     "framer-motion": "^10.16.4",
     "i18next": "^23.5.1",
@@ -31,19 +31,19 @@
     "@iconify-json/carbon": "^1.1.21",
     "@testing-library/react": "^14.0.0",
     "@types/lodash-es": "^4.17.9",
-    "@types/react": "^18.2.23",
+    "@types/react": "^18.2.24",
     "@types/react-dom": "^18.2.8",
     "@unocss/reset": "^0.56.4",
     "@vitejs/plugin-react-swc": "^3.4.0",
-    "@ziloen/eslint-config-format": "^0.0.108",
-    "@ziloen/eslint-config-react": "^0.0.108",
+    "@ziloen/eslint-config-format": "^0.0.109",
+    "@ziloen/eslint-config-react": "^0.0.109",
     "dprint": "^0.41.0",
     "eslint": "^8.50.0",
     "jsdom": "^22.1.0",
-    "postcss": "^8.4.30",
+    "postcss": "^8.4.31",
     "postcss-preset-env": "^9.1.4",
     "sass": "^1.68.0",
-    "type-fest": "^4.3.2",
+    "type-fest": "^4.3.3",
     "typescript": "^5.2.2",
     "typescript-lib-enhancer": "^1.0.12",
     "unocss": "^0.56.4",
@@ -51,16 +51,13 @@
     "unplugin-auto-import": "^0.16.6",
     "vite": "^4.4.9",
     "vite-plugin-pages": "^0.31.0",
-    "vitest": "^0.34.5"
+    "vitest": "^0.34.6"
   },
   "eslintConfig": {
     "extends": [
       "@ziloen/eslint-config-react",
       "@ziloen/eslint-config-format"
     ],
-    "rules": {
-      "react/self-closing-comp": "off"
-    },
     "parserOptions": {
       "project": "./tsconfig.json"
     },
