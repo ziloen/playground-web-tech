@@ -1,12 +1,24 @@
-import { LiteralUnion, patternMatching } from '@wai-ri/core'
+/* eslint-disable unicorn/prefer-dom-node-text-content */
+import { useMotionValue } from 'framer-motion'
+import { InputEventInputType as InputType } from 'ts-lib-enhance'
 import { useEventListener } from '~/hooks'
 import { defineStore, reactivity, ref } from '~/stores'
+import styles from './contenteditable.module.scss'
 
+const MAX_LENGTH = 100
 
+const isChromium = (() => {
+  // @ts-expect-error useAgentData is non-standard now
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const brands = navigator.userAgentData?.brands as Array<{ brand: string }>
+  if (!brands) return false
+  return brands.some(({ brand }) => brand === 'Chromium')
+})()
 
 export default reactivity(function ContentEditableText() {
   const inputRef = useRef<HTMLDivElement>(null!)
   const messageStore = useMessageStore()
+  const currentLength = useMotionValue(0)
   const messages = messageStore.messages
 
   useEventListener('beforeinput', onBeforeInput, { target: inputRef })
@@ -14,16 +26,21 @@ export default reactivity(function ContentEditableText() {
   useEventListener('input', (e: InputEvent) => {
     const inputType = e.inputType as InputType
     if (inputType === 'insertParagraph') {
-      const text = transformContent(inputRef.current)
-      if (!text) return
-      messages.push({ text })
-      inputRef.current.innerHTML = ''
+      // const text = transformContent(inputRef.current)
+      // if (!text) return
+      // messages.push({ text })
+      // inputRef.current.innerHTML = ''
+      const mentions = getMentionsFromTarget(inputRef.current)
+      console.log(mentions)
     }
+
+    const length = inputRef.current.innerText.length ?? 0
+    currentLength.set(length)
   }, { target: inputRef })
 
-  useEffect(() => {
-    document.execCommand('defaultParagraphSeparator', false, 'br')
-  }, [])
+  // useEffect(() => {
+  //   document.execCommand('defaultParagraphSeparator', false, 'br')
+  // }, [])
 
   return (
     <div
@@ -53,13 +70,24 @@ export default reactivity(function ContentEditableText() {
       {/* [ ] max length */}
       {/* [ ] focus({ cursor: "start" | "end" | "all" | undefined }) */}
       {/* [ ] overflow issue when input */}
-      <div
-        ref={inputRef}
-        contentEditable
-        suppressContentEditableWarning
-        autoFocus
-        tabIndex={0}
-        className='min-h-54px px-8px py-10px whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-17px border-t border-t-white/20 text-14px outline-none max-w-full'>
+      {/* [ ] max length, crop text when pasting */}
+      <div className='border-t border-t-white/20 grid'>
+        <div
+          ref={inputRef}
+          contentEditable
+          suppressContentEditableWarning
+          autoFocus
+          data-placeholder='Type something...'
+          tabIndex={0}
+          className={clsx(
+            'min-h-54px px-8px py-10px focus:outline-blue-6 inline-block whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-17px text-14px outline-none max-w-full',
+            styles.contenteditable
+          )}>
+        </div>
+
+        <div className='flex justify-self-end mr-10px mb-10px'>
+          <motion.div>{currentLength}</motion.div>&nbsp;/&nbsp;{MAX_LENGTH}
+        </div>
       </div>
     </div>
   )
@@ -81,37 +109,61 @@ type MessageType = {
   text: string
 }
 
-function transformContent(element: HTMLElement) {
-  return Array
-    .from(element.childNodes)
-    .map(node => {
-      if (node.nodeType === Node.TEXT_NODE && node.textContent) {
-        return node.textContent
-      }
-      if (node.nodeType === Node.ELEMENT_NODE && node.nodeName === 'BR') {
-        return '\n'
-      } else {
-        return ''
-      }
-    })
-    .join('')
-}
-
-
 /** remove style before input */
 function onBeforeInput(e: InputEvent) {
-  const { inputType, dataTransfer, data } = e
-
+  const { dataTransfer, data } = e
+  const inputType = e.inputType as InputType
+  console.log(inputType, e)
   // prevent format input
   if (inputType.startsWith('format')) return e.preventDefault()
 
-  console.log('beforeinput', e)
+  const currentLength = (e.currentTarget as HTMLDivElement).innerText.length ?? 0
+
+  if (currentLength >= MAX_LENGTH && !inputType.startsWith('delete')) {
+    if (inputType === "insertCompositionText") {
+      // insertCompositionText can not be canceled
+    } else {
+      e.preventDefault()
+    }
+
+    return
+  }
+
+  // if (inputType === 'insertParagraph') {
+  //   e.preventDefault()
+  //   document.execCommand('insertHTML', false, '<br>')
+  //   return
+  // }
+
+  if (inputType === 'insertText' && data === '@') {
+    e.preventDefault()
+
+    if (isChromium) {
+      // do not use user-select: none in chrome, strange behavior
+      document.execCommand('insertText', false, ' ')
+
+      document.execCommand('insertHTML', false, '<span contenteditable="false" data-mention-id="qqq" class=" underline-white bg-green/20 underline select-text">@qqq</span>')
+      skipNonEditable()
+
+      document.execCommand('insertText', false, ' ')
+    } else {
+      const span = document.createElement('span')
+      span.contentEditable = 'false'
+      span.className = 'underline-white bg-green/20 underline select-text'
+      span.innerText = '@qqq'
+      span.dataset.mentionId = 'qqq'
+      insertNodeAtCaret(span)
+    }
+
+    return
+  }
 
   if (data || !dataTransfer) return
 
   if (inputType === 'insertFromPaste' || inputType === 'insertFromDrop') {
     const html = dataTransfer.getData('text/html')
     const text = dataTransfer.getData('text/plain')
+    // 
     if (!text) return e.preventDefault()
 
     if (html) {
@@ -130,20 +182,68 @@ function onBeforeInput(e: InputEvent) {
   }
 }
 
-// 具体参见 InputEvent.inputType 标准文档 https://rawgit.com/w3c/input-events/v1/index.html#interface-InputEvent-Attributes
-type InputType = LiteralUnion<
-  // 纯文本输入，输入内容在 data 属性中
-  | 'insertText'
-  // 中文等输入法合成阶段输入，输入内容在 data 属性中
-  | 'insertCompositionText'
-  // 从剪贴板粘贴，输入内容在 dataTransfer 属性中（Chrome 中没有？）
-  | 'insertFromPaste'
-  // backspace 键删除
-  | 'suppressContentEditableWarning'
-  // Ctrl + B 选中文字 变成/取消 粗体
-  // formatXxxx 均为修改文本样式 input
-  | 'formatBold'
->
+/** 
+ * skip contenteditable: false
+ * prevent caret stuck inside contenteditable: false element
+ */
+function skipNonEditable() {
+  const selection = window.getSelection()
+  if (!selection || !selection.isCollapsed) return
+
+  const node = selection.anchorNode
+  const parent = selection.anchorNode?.parentNode
+
+  if (
+    parent instanceof HTMLElement &&
+    parent.contentEditable === 'false'
+  ) {
+    selection.removeAllRanges()
+    const range = document.createRange()
+    range.setEndAfter(parent)
+    range.setEndAfter(parent)
+    range.collapse(false)
+    selection.addRange(range)
+  }/*  else if (
+    node instanceof HTMLElement &&
+    node.contentEditable === 'false'
+  ) {
+    selection.removeAllRanges()
+    const range = document.createRange()
+    range.setEndAfter(node)
+    range.setEndAfter(node)
+    range.collapse(false)
+    selection.addRange(range)
+  } */
+}
+
+
+
+function insertNodeAtCaret(node: Node) {
+  const selection = window.getSelection()
+  if (!selection) return
+
+  const range = selection.getRangeAt(selection.rangeCount - 1)
+  range.insertNode(node)
+  range.setStartAfter(node)
+  range.collapse(true)
+  selection.removeAllRanges()
+  selection.addRange(range)
+}
+
+
+function getMentionsFromTarget(target: HTMLElement) {
+  const mentions: string[] = []
+  const nodes = target.querySelectorAll('[data-mention-id]')
+
+  for (const node of nodes) {
+    if (!(node instanceof HTMLElement)) continue
+    const id = node.dataset.mentionId
+    if (!id) return
+    mentions.push(id)
+  }
+
+  return mentions
+}
 
 
 const useMessageStore = defineStore(() => {
@@ -166,3 +266,8 @@ function getSelectionEndPosition() {
 function getCaretPosition() {
 
 }
+
+function moveCaret(pos: number) {
+
+}
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1665167
