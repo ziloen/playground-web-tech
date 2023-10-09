@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/prefer-dom-node-text-content */
 import { useMotionValue } from 'framer-motion'
-import { InputEventInputType as InputType } from 'ts-lib-enhance'
+import { InputEventInputType as InputType, KeyboardEventKey } from 'ts-lib-enhance'
 import { useEventListener } from '~/hooks'
 import { defineStore, reactivity, ref } from '~/stores'
 import styles from './contenteditable.module.scss'
@@ -36,6 +36,19 @@ export default reactivity(function ContentEditableText() {
 
     const length = inputRef.current.innerText.length ?? 0
     currentLength.set(length)
+  }, { target: inputRef })
+
+
+  useEventListener('keydown', e => {
+    const key = e.key as KeyboardEventKey
+
+    if (key === 'Enter') {
+
+    }
+
+  }, { target: inputRef })
+
+  useEventListener('compositionstart', e => {
   }, { target: inputRef })
 
   // useEffect(() => {
@@ -80,9 +93,10 @@ export default reactivity(function ContentEditableText() {
           data-placeholder='Type something...'
           tabIndex={0}
           className={clsx(
-            'min-h-54px px-8px py-10px focus:outline-blue-6 inline-block whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-17px text-14px outline-none max-w-full',
+            'min-h-54px px-8px py-10px focus:outline-lightBlue-6 inline-block whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-17px text-14px outline-none max-w-full',
             styles.contenteditable
           )}>
+
         </div>
 
         <div className='flex justify-self-end mr-10px mb-10px'>
@@ -113,15 +127,15 @@ type MessageType = {
 function onBeforeInput(e: InputEvent) {
   const { dataTransfer, data } = e
   const inputType = e.inputType as InputType
-  console.log(inputType, e)
   // prevent format input
   if (inputType.startsWith('format')) return e.preventDefault()
 
   const currentLength = (e.currentTarget as HTMLDivElement).innerText.length ?? 0
 
   if (currentLength >= MAX_LENGTH && !inputType.startsWith('delete')) {
-    if (inputType === "insertCompositionText") {
+    if (inputType === 'insertCompositionText') {
       // insertCompositionText can not be canceled
+      truncToMaxLength(e.currentTarget as HTMLDivElement, MAX_LENGTH)
     } else {
       e.preventDefault()
     }
@@ -129,11 +143,13 @@ function onBeforeInput(e: InputEvent) {
     return
   }
 
-  // if (inputType === 'insertParagraph') {
-  //   e.preventDefault()
-  //   document.execCommand('insertHTML', false, '<br>')
-  //   return
-  // }
+  if (inputType === 'insertParagraph') {
+    e.preventDefault()
+    // document.execCommand('insertText', false, '\n')
+    const nl = document.createTextNode(" \n")
+    insertNodeAtCaret(nl)
+    return
+  }
 
   if (inputType === 'insertText' && data === '@') {
     e.preventDefault()
@@ -223,6 +239,7 @@ function insertNodeAtCaret(node: Node) {
   if (!selection) return
 
   const range = selection.getRangeAt(selection.rangeCount - 1)
+  range.deleteContents()
   range.insertNode(node)
   range.setStartAfter(node)
   range.collapse(true)
@@ -270,4 +287,15 @@ function getCaretPosition() {
 function moveCaret(pos: number) {
 
 }
+
+
+
+function truncToMaxLength(target: HTMLElement, maxLength: number) {
+  const length = target.innerText.length
+  if (length <= maxLength) return
+
+  target.innerText = target.innerText.slice(0, maxLength)
+}
+
+
 // https://bugzilla.mozilla.org/show_bug.cgi?id=1665167
