@@ -1,3 +1,8 @@
+// reference: 
+// https://github.com/sodenn/lexical-beautiful-mentions
+// https://github.com/facebook/lexical/blob/main/packages/lexical-playground/src/plugins/MentionsPlugin/index.tsx
+
+
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin'
 import { ClearEditorPlugin } from '@lexical/react/LexicalClearEditorPlugin'
 import { InitialConfigType, LexicalComposer } from '@lexical/react/LexicalComposer'
