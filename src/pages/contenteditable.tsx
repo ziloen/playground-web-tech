@@ -146,7 +146,7 @@ function onBeforeInput(e: InputEvent) {
   if (inputType === 'insertParagraph') {
     e.preventDefault()
     // document.execCommand('insertText', false, '\n')
-    const nl = document.createTextNode(" \n")
+    const nl = document.createTextNode(' \n')
     insertNodeAtCaret(nl)
     return
   }
@@ -211,7 +211,7 @@ function skipNonEditable() {
 
   if (
     parent instanceof HTMLElement &&
-    parent.contentEditable === 'false'
+    !parent.isContentEditable
   ) {
     selection.removeAllRanges()
     const range = document.createRange()
@@ -221,7 +221,7 @@ function skipNonEditable() {
     selection.addRange(range)
   }/*  else if (
     node instanceof HTMLElement &&
-    node.contentEditable === 'false'
+    !node.isContentEditable
   ) {
     selection.removeAllRanges()
     const range = document.createRange()
