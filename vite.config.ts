@@ -45,15 +45,15 @@ export default defineConfig(({ command, mode }) => {
         imports: [
           {
             react: [
-              'useState',
-              'useEffect',
-              'useMemo',
-              'useLayoutEffect',
-              'useCallback',
-              'useRef',
+              'Suspense',
               'forwardRef',
+              'useCallback',
+              'useEffect',
               'useImperativeHandle',
-              'Suspense'
+              'useLayoutEffect',
+              'useMemo',
+              'useRef',
+              'useState',
             ],
             'react-router-dom': ['useNavigate', 'useParams', 'useRoutes'],
             'framer-motion': ['motion', 'AnimatePresence'],

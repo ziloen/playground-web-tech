@@ -1,25 +1,18 @@
 import { ConfigProvider, theme } from 'antd'
 import { Suspense } from 'react'
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 import routes from '~react-pages'
 
-
-const routeElements = routes.map(route => (
-  <Route
-    key={route.path}
-    path={route.path}
-    element={route.element}
-  />
-))
+function Routes() {
+  return useRoutes(routes)
+}
 
 export default function App() {
   return (
     <HashRouter>
       <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
         <Suspense>
-          <Routes>
-            {routeElements}
-          </Routes>
+          <Routes />
         </Suspense>
       </ConfigProvider>
     </HashRouter>
