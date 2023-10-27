@@ -10,7 +10,9 @@ function Routes() {
 export default function App() {
   return (
     <HashRouter>
-      <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
+      <ConfigProvider
+        theme={{ algorithm: theme.darkAlgorithm }}
+      >
         <Suspense>
           <Routes />
         </Suspense>
