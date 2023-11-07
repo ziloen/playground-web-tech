@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@lexical/react": "^0.12.2",
+    "@radix-ui/react-select": "2.0.0",
     "@vitejs/plugin-legacy": "^4.1.1",
     "@vue/reactivity": "^3.3.8",
     "@wai-ri/core": "^0.0.101",
