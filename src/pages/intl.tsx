@@ -1,3 +1,4 @@
+import { ArrayType } from '@wai-ri/core'
 import { Select } from 'antd'
 import { useMotionValue } from 'framer-motion'
 
@@ -40,25 +41,33 @@ function LanguageSelect({
   onChange: (language: string) => void }
 ) {
   const options = useMemo(() => {
-    return Languages.map(lang => ({
-      label: (
-        <div className='flex-between items-center gap-2em'>
-          <span>{getLanguageDisplayName(language, lang)}</span>
-          <span>{getLanguageDisplayName(lang, lang)}</span>
-        </div>
-      ),
-      value: lang
-    }))
+    return Languages.map(lang => {
+      const nativeDisplayName = getLanguageDisplayName(lang, lang)
+      const displayName = getLanguageDisplayName(language, lang)
+
+      return {
+        label: (
+          <div className='flex-between items-center gap-2em'>
+            <span>{displayName}</span>
+            <span>{nativeDisplayName}</span>
+          </div>
+        ),
+        value: lang,
+        nativeDisplayName,
+        displayName,
+      }
+    })
   }, [language])
 
   return (
-    <Select<string>
+    <Select<string, ArrayType<typeof options>>
       defaultValue={language}
       options={options}
       onChange={onChange}
       popupMatchSelectWidth={false}
       placement="bottomRight"
       bordered={false}
+      optionLabelProp='nativeDisplayName'
     />
   )
 }
