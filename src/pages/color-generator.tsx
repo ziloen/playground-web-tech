@@ -1,6 +1,7 @@
 // 
 // https://uicolors.app
 
+
 import { ColorPicker, Input, Slider } from 'antd'
 import Color from 'colorjs.io'
 
@@ -22,7 +23,8 @@ export default function ColorGenerator() {
   }, [inputVal])
 
   const activeColor = useMemo(() => {
-    const activeColor = new Color(Color.mix(inputVal, '#000', .2, { space: 'oklab' }))
+    const inputColor = new Color(inputVal)
+    const activeColor = new Color(Color.mix(inputColor, '#000', .2, { space: 'oklab' }))
     return activeColor.toString()
   }, [inputVal])
 
