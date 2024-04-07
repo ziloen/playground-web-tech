@@ -36,18 +36,12 @@
   }
 
   &::-webkit-scrollbar-track {
+    /* border-radius - scrollbar-size / 2 */
     margin: calc(24px - var(--scrollbar-size) / 2);
   }
 
-  &::-webkit-scrollbar-track-piece {}
-
-  &::-webkit-scrollbar-button {
-    display: none;
-  }
-
+  &::-webkit-scrollbar-button,
   &::-webkit-scrollbar-corner {
     display: none;
   }
-
-  &::-webkit-resizer {}
 }
