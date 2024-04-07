@@ -1,28 +1,31 @@
 /* https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar */
 
 .scrollbar {
-  --sb-size: 9px;
+  --scrollbar-size: 10px;
+  --scrollbar-thumb-background-color: oklch(100% 0 0 / 0.2);
+  --scrollbar-thumb-background-color-active: oklch(100% 0 0 / 0.5);
 
   &::-webkit-scrollbar {
-    width: var(--sb-size);
-    height: var(--sb-size);
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
+    background: transparent;
   }
-
-  &::-webkit-scrollbar:horizontal {}
-
-  &::-webkit-scrollbar:vertical {}
 
   &::-webkit-scrollbar-thumb {
     /* hide when not hover */
     /* visibility: hidden; */
-    background-color: oklch(100% 0 0 / 0.2);
-    background-clip: content-box;
-    border-radius: 9999px;
-    border: 2px solid transparent;
+    background-color: var(--scrollbar-thumb-background-color);
+    background-clip: padding-box;
+    border-radius: var(--scrollbar-size);
 
-    &:hover {
-      background-color: oklch(100% 0 0 / 0.45);
-      background-clip: border-box;
+    border-width: 3px;
+    border-style: solid;
+    border-color: transparent;
+
+    &:hover,
+    &:active {
+      border-width: 1px;
+      background-color: var(--scrollbar-thumb-background-color-active);
     }
   }
 
@@ -33,7 +36,7 @@
   }
 
   &::-webkit-scrollbar-track {
-    margin: calc(24px - var(--sb-size) / 2);
+    margin: calc(24px - var(--scrollbar-size) / 2);
   }
 
   &::-webkit-scrollbar-track-piece {}
