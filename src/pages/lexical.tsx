@@ -1,33 +1,34 @@
-// reference: 
+// reference:
 // https://github.com/sodenn/lexical-beautiful-mentions
 // https://github.com/facebook/lexical/blob/main/packages/lexical-playground/src/plugins/MentionsPlugin/index.tsx
 
-
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin'
 import { ClearEditorPlugin } from '@lexical/react/LexicalClearEditorPlugin'
-import { InitialConfigType, LexicalComposer } from '@lexical/react/LexicalComposer'
+import type { InitialConfigType } from '@lexical/react/LexicalComposer'
+import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { EditorRefPlugin } from '@lexical/react/LexicalEditorRefPlugin'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin'
-import { LexicalTypeaheadMenuPlugin, MenuOption, useBasicTypeaheadTriggerMatch } from '@lexical/react/LexicalTypeaheadMenuPlugin'
-import { useMemoizedFn } from 'ahooks'
 import {
-  $applyNodeReplacement,
-  $getSelection,
-  CLEAR_EDITOR_COMMAND,
-  DecoratorNode,
+  LexicalTypeaheadMenuPlugin,
+  MenuOption,
+  useBasicTypeaheadTriggerMatch,
+} from '@lexical/react/LexicalTypeaheadMenuPlugin'
+import { useMemoizedFn } from 'ahooks'
+import type {
+  DOMConversionMap,
+  DOMConversionOutput,
+  DOMExportOutput,
+  EditorConfig,
   LexicalEditor,
+  NodeKey,
   SerializedLexicalNode,
+  Spread,
   TextNode,
-  type DOMConversionMap,
-  type DOMConversionOutput,
-  type DOMExportOutput,
-  type EditorConfig,
-  type NodeKey,
-  type Spread
 } from 'lexical'
+import { $applyNodeReplacement, $getSelection, CLEAR_EDITOR_COMMAND, DecoratorNode } from 'lexical'
 import { createPortal } from 'react-dom'
 
 type SerializedMentionNode = Spread<
@@ -38,7 +39,6 @@ type SerializedMentionNode = Spread<
   },
   SerializedLexicalNode
 >
-
 
 function convertMentionElement(
   domNode: HTMLElement,
@@ -73,7 +73,6 @@ class MentionNode extends DecoratorNode<JSX.Element> {
     return $createMentionNode(serializedNode.trigger, serializedNode.value, serializedNode.id)
   }
 
-
   exportDOM(): DOMExportOutput {
     const element = document.createElement('span')
 
@@ -85,7 +84,6 @@ class MentionNode extends DecoratorNode<JSX.Element> {
 
     return { element }
   }
-
 
   static importDOM(): DOMConversionMap | null {
     return {
@@ -126,7 +124,6 @@ class MentionNode extends DecoratorNode<JSX.Element> {
     // return dom
   }
 
-
   getTextContent(): string {
     return this.#trigger + this.#value
   }
@@ -164,7 +161,6 @@ class MentionNode extends DecoratorNode<JSX.Element> {
     return null
   }
 
-
   decorate(editor: LexicalEditor, config: EditorConfig): JSX.Element {
     return (
       <MentionComponent
@@ -176,7 +172,6 @@ class MentionNode extends DecoratorNode<JSX.Element> {
     )
   }
 
-
   isKeyboardSelectable(): boolean {
     return false
   }
@@ -187,7 +182,6 @@ function $createMentionNode(trigger: string, value: string, id: string): Mention
   // mentionNode.setMode('segmented').toggleDirectionless()
   return $applyNodeReplacement(mentionNode)
 }
-
 
 class MentionOptions extends MenuOption {
   constructor(id: string, public label: string, public avatar?: JSX.Element) {
@@ -201,11 +195,9 @@ const initialConfig: InitialConfigType = {
     console.error(error)
   },
   nodes: [
-    MentionNode
-  ]
+    MentionNode,
+  ],
 }
-
-
 
 function MentionsMenuItem({
   index,
@@ -220,19 +212,17 @@ function MentionsMenuItem({
   onMouseEnter: () => void
   option: MentionOptions
 }) {
-
   return (
     <div
       key={option.key}
       className={clsx(
         'whitespace-nowrap',
-        isSelected && 'bg-blueGray-7 text-white'
-
+        isSelected && 'bg-blueGray-7 text-white',
       )}
       // eslint-disable-next-line @typescript-eslint/unbound-method
       ref={option.setRefElement}
       tabIndex={-1}
-      role='option'
+      role="option"
       id={`mention-option-${index}`}
       onMouseEnter={onMouseEnter}
       onClick={onClick}
@@ -243,8 +233,6 @@ function MentionsMenuItem({
     </div>
   )
 }
-
-
 
 function useMentionLookupService(mentionString: string | null) {
   const [results, setResults] = useState<Array<string>>([])
@@ -266,8 +254,6 @@ function useMentionLookupService(mentionString: string | null) {
 
   return results
 }
-
-
 
 class LRUCache<K, V> extends Map<K, V> {
   constructor(
@@ -296,21 +282,15 @@ class LRUCache<K, V> extends Map<K, V> {
   }
 }
 
-
-
 function searchService(text: string) {
   const results = dummyMentionsData.filter(mention =>
-    mention.toLowerCase().includes(text.toLowerCase()),
+    mention.toLowerCase().includes(text.toLowerCase())
   )
 
   return results
 }
 
-
-
 const mentionsCache = new LRUCache<string, Array<string> | null>(100)
-
-
 
 const dummyMentionsData = [
   'Aayla Secura',
@@ -718,8 +698,6 @@ const dummyMentionsData = [
   'Zuckuss',
 ]
 
-
-
 function MentionComponent({ trigger, value, id, nodeKey }: {
   trigger: string
   value: string
@@ -727,13 +705,12 @@ function MentionComponent({ trigger, value, id, nodeKey }: {
   nodeKey: NodeKey
 }) {
   return (
-    <span className='text-black bg-green px-4px rounded-3px'>
-      {trigger}{value}
+    <span className="text-black bg-green px-4px rounded-3px">
+      {trigger}
+      {value}
     </span>
   )
 }
-
-
 
 export default function Editor() {
   const editorRef = useRef<LexicalEditor>(null)
@@ -747,7 +724,7 @@ export default function Editor() {
   })
 
   const checkMentionMatch = useBasicTypeaheadTriggerMatch('@', {
-    minLength: 0
+    minLength: 0,
   })
 
   function clearEditor() {
@@ -767,7 +744,7 @@ export default function Editor() {
     selectedOption: MentionOptions,
     nodeToReplace: TextNode | null,
     closeMenu: () => void,
-    matchingString: string
+    matchingString: string,
   ) => {
     const editor = editorRef.current
     if (!editor) return
@@ -786,7 +763,6 @@ export default function Editor() {
     })
   })
 
-
   function insertAt() {
     const editor = editorRef.current
     if (!editor) return
@@ -800,8 +776,8 @@ export default function Editor() {
   }
 
   return (
-    <div className='h-full px-12px py-12px flex flex-col gap-12px'>
-      <div className='relative'>
+    <div className="h-full px-12px py-12px flex flex-col gap-12px">
+      <div className="relative">
         <LexicalComposer initialConfig={initialConfig}>
           <PlainTextPlugin
             contentEditable={
@@ -819,7 +795,7 @@ export default function Editor() {
             menuRenderFn={(anchorElementRef, itemProps, matchingString) => {
               if (!anchorElementRef.current || !results.length) return null
               return createPortal(
-                <div className='bg-gray-8 absolute top-100% text-gray-3 max-h-400px overflow-y-auto overflow-x-hidden'>
+                <div className="bg-gray-8 absolute top-100% text-gray-3 max-h-400px overflow-y-auto overflow-x-hidden">
                   {options.map((option, i) => (
                     <MentionsMenuItem
                       index={i}
@@ -836,7 +812,7 @@ export default function Editor() {
                     />
                   ))}
                 </div>,
-                anchorElementRef.current
+                anchorElementRef.current,
               )
             }}
             onQueryChange={setQueryString}
@@ -856,9 +832,9 @@ export default function Editor() {
         </LexicalComposer>
       </div>
 
-      <div className='flex gap-10px'>
-        <button className='btn' onClick={clearEditor}>Clear</button>
-        <button className='btn' onClick={insertAt}>@</button>
+      <div className="flex gap-10px">
+        <button className="btn" onClick={clearEditor}>Clear</button>
+        <button className="btn" onClick={insertAt}>@</button>
       </div>
     </div>
   )

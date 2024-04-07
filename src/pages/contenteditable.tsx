@@ -1,9 +1,9 @@
 /* eslint-disable unicorn/prefer-dom-node-text-content */
 import { useMotionValue } from 'framer-motion'
-import { InputEventInputType as InputType, KeyboardEventKey } from 'ts-lib-enhance'
+import type { InputEventInputType as InputType, KeyboardEventKey } from 'ts-lib-enhance'
 import { useEventListener } from '~/hooks'
 import { defineStore, reactivity, ref } from '~/stores'
-import styles from './contenteditable.module.scss'
+import styles from './contenteditable.module.css'
 
 const MAX_LENGTH = 100
 

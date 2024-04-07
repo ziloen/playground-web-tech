@@ -1,14 +1,12 @@
 /// <reference types="vitest" />
 
-import legacy from '@vitejs/plugin-legacy'
 import react from '@vitejs/plugin-react-swc'
+import { Features } from 'lightningcss'
 import { resolve as r } from 'node:path'
-import PostcssPresetEnv from 'postcss-preset-env'
 import Unocss from 'unocss/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import { defineConfig } from 'vite'
 import Pages from 'vite-plugin-pages'
-
 
 export default defineConfig(({ command, mode }) => {
   const IS_PROD = process.env.NODE_ENV === 'production'
@@ -21,7 +19,7 @@ export default defineConfig(({ command, mode }) => {
       alias: {
         '~': r('src'),
         '~cwd': process.cwd(),
-      }
+      },
     },
 
     define: {
@@ -31,8 +29,8 @@ export default defineConfig(({ command, mode }) => {
     },
 
     plugins: [
-    // https://github.com/antfu/unocss
-    // see unocss.config.ts for config
+      // https://github.com/antfu/unocss
+      // see unocss.config.ts for config
       Unocss(),
 
       react(),
@@ -58,22 +56,24 @@ export default defineConfig(({ command, mode }) => {
             'react-router-dom': ['useNavigate', 'useParams', 'useRoutes'],
             'framer-motion': ['motion', 'AnimatePresence'],
             'react-i18next': ['useTranslation'],
-            clsx: ['clsx']
+            'clsx': ['clsx'],
           },
         ],
-        dts: 'src/types/auto-imports.d.ts'
+        dts: 'src/types/auto-imports.d.ts',
       }),
     ],
 
     css: {
-      postcss: {
-        plugins: [PostcssPresetEnv({ stage: 0 })]
-      }
+      devSourcemap: true,
+      transformer: 'lightningcss',
+      lightningcss: {
+        include: Features.Colors | Features.Nesting | Features.MediaQueries,
+      },
     },
 
     // https://github.com/vitest-dev/vitest
     test: {
-      environment: 'jsdom'
-    }
+      environment: 'jsdom',
+    },
   }
 })

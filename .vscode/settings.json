@@ -1,9 +1,9 @@
 {
   "[typescript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    "editor.defaultFormatter": "dprint.dprint"
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    "editor.defaultFormatter": "dprint.dprint"
   },
   // add @apply & @container to css atDirectives
   "css.customData": [

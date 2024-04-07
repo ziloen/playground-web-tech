@@ -1,0 +1,51 @@
+/* https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar */
+
+.scrollbar {
+  --sb-size: 9px;
+
+  &::-webkit-scrollbar {
+    width: var(--sb-size);
+    height: var(--sb-size);
+  }
+
+  &::-webkit-scrollbar:horizontal {}
+
+  &::-webkit-scrollbar:vertical {}
+
+  &::-webkit-scrollbar-thumb {
+    /* hide when not hover */
+    /* visibility: hidden; */
+    background-color: oklch(100% 0 0 / 0.2);
+    background-clip: content-box;
+    border-radius: 9999px;
+    border: 2px solid transparent;
+
+    &:hover {
+      background-color: oklch(100% 0 0 / 0.45);
+      background-clip: border-box;
+    }
+  }
+
+  &:hover {
+    &::-webkit-scrollbar-thumb {
+      /* visibility: visible; */
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    /* border-radius - scrollbar-width ÷ 2 */
+    margin: calc(24px - var(--sb-size) / 2);
+  }
+
+  &::-webkit-scrollbar-track-piece {}
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  &::-webkit-scrollbar-corner {
+    display: none;
+  }
+
+  &::-webkit-resizer {}
+}

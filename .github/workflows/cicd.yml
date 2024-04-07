@@ -33,30 +33,24 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
+      - uses: actions/checkout@v4
 
       - name: Set node version to ${{ matrix.node_version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: pnpm
 
       - name: Install
-        run: pnpm i
+        run: npm i
 
       - name: Lint
-        run: pnpm run lint
+        run: npm run lint
 
       - name: TypeCheck
-        run: pnpm run typecheck
+        run: npm run typecheck
 
       - name: Build
-        run: pnpm run build
+        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
