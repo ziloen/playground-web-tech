@@ -38,14 +38,11 @@ export default reactivity(function ContentEditableText() {
     currentLength.set(length)
   }, { target: inputRef })
 
-
   useEventListener('keydown', e => {
     const key = e.key as KeyboardEventKey
 
     if (key === 'Enter') {
-
     }
-
   }, { target: inputRef })
 
   useEventListener('compositionstart', e => {
@@ -57,24 +54,23 @@ export default reactivity(function ContentEditableText() {
 
   return (
     <div
-      className='grid h-full w-full'
+      className="grid size-full"
       style={{
         gridTemplateRows: 'minmax(0, 1fr) max-content',
         gridTemplateColumns: '1fr',
       }}
     >
       {/* add backdrop-filter blur */}
-      <div className='overflow-y-auto w-full relative'>
-        <div className='sticky top-0 flex-col flex w-full top-0 left-0 right-0 border-b border-b-white/20'>
-          <div className='backdrop-blur-8 bg-black/20 shrink-0 px-10px py-8px'>Chat room</div>
-          <div className='h-2px backdrop-blur-90 backdrop-saturate-105 backdrop-brightness-105'></div>
+      <div className="overflow-y-auto w-full relative">
+        <div className="sticky top-0 flex-col flex w-full top-0 left-0 right-0 border-b border-b-white/20">
+          <div className="backdrop-blur-[8px] bg-black/20 shrink-0 px-[10px] py-[8px]">
+            Chat room
+          </div>
+          <div className="h-[2px] backdrop-blur-[90px] backdrop-saturate-[1.05] backdrop-brightness-[1.05]">
+          </div>
         </div>
 
-        {
-          messages.map((m, i) => (
-            <Message key={i} text={m.text} />
-          ))
-        }
+        {messages.map((m, i) => <Message key={i} text={m.text} />)}
       </div>
 
       {/* [ ] drag to resize the height */}
@@ -84,22 +80,22 @@ export default reactivity(function ContentEditableText() {
       {/* [ ] focus({ cursor: "start" | "end" | "all" | undefined }) */}
       {/* [ ] overflow issue when input */}
       {/* [ ] max length, crop text when pasting */}
-      <div className='border-t border-t-white/20 grid'>
+      <div className="border-t border-t-white/20 grid">
         <div
           ref={inputRef}
           contentEditable
           suppressContentEditableWarning
           autoFocus
-          data-placeholder='Type something...'
+          data-placeholder="Type something..."
           tabIndex={0}
           className={clsx(
-            'min-h-54px px-8px py-10px focus:outline-lightBlue-6 inline-block whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-17px text-14px outline-none max-w-full',
+            'min-h-[54px] px-[8px] py-[10px] focus:outline-lightBlue-6 inline-block whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-[17px] text-[14px] outline-none max-w-full',
             styles.contenteditable
-          )}>
-
+          )}
+        >
         </div>
 
-        <div className='flex justify-self-end mr-10px mb-10px'>
+        <div className="flex justify-self-end mr-[10px] mb-[10px]">
           <motion.div>{currentLength}</motion.div>&nbsp;/&nbsp;{MAX_LENGTH}
         </div>
       </div>
@@ -107,13 +103,9 @@ export default reactivity(function ContentEditableText() {
   )
 })
 
-
-
 function Message({ text }: { text: string }) {
   return (
-    <div
-      className='rounded-4px bg-blue-4 max-w-fit whitespace-pre-wrap word-wrap-break my-12px mx-12px p-10px'
-    >
+    <div className="rounded-[4px] bg-blue-4 max-w-fit whitespace-pre-wrap word-wrap-break my-[12px] mx-[12px] p-[10px]">
       {text}
     </div>
   )
@@ -158,7 +150,11 @@ function onBeforeInput(e: InputEvent) {
       // do not use user-select: none in chrome, strange behavior
       document.execCommand('insertText', false, ' ')
 
-      document.execCommand('insertHTML', false, '<span contenteditable="false" data-mention-id="qqq" class=" underline-white bg-green/20 underline select-text">@qqq</span>')
+      document.execCommand(
+        'insertHTML',
+        false,
+        '<span contenteditable="false" data-mention-id="qqq" class=" underline-white bg-green/20 underline select-text">@qqq</span>'
+      )
       skipNonEditable()
 
       document.execCommand('insertText', false, ' ')
@@ -179,7 +175,7 @@ function onBeforeInput(e: InputEvent) {
   if (inputType === 'insertFromPaste' || inputType === 'insertFromDrop') {
     const html = dataTransfer.getData('text/html')
     const text = dataTransfer.getData('text/plain')
-    // 
+    //
     if (!text) return e.preventDefault()
 
     if (html) {
@@ -198,7 +194,7 @@ function onBeforeInput(e: InputEvent) {
   }
 }
 
-/** 
+/**
  * skip contenteditable: false
  * prevent caret stuck inside contenteditable: false element
  */
@@ -210,8 +206,8 @@ function skipNonEditable() {
   const parent = selection.anchorNode?.parentNode
 
   if (
-    parent instanceof HTMLElement &&
-    !parent.isContentEditable
+    parent instanceof HTMLElement
+    && !parent.isContentEditable
   ) {
     selection.removeAllRanges()
     const range = document.createRange()
@@ -219,7 +215,7 @@ function skipNonEditable() {
     range.setEndAfter(parent)
     range.collapse(false)
     selection.addRange(range)
-  }/*  else if (
+  } /*  else if (
     node instanceof HTMLElement &&
     !node.isContentEditable
   ) {
@@ -231,8 +227,6 @@ function skipNonEditable() {
     selection.addRange(range)
   } */
 }
-
-
 
 function insertNodeAtCaret(node: Node) {
   const selection = window.getSelection()
@@ -246,7 +240,6 @@ function insertNodeAtCaret(node: Node) {
   selection.removeAllRanges()
   selection.addRange(range)
 }
-
 
 function getMentionsFromTarget(target: HTMLElement) {
   const mentions: string[] = []
@@ -262,7 +255,6 @@ function getMentionsFromTarget(target: HTMLElement) {
   return mentions
 }
 
-
 const useMessageStore = defineStore(() => {
   const messages = ref<MessageType[]>([])
 
@@ -271,24 +263,17 @@ const useMessageStore = defineStore(() => {
   }
 })
 
-
 function getSelectionStartPosition() {
-
 }
 
 function getSelectionEndPosition() {
-
 }
 
 function getCaretPosition() {
-
 }
 
 function moveCaret(pos: number) {
-
 }
-
-
 
 function truncToMaxLength(target: HTMLElement, maxLength: number) {
   const length = target.innerText.length
@@ -296,6 +281,5 @@ function truncToMaxLength(target: HTMLElement, maxLength: number) {
 
   target.innerText = target.innerText.slice(0, maxLength)
 }
-
 
 // https://bugzilla.mozilla.org/show_bug.cgi?id=1665167

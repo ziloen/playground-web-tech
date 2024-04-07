@@ -53,12 +53,12 @@ export default function IntlPage() {
   return (
     <div className="w-full h-full flex flex-col">
       {/* Header */}
-      <div className="px-20px py-8px bg-white/10 flex-between items-center">
+      <div className="px-[20px] py-[8px] bg-white/10 flex-between items-center">
         <div>Intl</div>
         <LanguageSelect language={language} onChange={setLanguage} />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-20px py-10px">
+      <div className="flex-1 overflow-y-auto px-[20px] py-[10px]">
         <TimeNow language={language} />
       </div>
     </div>

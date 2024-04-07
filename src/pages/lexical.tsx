@@ -41,7 +41,7 @@ type SerializedMentionNode = Spread<
 >
 
 function convertMentionElement(
-  domNode: HTMLElement,
+  domNode: HTMLElement
 ): DOMConversionOutput | null {
   // const textContent = domNode.textContent
   const trigger = domNode.dataset.mentionTrigger
@@ -217,7 +217,7 @@ function MentionsMenuItem({
       key={option.key}
       className={clsx(
         'whitespace-nowrap',
-        isSelected && 'bg-blueGray-7 text-white',
+        isSelected && 'bg-blueGray-7 text-white'
       )}
       // eslint-disable-next-line @typescript-eslint/unbound-method
       ref={option.setRefElement}
@@ -258,7 +258,7 @@ function useMentionLookupService(mentionString: string | null) {
 class LRUCache<K, V> extends Map<K, V> {
   constructor(
     public capacity: number,
-    iterable?: Iterable<readonly [K, V]> | null,
+    iterable?: Iterable<readonly [K, V]> | null
   ) {
     super(iterable)
   }
@@ -705,7 +705,7 @@ function MentionComponent({ trigger, value, id, nodeKey }: {
   nodeKey: NodeKey
 }) {
   return (
-    <span className="text-black bg-green px-4px rounded-3px">
+    <span className="text-black bg-green px-[4px] rounded-[3px]">
       {trigger}
       {value}
     </span>
@@ -744,7 +744,7 @@ export default function Editor() {
     selectedOption: MentionOptions,
     nodeToReplace: TextNode | null,
     closeMenu: () => void,
-    matchingString: string,
+    matchingString: string
   ) => {
     const editor = editorRef.current
     if (!editor) return
@@ -776,7 +776,7 @@ export default function Editor() {
   }
 
   return (
-    <div className="h-full px-12px py-12px flex flex-col gap-12px">
+    <div className="h-full px-[12px] py-[12px] flex flex-col gap-[12px]">
       <div className="relative">
         <LexicalComposer initialConfig={initialConfig}>
           <PlainTextPlugin
@@ -785,7 +785,7 @@ export default function Editor() {
             }
             ErrorBoundary={LexicalErrorBoundary}
             placeholder={
-              <div className="absolute text-#bbbbbe w-max dark:text-#5e5e60 select-none pointer-events-none text-14px text-ellipsis whitespace-nowrap top-6px left-16px">
+              <div className="absolute text-#bbbbbe w-max dark:text-[#5e5e60] select-none pointer-events-none text-[14px] text-ellipsis whitespace-nowrap top-[6px] left-[16px]">
                 {'Placeholder'}
               </div>
             }
@@ -795,7 +795,7 @@ export default function Editor() {
             menuRenderFn={(anchorElementRef, itemProps, matchingString) => {
               if (!anchorElementRef.current || !results.length) return null
               return createPortal(
-                <div className="bg-gray-8 absolute top-100% text-gray-3 max-h-400px overflow-y-auto overflow-x-hidden">
+                <div className="bg-gray-8 absolute top-full text-gray-3 max-h-[400px] overflow-y-auto overflow-x-hidden">
                   {options.map((option, i) => (
                     <MentionsMenuItem
                       index={i}
@@ -812,7 +812,7 @@ export default function Editor() {
                     />
                   ))}
                 </div>,
-                anchorElementRef.current,
+                anchorElementRef.current
               )
             }}
             onQueryChange={setQueryString}
@@ -832,7 +832,7 @@ export default function Editor() {
         </LexicalComposer>
       </div>
 
-      <div className="flex gap-10px">
+      <div className="flex gap-[10px]">
         <button className="btn" onClick={clearEditor}>Clear</button>
         <button className="btn" onClick={insertAt}>@</button>
       </div>

@@ -1,6 +1,5 @@
-// 
+//
 // https://uicolors.app
-
 
 import { ColorPicker, Input, Slider } from 'antd'
 import Color from 'colorjs.io'
@@ -29,7 +28,7 @@ export default function ColorGenerator() {
   }, [inputVal])
 
   return (
-    <div className='grid place-items-center h-full size-full w-full place-content-center'>
+    <div className="grid place-items-center h-full size-full w-full place-content-center">
       <Input value={inputVal} onChange={e => setInputVal(e.currentTarget.value)} />
 
       <div>
@@ -37,19 +36,20 @@ export default function ColorGenerator() {
       </div>
 
       <button
-        className='px-8px py-4px bg-$bg hover:bg-$hover-bg active:bg-$active-bg'
+        className="px-8px py-4px bg-$bg hover:bg-$hover-bg active:bg-$active-bg"
         style={{
           '--bg': bgColor,
           '--hover-bg': hoverColor,
           '--active-bg': activeColor,
         }}
-      >Test Button</button>
+      >
+        Test Button
+      </button>
 
       <ColorCompare />
     </div>
   )
 }
-
 
 const colorPalette = [
   ['#00F260', '#0575E6'],
@@ -66,7 +66,10 @@ function ColorCompare() {
   const [steps, setSteps] = useState(30)
   const [[startColor, endColor], setGradient] = useState(['#ffffff', '#000000'])
 
-  const [start, end] = useMemo(() => [new Color(startColor), new Color(endColor)], [startColor, endColor])
+  const [start, end] = useMemo(() => [new Color(startColor), new Color(endColor)], [
+    startColor,
+    endColor,
+  ])
 
   const gradients = useMemo(() => {
     return colorSpaces.map(space => {
@@ -80,31 +83,30 @@ function ColorCompare() {
             const color = range(i / steps)
             return color.toString()
           })
-          .join(',')
+          .join(','),
       }
     })
   }, [start, end, steps])
 
-
   return (
     <div>
-      <div className='w-200px'>
+      <div className="w-200px">
         <Slider value={steps} min={3} max={100} onChange={setSteps} />
       </div>
 
-      <div className='flex-align gap-6px'>
+      <div className="flex-align gap-6px">
         {colorPalette.map(([start, end], i) => (
           <div
             key={i}
-            className='flex border cursor-pointer'
+            className="flex border cursor-pointer"
             onClick={() => setGradient([start, end])}
           >
             <div
-              className='w-16px h-16px'
+              className="w-16px h-16px"
               style={{ background: start }}
             />
             <div
-              className='w-16px h-16px'
+              className="w-16px h-16px"
               style={{ background: end }}
             />
           </div>
@@ -115,7 +117,11 @@ function ColorCompare() {
         {gradients.map(({ name, gradient }) => (
           <div key={name} className="flex-between items-center w-[300px]">
             <div>{name}</div>
-            <div className='w-[200px] h-[16px] rounded-4px' style={{ background: 'linear-gradient(to right, var(--stops))', '--stops': gradient }}></div>
+            <div
+              className="w-[200px] h-[16px] rounded-4px"
+              style={{ background: 'linear-gradient(to right, var(--stops))', '--stops': gradient }}
+            >
+            </div>
           </div>
         ))}
       </div>

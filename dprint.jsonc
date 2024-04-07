@@ -11,8 +11,23 @@
     "newLineKind": "lf",
     "useBraces": "maintain",
     "module.sortImportDeclarations": "maintain",
+    // #region "trailingCommas"
+    "trailingCommas": "onlyMultiLine",
+    "arguments.trailingCommas": "never",
+    "parameters.trailingCommas": "never",
+    "importDeclaration.trailingCommas": "onlyMultiLine",
+    // #endregion
+    "jsx.multiLineParens": "prefer",
     "importDeclaration.sortNamedImports": "maintain",
-    "importDeclaration.trailingCommas": "onlyMultiLine"
+    "operatorPosition": "nextLine",
+    "jsx.bracketPosition": "nextLine",
+    "spaceAround": false,
+    "spaceSurroundingProperties": true,
+    "binaryExpression.spaceSurroundingBitwiseAndArithmeticOperator": true,
+    "commentLine.forceSpaceAfterSlashes": true,
+    "constructor.spaceBeforeParentheses": false,
+    "constructorType.spaceAfterNewKeyword": true,
+    "constructSignature.spaceAfterNewKeyword": true
   },
   "excludes": [
     "**/node_modules"

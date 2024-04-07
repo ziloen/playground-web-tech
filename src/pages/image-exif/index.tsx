@@ -1,11 +1,7 @@
-
-
 export default function ImageEXIF() {
-
   return (
     <div>
-      ImageEXIF
-      dajdoiwjadoawoijdi
+      ImageEXIF dajdoiwjadoawoijdi
     </div>
   )
 }

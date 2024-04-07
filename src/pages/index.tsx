@@ -12,10 +12,8 @@ export default function Index() {
 
   return (
     <div>
-      <div className='flex flex-col'>
-        {flattenedRoutes.map(route => (
-          <Link to={route} key={route}>{route}</Link>
-        ))}
+      <div className="flex flex-col items-start">
+        {flattenedRoutes.map(route => <Link to={route} key={route}>{route}</Link>)}
       </div>
     </div>
   )
