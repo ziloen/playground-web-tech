@@ -33,7 +33,6 @@
   }
 
   &::-webkit-scrollbar-track {
-    /* border-radius - scrollbar-width ÷ 2 */
     margin: calc(24px - var(--sb-size) / 2);
   }
 

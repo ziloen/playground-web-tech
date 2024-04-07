@@ -11,7 +11,12 @@ export default function App() {
   return (
     <HashRouter>
       <ConfigProvider
-        theme={{ algorithm: theme.darkAlgorithm }}
+        theme={{
+          algorithm: theme.darkAlgorithm,
+          token: {
+            motion: false,
+          },
+        }}
       >
         <Suspense>
           <Routes />
@@ -20,4 +25,3 @@ export default function App() {
     </HashRouter>
   )
 }
-

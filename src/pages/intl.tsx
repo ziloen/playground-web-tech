@@ -4,12 +4,47 @@ import { useMotionValue } from 'framer-motion'
 
 const Languages = [
   'en',
-  'es',
   'zh-Hans',
   'zh-Hant',
+  'hi',
+  'es',
   'fr',
-  'ja',
+  'ar',
+  'bn',
+  'ru',
+  'pt',
+  'id',
+  'ur',
+  'mr',
+  'tr',
+  'ta',
+  'th',
+  'vi',
+  'it',
   'ko',
+  'de',
+  'fa',
+  'jv',
+  'gu',
+  'te',
+  'kn',
+  'pl',
+  'or',
+  'ms',
+  'my',
+  'kk',
+  'sr',
+  'ha',
+  'am',
+  'uk',
+  'ne',
+  'nl',
+  'yo',
+  'pa',
+  'si',
+  'ny',
+  'kmr',
+  'sdh',
 ]
 
 export default function IntlPage() {
@@ -38,22 +73,24 @@ function LanguageSelect({
   onChange: (language: string) => void
 }) {
   const options = useMemo(() => {
-    return Languages.map(lang => {
-      const nativeDisplayName = getLanguageDisplayName(lang, lang)
-      const displayName = getLanguageDisplayName(language, lang)
+    return Intl.DisplayNames.supportedLocalesOf(Languages, { localeMatcher: 'best fit' }).map(
+      lang => {
+        const nativeDisplayName = getLanguageDisplayName(lang, lang)
+        const displayName = getLanguageDisplayName(language, lang)
 
-      return {
-        label: (
-          <div className="flex-between items-center gap-2em">
-            <span>{displayName}</span>
-            <span>{nativeDisplayName}</span>
-          </div>
-        ),
-        value: lang,
-        nativeDisplayName,
-        displayName,
-      }
-    })
+        return {
+          label: (
+            <div className="flex-between items-center gap-2em">
+              <span>{displayName}</span>
+              <span>{nativeDisplayName}</span>
+            </div>
+          ),
+          value: lang,
+          nativeDisplayName,
+          displayName,
+        }
+      },
+    )
   }, [language])
 
   return (
@@ -105,6 +142,9 @@ function getLanguageDisplayName(
   displayLanguage: string,
   language: string,
 ) {
-  const displayNames = new Intl.DisplayNames([displayLanguage], { type: 'language' })
+  const displayNames = new Intl.DisplayNames([displayLanguage], {
+    type: 'language',
+    languageDisplay: 'dialect',
+  })
   return displayNames.of(language)
 }
