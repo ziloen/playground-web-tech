@@ -71,6 +71,10 @@ export default defineConfig(({ command, mode }) => {
       },
     },
 
+    build: {
+      cssMinify: 'lightningcss',
+    },
+
     // https://github.com/vitest-dev/vitest
     test: {
       environment: 'jsdom',
