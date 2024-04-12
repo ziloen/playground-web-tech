@@ -10,6 +10,8 @@
   },
   "type": "module",
   "dependencies": {
+    "@fontsource-variable/fira-code": "5.0.17",
+    "@fontsource-variable/noto-sans-sc": "5.0.5",
     "@lexical/react": "^0.14.3",
     "@radix-ui/react-select": "2.0.0",
     "@vitejs/plugin-legacy": "^5.3.2",
