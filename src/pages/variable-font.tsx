@@ -8,10 +8,9 @@ export default function VariableFont() {
   return (
     <div>
       <div>
-
       </div>
 
-      <div className='flex items-center'>
+      <div className="flex items-center">
         <span>wght</span>
 
         <input
@@ -29,7 +28,6 @@ export default function VariableFont() {
       <motion.div
         style={{
           fontWeight: wght,
-          fontVariationSettings: `'wght' var(--wght)`,
         }}
       >
         <pre className="my-2">
