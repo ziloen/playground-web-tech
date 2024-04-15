@@ -217,7 +217,7 @@ function MentionsMenuItem({
       key={option.key}
       className={clsx(
         'whitespace-nowrap',
-        isSelected && 'bg-blueGray-7 text-white'
+        isSelected && 'bg-dark-gray-100 text-white'
       )}
       // eslint-disable-next-line @typescript-eslint/unbound-method
       ref={option.setRefElement}
@@ -705,7 +705,7 @@ function MentionComponent({ trigger, value, id, nodeKey }: {
   nodeKey: NodeKey
 }) {
   return (
-    <span className="text-black bg-green px-[4px] rounded-[3px]">
+    <span className="text-black bg-green-700 px-[4px] rounded-[3px]">
       {trigger}
       {value}
     </span>
@@ -781,11 +781,11 @@ export default function Editor() {
         <LexicalComposer initialConfig={initialConfig}>
           <PlainTextPlugin
             contentEditable={
-              <ContentEditable className="outline-none z-1 focus:outline-green cursor-text text-[14px] leading-[21px] px-[16px] py-[6px] resize-none transition-all" />
+              <ContentEditable className="outline-none z-1 focus:outline-green-600 cursor-text text-[14px] leading-[21px] px-[16px] py-[6px] resize-none transition-all" />
             }
             ErrorBoundary={LexicalErrorBoundary}
             placeholder={
-              <div className="absolute text-#bbbbbe w-max dark:text-[#5e5e60] select-none pointer-events-none text-[14px] text-ellipsis whitespace-nowrap top-[6px] left-[16px]">
+              <div className="absolute text-[#bbbbbe] w-max dark:text-[#5e5e60] select-none pointer-events-none text-[14px] text-ellipsis whitespace-nowrap top-[6px] left-[16px]">
                 {'Placeholder'}
               </div>
             }
@@ -795,7 +795,7 @@ export default function Editor() {
             menuRenderFn={(anchorElementRef, itemProps, matchingString) => {
               if (!anchorElementRef.current || !results.length) return null
               return createPortal(
-                <div className="bg-gray-8 absolute top-full text-gray-3 max-h-[400px] overflow-y-auto overflow-x-hidden">
+                <div className="bg-dark-gray-700 absolute top-full text-gray-3 max-h-[400px] overflow-y-auto overflow-x-hidden">
                   {options.map((option, i) => (
                     <MentionsMenuItem
                       index={i}

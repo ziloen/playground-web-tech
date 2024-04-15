@@ -62,7 +62,7 @@ export default reactivity(function ContentEditableText() {
     >
       {/* add backdrop-filter blur */}
       <div className="overflow-y-auto w-full relative">
-        <div className="sticky top-0 flex-col flex w-full top-0 left-0 right-0 border-b border-b-white/20">
+        <div className="sticky flex-col flex w-full top-0 left-0 right-0 border-b border-b-white/20">
           <div className="backdrop-blur-[8px] bg-black/20 shrink-0 px-[10px] py-[8px]">
             Chat room
           </div>

@@ -3,7 +3,7 @@
 import react from '@vitejs/plugin-react-swc'
 import { Features } from 'lightningcss'
 import { resolve as r } from 'node:path'
-import Unocss from 'unocss/vite'
+import tailwindcss from 'tailwindcss'
 import AutoImport from 'unplugin-auto-import/vite'
 import { defineConfig } from 'vite'
 import Pages from 'vite-plugin-pages'
@@ -29,10 +29,6 @@ export default defineConfig(({ command, mode }) => {
     },
 
     plugins: [
-      // https://github.com/antfu/unocss
-      // see unocss.config.ts for config
-      Unocss(),
-
       react(),
 
       // https://github.com/hannoeru/vite-plugin-pages
@@ -65,9 +61,12 @@ export default defineConfig(({ command, mode }) => {
 
     css: {
       devSourcemap: true,
-      transformer: 'lightningcss',
-      lightningcss: {
-        include: Features.Colors | Features.Nesting | Features.MediaQueries,
+      // transformer: 'lightningcss',
+      // lightningcss: {
+      //   include: Features.Colors | Features.Nesting | Features.MediaQueries,
+      // },
+      postcss: {
+        plugins: [tailwindcss()],
       },
     },
 
