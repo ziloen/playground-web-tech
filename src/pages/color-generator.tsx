@@ -20,8 +20,8 @@ export default function ColorGenerator() {
     const activeColor = color.clone()
     activeColor.oklch.l += 0.08
 
-    const whiteContrast = Color.contrast(color, 'white', 'WCAG21')
-    const blackContrast = Color.contrast(color, 'black', 'WCAG21')
+    const whiteContrast = Math.abs(Color.contrast(color, 'white', 'APCA'))
+    const blackContrast = Math.abs(Color.contrast(color, 'black', 'APCA'))
     const textColor = whiteContrast > blackContrast ? 'white' : 'black'
 
     return {
