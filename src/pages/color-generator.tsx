@@ -11,21 +11,25 @@ export default function ColorGenerator() {
     console.log(Color.spaces)
   }, [])
 
-  const bgColor = useMemo(() => {
+  const { bgColor, activeColor, hoverColor, textColor } = useMemo(() => {
     const color = new Color(inputVal)
-    return color.toString()
-  }, [inputVal])
 
-  const hoverColor = useMemo(() => {
-    const color = new Color(inputVal)
-    color.oklch.l += 0.04
-    return color.toString()
-  }, [inputVal])
+    const hoverColor = color.clone()
+    hoverColor.oklch.l += 0.04
 
-  const activeColor = useMemo(() => {
-    const color = new Color(inputVal)
-    color.oklch.l += 0.08
-    return color.toString()
+    const activeColor = color.clone()
+    activeColor.oklch.l += 0.08
+
+    const whiteContrast = Color.contrast(color, 'white', 'WCAG21')
+    const blackContrast = Color.contrast(color, 'black', 'WCAG21')
+    const textColor = whiteContrast > blackContrast ? 'white' : 'black'
+
+    return {
+      bgColor: color.toString(),
+      hoverColor: hoverColor.toString(),
+      activeColor: activeColor.toString(),
+      textColor: textColor,
+    }
   }, [inputVal])
 
   return (
@@ -43,11 +47,12 @@ export default function ColorGenerator() {
       </div>
 
       <button
-        className="px-[8px] py-[4px] bg-[--bg] hover:bg-[--hover-bg] active:bg-[--active-bg]"
+        className="px-[8px] py-[4px] bg-[--bg] hover:bg-[--hover-bg] active:bg-[--active-bg] text-[--text]"
         style={{
           '--bg': bgColor,
           '--hover-bg': hoverColor,
           '--active-bg': activeColor,
+          '--text': textColor,
         }}
       >
         Test Button
@@ -79,11 +84,6 @@ const colorSpaces = [
 function ColorCompare() {
   const [steps, setSteps] = useState(10)
   const [[startColor, endColor], setGradient] = useState(['#ffffff', '#000000'])
-
-  const [start, end] = useMemo(() => [new Color(startColor), new Color(endColor)], [
-    startColor,
-    endColor,
-  ])
 
   const gradients = useMemo(() => {
     return colorSpaces.map(space => ({
