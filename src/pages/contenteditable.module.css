@@ -1,4 +1,4 @@
 .contenteditable:empty::before {
   content: attr(data-placeholder);
-  color: #aaa;
+  color: oklch(73.8% 0 0);
 }

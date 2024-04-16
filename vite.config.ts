@@ -1,7 +1,6 @@
 /// <reference types="vitest" />
 
 import react from '@vitejs/plugin-react-swc'
-import { Features } from 'lightningcss'
 import { resolve as r } from 'node:path'
 import tailwindcss from 'tailwindcss'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -32,7 +31,9 @@ export default defineConfig(({ command, mode }) => {
       react(),
 
       // https://github.com/hannoeru/vite-plugin-pages
-      Pages(),
+      Pages({
+        importMode: 'async',
+      }),
 
       // https://github.com/antfu/unplugin-auto-import
       AutoImport({

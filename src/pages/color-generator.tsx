@@ -5,7 +5,7 @@ import { ColorPicker, Input, Slider } from 'antd'
 import Color from 'colorjs.io'
 
 export default function ColorGenerator() {
-  const [inputVal, setInputVal] = useState('#fff')
+  const [inputVal, setInputVal] = useState('#8519F1')
 
   useEffect(() => {
     console.log(Color.spaces)
@@ -17,26 +17,33 @@ export default function ColorGenerator() {
   }, [inputVal])
 
   const hoverColor = useMemo(() => {
-    const hoverColor = new Color(Color.mix(inputVal, '#000', .1, { space: 'oklab' }))
-    return hoverColor.toString()
+    const color = new Color(inputVal)
+    color.oklch.l += 0.04
+    return color.toString()
   }, [inputVal])
 
   const activeColor = useMemo(() => {
-    const inputColor = new Color(inputVal)
-    const activeColor = new Color(Color.mix(inputColor, '#000', .2, { space: 'oklab' }))
-    return activeColor.toString()
+    const color = new Color(inputVal)
+    color.oklch.l += 0.08
+    return color.toString()
   }, [inputVal])
 
   return (
     <div className="grid place-items-center h-full size-full w-full place-content-center">
-      <Input value={inputVal} onChange={e => setInputVal(e.currentTarget.value)} />
-
-      <div>
-        hover: {}
+      <div className="flex gap-2">
+        <Input value={inputVal} onChange={e => setInputVal(e.currentTarget.value)} />
+        <ColorPicker
+          value={inputVal}
+          onChange={e => {
+            setInputVal(e.toRgbString())
+          }}
+          destroyTooltipOnHide
+          placement="topRight"
+        />
       </div>
 
       <button
-        className="px-8px py-4px bg-$bg hover:bg-$hover-bg active:bg-$active-bg"
+        className="px-[8px] py-[4px] bg-[--bg] hover:bg-[--hover-bg] active:bg-[--active-bg]"
         style={{
           '--bg': bgColor,
           '--hover-bg': hoverColor,
@@ -61,9 +68,16 @@ const colorPalette = [
   ['#FC5C7D', '#6A82FB'],
 ]
 
+const colorSpaces = [
+  'oklch',
+  'oklab',
+  'lch',
+  'hsl',
+  'srgb',
+]
+
 function ColorCompare() {
-  const colorSpaces = useMemo(() => ['oklab', 'oklch', 'lch', 'hsl', 'srgb'], [])
-  const [steps, setSteps] = useState(30)
+  const [steps, setSteps] = useState(10)
   const [[startColor, endColor], setGradient] = useState(['#ffffff', '#000000'])
 
   const [start, end] = useMemo(() => [new Color(startColor), new Color(endColor)], [
@@ -72,29 +86,14 @@ function ColorCompare() {
   ])
 
   const gradients = useMemo(() => {
-    return colorSpaces.map(space => {
-      const range = start.range(end, { space, outputSpace: 'srgb' })
-
-      return {
-        name: Color.spaces[space].name,
-        gradient: Array
-          .from({ length: steps + 1 })
-          .map((_, i) => {
-            const color = range(i / steps)
-            return color.toString()
-          })
-          .join(','),
-      }
-    })
-  }, [start, end, steps])
+    return colorSpaces.map(space => ({
+      name: Color.spaces[space].name,
+    }))
+  }, [])
 
   return (
     <div>
-      <div className="w-200px">
-        <Slider value={steps} min={3} max={100} onChange={setSteps} />
-      </div>
-
-      <div className="flex-align gap-6px">
+      <div className="flex-align gap-[6px]">
         {colorPalette.map(([start, end], i) => (
           <div
             key={i}
@@ -102,11 +101,11 @@ function ColorCompare() {
             onClick={() => setGradient([start, end])}
           >
             <div
-              className="w-16px h-16px"
+              className="w-[16px] h-[16px]"
               style={{ background: start }}
             />
             <div
-              className="w-16px h-16px"
+              className="w-[16px] h-[16px]"
               style={{ background: end }}
             />
           </div>
@@ -114,12 +113,17 @@ function ColorCompare() {
       </div>
 
       <div>
-        {gradients.map(({ name, gradient }) => (
+        {gradients.map(({ name }) => (
           <div key={name} className="flex-between items-center w-[300px]">
             <div>{name}</div>
             <div
               className="w-[200px] h-[16px] rounded-4px"
-              style={{ background: 'linear-gradient(to right, var(--stops))', '--stops': gradient }}
+              style={{
+                '--start': startColor,
+                '--end': endColor,
+                background:
+                  `linear-gradient(in ${name.toLowerCase()} to right, var(--start), var(--end)`,
+              }}
             >
             </div>
           </div>
