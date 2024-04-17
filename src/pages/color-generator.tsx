@@ -33,7 +33,15 @@ export default function ColorGenerator() {
   }, [inputVal])
 
   return (
-    <div className="grid place-items-center h-full size-full w-full place-content-center">
+    <div
+      className="grid size-full place-content-center"
+      style={{
+        '--input-color': bgColor,
+        '--start': 'oklch(from var(--input-color) 0.18 0.24 h)',
+        '--end': 'oklch(from var(--input-color) 0.01 0.14 h)',
+        backgroundImage: 'linear-gradient(in oklch, var(--start) 0%, var(--end) 80%)',
+      }}
+    >
       <div className="flex gap-2">
         <Input value={inputVal} onChange={e => setInputVal(e.currentTarget.value)} />
         <ColorPicker
