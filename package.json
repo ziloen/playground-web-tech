@@ -40,7 +40,7 @@
     "@types/react-dom": "^18.2.25",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "@ziloen/eslint-config": "0.1.23",
-    "@ziloen/tailwind-config": "1.1.8",
+    "@ziloen/tailwind-config": "1.1.9",
     "dprint": "0.45.1",
     "eslint": "^8.57.0",
     "jsdom": "^24.0.0",
