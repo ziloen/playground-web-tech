@@ -3,7 +3,7 @@ const testString =
 
 export default function CSSPage() {
   return (
-    <div className="py-[4em] text-sm resizable-x w-[800px]">
+    <div className="py-[1em] text-sm resizable-x w-[800px] max-w-full">
       <EllipsisMiddle text={testString} />
     </div>
   )
