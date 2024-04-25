@@ -4,15 +4,17 @@ const testString =
 export default function CSSPage() {
   return (
     <div className="py-[4em] text-sm resizable-x w-[800px]">
-      <EllipsisCenter text={testString} />
+      <EllipsisMiddle text={testString} />
     </div>
   )
 }
 
 /**
  * Text ellipsis at the center of the element
+ *
+ * ref: https://codepen.io/xboxyan/pen/VwpPNbm
  */
-function EllipsisCenter({ text }: {
+function EllipsisMiddle({ text }: {
   text: string
 }) {
   return (
