@@ -27,8 +27,8 @@
     "i18next": "^23.11.2",
     "lexical": "^0.14.5",
     "lodash-es": "^4.17.21",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
     "react-i18next": "^14.1.1",
     "react-router-dom": "^6.23.0",
     "ulid": "^2.3.0"
@@ -36,8 +36,8 @@
   "devDependencies": {
     "@testing-library/react": "^15.0.4",
     "@types/lodash-es": "^4.17.12",
-    "@types/react": "^18.2.79",
-    "@types/react-dom": "^18.2.25",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.6.0",
     "@ziloen/eslint-config": "0.1.23",
     "@ziloen/tailwind-config": "1.1.9",
@@ -53,6 +53,6 @@
     "unplugin-auto-import": "^0.17.5",
     "vite": "^5.2.10",
     "vite-plugin-pages": "^0.32.1",
-    "vitest": "^1.5.1"
+    "vitest": "^1.5.2"
   }
 }
