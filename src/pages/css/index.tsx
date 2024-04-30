@@ -59,18 +59,11 @@ function Subgrid() {
       {Array.from({ length: 4 }).map((_, i) => (
         <div
           key={i}
-          className="grid grid-cols-subgrid border border-solid border-green-600"
-          style={{ gridColumn: 'main' }}
+          className="col-[main] grid grid-cols-subgrid border border-solid border-green-600"
         >
-          <div
-            className="bg-blue-500 rounded-full size-[20px]"
-            style={{ gridColumn: 'icon' }}
-          >
-          </div>
+          <div className="col-[icon] bg-blue-500 rounded-full size-[20px]"></div>
 
-          <div style={{ gridColumn: 'text' }}>
-            {'A'.repeat(i + 1)}
-          </div>
+          <div className="col-[text]">{'A'.repeat(i + 1)}</div>
         </div>
       ))}
     </div>
