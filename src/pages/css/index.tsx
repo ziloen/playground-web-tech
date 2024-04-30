@@ -7,6 +7,10 @@ export default function CSSPage() {
       <div className="py-[1em] text-sm resizable-x w-[800px] max-w-full">
         <EllipsisMiddle text={testString} />
       </div>
+
+      <div>
+        <Subgrid />
+      </div>
     </div>
   )
 }
@@ -38,6 +42,37 @@ function EllipsisMiddle({ text }: {
           {text}
         </div>
       </div>
+    </div>
+  )
+}
+
+function Subgrid() {
+  return (
+    <div
+      className="grid min-w-[400px] w-max gap-x-2 gap-y-2"
+      style={{
+        // main-start icon[20px] text[max-content] main-end
+        gridTemplateColumns:
+          '[main-start] 1fr [icon-start] 20px [icon-end text-start] max-content [text-end] 1fr [main-end]',
+      }}
+    >
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div
+          key={i}
+          className="grid grid-cols-subgrid border border-solid border-green-600"
+          style={{ gridColumn: 'main' }}
+        >
+          <div
+            className="bg-blue-500 rounded-full size-[20px]"
+            style={{ gridColumn: 'icon' }}
+          >
+          </div>
+
+          <div style={{ gridColumn: 'text' }}>
+            {'A'.repeat(i + 1)}
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
