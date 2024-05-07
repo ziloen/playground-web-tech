@@ -3,13 +3,17 @@ const testString =
 
 export default function CSSPage() {
   return (
-    <div>
-      <div className="py-[1em] text-sm resizable-x w-[800px] max-w-full">
+    <div className="flex flex-col gap-4">
+      <div className="text-sm resizable-x w-[800px] max-w-full">
         <EllipsisMiddle text={testString} />
       </div>
 
       <div>
         <Subgrid />
+      </div>
+
+      <div>
+        <HolyGrail />
       </div>
     </div>
   )
@@ -66,6 +70,21 @@ function Subgrid() {
           <div className="col-[text]">{'A'.repeat(i + 1)}</div>
         </div>
       ))}
+    </div>
+  )
+}
+
+function HolyGrail() {
+  return (
+    <div
+      className="grid max-w-[600px] bg-dark-gray-600"
+      style={{ gridTemplateColumns: '1fr auto 1fr' }}
+    >
+      <div className="bg-green-600/15">Looooooooooooong text</div>
+
+      <div className="">Center Title</div>
+
+      <div className="flex justify-end bg-red-700/15">Short text</div>
     </div>
   )
 }
