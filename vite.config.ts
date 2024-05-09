@@ -2,6 +2,7 @@
 
 import react from '@vitejs/plugin-react-swc'
 import { resolve as r } from 'node:path'
+import PostcssPresetEnv from 'postcss-preset-env'
 import tailwindcss from 'tailwindcss'
 import AutoImport from 'unplugin-auto-import/vite'
 import { defineConfig } from 'vite'
@@ -67,7 +68,7 @@ export default defineConfig(({ command, mode }) => {
       //   include: Features.Colors | Features.Nesting | Features.MediaQueries,
       // },
       postcss: {
-        plugins: [tailwindcss()],
+        plugins: [PostcssPresetEnv({ stage: 0 }), tailwindcss()],
       },
     },
 
