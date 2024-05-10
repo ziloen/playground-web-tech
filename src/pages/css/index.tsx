@@ -94,13 +94,18 @@ function HolyGrail() {
 function AspectRatio() {
   return (
     <div className="flex">
+      {/* Works on Firefox */}
       <div className="resizable min-h-[40px] min-w-[40px] flex bg-light-gray-900 size-[100px]">
-        <div className="bg-green-900 w-stretch aspect-video max-w-full max-h-full m-auto" />
+        <div className="bg-green-900 min-w-0 min-h-0 w-stretch aspect-video max-w-full max-h-full m-auto">
+          Only works on Firefox
+        </div>
       </div>
 
+      {/* Works on All */}
       <div className="resizable min-h-[40px] min-w-[40px] bg-dark-gray-600 size-[100px] flex">
+        {/* viewBox or el.getBBox() */}
         <svg viewBox="0 0 300 200" className="max-w-full max-h-full m-auto">
-          <image href="https://dummyimage.com/300x200/554d3e/ffffff.png&text=300x200" />
+          <image href="https://dummyimage.com/300x200/554d3e/ffffff.png&text=300x200 SVG" />
         </svg>
       </div>
     </div>
