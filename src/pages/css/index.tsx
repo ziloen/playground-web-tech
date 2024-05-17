@@ -96,7 +96,7 @@ function AspectRatio() {
     <div className="flex">
       {/* Works on Firefox */}
       <div className="resizable min-h-[40px] min-w-[40px] flex bg-light-gray-900 size-[100px]">
-        <div className="bg-green-900 min-w-0 min-h-0 w-stretch aspect-video max-w-full max-h-full m-auto">
+        <div className="bg-green-900 w-stretch aspect-video max-w-full max-h-full m-auto">
           Only works on Firefox
         </div>
       </div>
@@ -110,7 +110,7 @@ function AspectRatio() {
       </div>
 
       <div className="resizable min-h-[40px] min-w-[40px] flex bg-light-gray-900 size-[100px]">
-        <div className="bg-green-900 overflow-clip min-w-0 min-h-0 aspect-video max-w-full max-h-full m-auto relative">
+        <div className="bg-green-900 min-h-0 min-w-0 overflow-clip aspect-video max-w-full max-h-full m-auto relative">
           <div className="size-[99999px]">
             Hack
           </div>
