@@ -108,6 +108,14 @@ function AspectRatio() {
           <image href="https://dummyimage.com/300x200/554d3e/ffffff.png&text=300x200 SVG" />
         </svg>
       </div>
+
+      <div className="resizable min-h-[40px] min-w-[40px] flex bg-light-gray-900 size-[100px]">
+        <div className="bg-green-900 overflow-clip min-w-0 min-h-0 aspect-video max-w-full max-h-full m-auto relative">
+          <div className="size-[99999px]">
+            Hack
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
