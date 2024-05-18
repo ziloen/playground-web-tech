@@ -8,6 +8,8 @@ export default function Index() {
       .map(route => route.path)
       .filter(isString)
       .filter(route => !['*', '/', ':'].includes(route[0]))
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      .toSorted((new Intl.Collator()).compare)
   }, [])
 
   return (
