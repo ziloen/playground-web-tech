@@ -1,3 +1,5 @@
+import { Button, Input } from 'antd'
+
 export default function WebSpeechAPIPage() {
   const [inputText, setInputText] = useState('')
 
@@ -5,12 +7,20 @@ export default function WebSpeechAPIPage() {
     <div>
       <h1>Web Speech API</h1>
       <div>
-        <input
-          type="text"
+        <Input
           value={inputText}
-          onChange={e => setInputText(e.target.value)}
+          onChange={e => setInputText(e.currentTarget.value)}
         />
       </div>
+
+      <Button
+        onClick={() => {
+          const utterance = new SpeechSynthesisUtterance(inputText)
+          window.speechSynthesis.speak(utterance)
+        }}
+      >
+        Speak
+      </Button>
     </div>
   )
 }
