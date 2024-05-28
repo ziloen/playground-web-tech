@@ -1,7 +1,11 @@
 /* eslint-disable unicorn/no-useless-undefined */
 import { DndContext, DragOverlay, useDraggable, useDroppable, type Active } from '@dnd-kit/core'
-import { CSS } from '@dnd-kit/utilities'
 import type { SVGProps } from 'react'
+
+// Change to pragmatic-drag-and-drop
+// Grid Drag and Drop
+// Swapping items when drag over another item
+// Change order when drag over between items
 
 export default function DND() {
   const targetRef = useRef<HTMLDivElement>(null!)
