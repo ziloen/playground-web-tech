@@ -1,8 +1,12 @@
 /* eslint-disable unicorn/no-useless-undefined */
-import { DndContext, DragOverlay, useDraggable, useDroppable, type Active } from '@dnd-kit/core'
+import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine'
+import {
+  draggable,
+  dropTargetForElements,
+  monitorForElements,
+} from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import type { SVGProps } from 'react'
 
-// Change to pragmatic-drag-and-drop
 // Grid Drag and Drop
 // Swapping items when drag over another item
 // Change order when drag over between items
@@ -61,62 +65,37 @@ export default function DND() {
     return () => ac.abort()
   }, [])
 
-  const [dragActiveItem, setDragActiveItem] = useState<Active | null>(null)
-
   return (
-    <DndContext
-      onDragStart={e => {
-        setDragActiveItem(e.active)
-      }}
-      onDragEnd={e => {
-        setDragActiveItem(null)
-      }}
-    >
-      <div className="relative size-full overflow-clip">
-        <div ref={targetRef} className="size-[200px] rounded-[6px] bg-dark-gray-50">
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <div>
-            <span>items:</span>
-            {dropItems.map(({ kind, type }, i) => <div key={i}>{kind} - {type}</div>)}
-          </div>
-
-          <div>
-            <span>files:</span>
-            {dropFiles.map((file, i) => (
-              <div key={i}>
-                {file.name} - {file.type}
-                {file.size ? <span>- {file.size} bytes</span> : null}
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <span>types:</span>
-            {dropTypes.map((type, i) => <div key={i}>{type}</div>)}
-          </div>
-        </div>
-
-        <DragItem />
-
-        <DeleteDropZone />
-
-        <DragOverlay
-          dropAnimation={{}}
-          transition={() => {
-            return undefined
-          }}
-        >
-          {dragActiveItem
-            ? (
-              <div className="size-20 bg-dark-gray-100 rounded-sm cursor-grabbing">
-              </div>
-            )
-            : null}
-        </DragOverlay>
+    <div className="relative size-full overflow-clip">
+      <div ref={targetRef} className="size-[200px] rounded-[6px] bg-dark-gray-50">
       </div>
-    </DndContext>
+
+      <div className="flex flex-col gap-4">
+        <div>
+          <span>items:</span>
+          {dropItems.map(({ kind, type }, i) => <div key={i}>{kind} - {type}</div>)}
+        </div>
+
+        <div>
+          <span>files:</span>
+          {dropFiles.map((file, i) => (
+            <div key={i}>
+              {file.name} - {file.type}
+              {file.size ? <span>- {file.size} bytes</span> : null}
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <span>types:</span>
+          {dropTypes.map((type, i) => <div key={i}>{type}</div>)}
+        </div>
+      </div>
+
+      <Grid />
+
+      <DeleteDropZone />
+    </div>
   )
 }
 
@@ -132,66 +111,38 @@ function MaterialSymbolsDeleteOutlineRounded(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-function DragItem() {
-  const {
-    activatorEvent,
-    active,
-    activeNodeRect,
-    attributes,
-    isDragging,
-    listeners,
-    node,
-    over,
-    setActivatorNodeRef,
-    setNodeRef,
-    transform,
-  } = useDraggable({
-    id: 'item',
-  })
-
-  return (
-    <div
-      className="size-20 bg-dark-gray-200 rounded-sm cursor-grab"
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-    >
-    </div>
-  )
-}
-
 function DeleteDropZone() {
-  const {
-    active,
-    isOver,
-    node,
-    over,
-    rect,
-    setNodeRef,
-  } = useDroppable({
-    id: 'delete',
-  })
+  const [isDragging, setIsDragging] = useState(false)
+
+  useEffect(() => {
+    return monitorForElements({
+      onDragStart() {
+        setIsDragging(true)
+      },
+      onDrop: () => setIsDragging(false),
+    })
+  }, [])
 
   return (
     <div className="absolute right-0 bottom-0">
       <AnimatePresence>
-        {active && active.id === 'item' && (
-          <motion.div
-            className={clsx('size-[100px] bg-red-700/45 flex items-end justify-end p-4')}
-            ref={setNodeRef}
-            initial={{ x: '100%', y: '100%' }}
-            animate={{ x: 0, y: 0 }}
-            exit={{ x: '100%', y: '100%', transition: { delay: 0.3, duration: 0.4 } }}
-            style={{
-              clipPath: 'polygon(0 100%,100% 0,100% 100%)',
-              shapeOutside: 'polygon(0 100%,100% 0,100% 100%)',
-              cursor: 'pointer',
-            }}
-            transition={{ type: 'tween' }}
-          >
-            <MaterialSymbolsDeleteOutlineRounded className="text-[28px]" />
-          </motion.div>
-        )}
+        {isDragging
+          && (
+            <motion.div
+              className={clsx('size-[100px] bg-red-700/45 flex items-end justify-end p-4')}
+              initial={{ x: '100%', y: '100%' }}
+              animate={{ x: 0, y: 0 }}
+              exit={{ x: '100%', y: '100%', transition: { delay: 0.3, duration: 0.4 } }}
+              style={{
+                clipPath: 'polygon(0 100%,100% 0,100% 100%)',
+                shapeOutside: 'polygon(0 100%,100% 0,100% 100%)',
+                cursor: 'pointer',
+              }}
+              transition={{ type: 'tween' }}
+            >
+              <MaterialSymbolsDeleteOutlineRounded className="text-[28px]" />
+            </motion.div>
+          )}
       </AnimatePresence>
     </div>
   )
@@ -217,4 +168,98 @@ function logDataTransfer(dataTransfer: DataTransfer | null) {
   })
 
   return { files, items, types }
+}
+
+function getInitItems() {
+  return [
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+  ]
+}
+
+function Grid() {
+  const [items, setItems] = useState(getInitItems)
+
+  useEffect(() => {
+    return monitorForElements({
+      onDrop({ location, source }) {
+        const destination = location.current.dropTargets[0]
+        if (!destination) return
+
+        const destinationItem = destination.data.value
+        const souceItem = source.data.value
+
+        if (typeof destinationItem !== 'string' || typeof souceItem !== 'string') return
+
+        const destinationIndex = items.indexOf(destinationItem)
+        const sourceIndex = items.indexOf(souceItem)
+
+        const newItems = [...items]
+        newItems[destinationIndex] = souceItem
+        newItems[sourceIndex] = destinationItem
+        setItems(newItems)
+      },
+    })
+  }, [items])
+
+  return (
+    <div
+      className="grid resizable"
+      style={{
+        gridTemplateColumns: 'repeat(auto-fit, 100px)',
+        gridAutoRows: '100px',
+        justifyItems: 'center',
+        alignItems: 'center',
+      }}
+    >
+      {items.map((item, i) => <Item key={item} value={item} />)}
+    </div>
+  )
+}
+
+function Item({ value }: { value: string }) {
+  const ref = useRef<HTMLDivElement>(null!)
+  const [state, setState] = useState<
+    'idle' | 'dragging' | 'drag-over'
+  >('idle')
+
+  useEffect(() => {
+    return combine(
+      draggable({
+        element: ref.current,
+        getInitialData: () => ({ value }),
+        onDragStart: () => setState('dragging'),
+        onDrop: () => setState('idle'),
+      }),
+      dropTargetForElements({
+        element: ref.current,
+        canDrop({ element, input, source }) {
+          return source.data.value !== value
+        },
+        getData: () => ({ value }),
+        onDragEnter: () => setState('drag-over'),
+        onDragLeave: () => setState('idle'),
+        onDrop: () => setState('idle'),
+      })
+    )
+  }, [value])
+
+  return (
+    <motion.div
+      layout
+      ref={ref}
+      className={clsx(
+        'size-20 rounded-full flex-center',
+        state === 'idle' && 'bg-dark-gray-200',
+        state === 'dragging' && 'bg-dark-gray-200 opacity-50',
+        state === 'drag-over' && 'bg-dark-gray-400'
+      )}
+    >
+      {value}
+    </motion.div>
+  )
 }
