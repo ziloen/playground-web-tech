@@ -216,12 +216,12 @@ function Grid() {
         alignItems: 'center',
       }}
     >
-      {items.map((item, i) => <Item key={item} value={item} />)}
+      {items.map((item, i) => <Item key={item} items={items} value={item} />)}
     </div>
   )
 }
 
-function Item({ value }: { value: string }) {
+function Item({ value, items }: { value: string; items: string[] }) {
   const ref = useRef<HTMLDivElement>(null!)
   const [state, setState] = useState<
     'idle' | 'dragging' | 'drag-over'
@@ -251,6 +251,7 @@ function Item({ value }: { value: string }) {
   return (
     <motion.div
       layout
+      layoutDependency={items}
       ref={ref}
       className={clsx(
         'size-20 rounded-full flex-center',
