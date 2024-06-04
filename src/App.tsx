@@ -9,7 +9,7 @@ function Routes() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/playground-web-tech">
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ConfigProvider
         theme={{
           algorithm: theme.darkAlgorithm,
