@@ -12,18 +12,31 @@
 
   <!-- Dark color scheme -->
   <meta name="color-scheme" content="dark light">
+
+  <script type="text/javascript">
+    (function (l) {
+      if (l.search[1] === '/') {
+        var decoded = l.search.slice(1).split('&').map(function (s) {
+          return s.replace(/~and~/g, '&')
+        }).join('?')
+        window.history.replaceState(null, null,
+          l.pathname.slice(0, -1) + decoded + l.hash
+        )
+      }
+    }(window.location))
+  </script>
 </head>
 
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
-  <script>
-    (() => {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      const setting = localStorage.getItem('color-schema') || 'auto'
-      if (prefersDark)
-        document.documentElement.classList.toggle('dark', true)
-    })()
+  <script type="text/javascript">
+      (() => {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const setting = localStorage.getItem('color-schema') || 'auto'
+        if (prefersDark)
+          document.documentElement.classList.toggle('dark', true)
+      })()
   </script>
 </body>
 
