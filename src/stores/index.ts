@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 // TODO: 参考 https://github.com/LegendApp/legend-state
 
-/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 export * from '@vue/reactivity'
 import type { Ref, UnwrapRef } from '@vue/reactivity'

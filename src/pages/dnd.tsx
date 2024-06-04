@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-useless-undefined */
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine'
 import {
   draggable,
