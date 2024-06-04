@@ -2,10 +2,10 @@
   "private": true,
   "scripts": {
     "dev": "vite --port 3333",
+    "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "build": "vite build",
     "test": "vitest"
   },
   "type": "module",

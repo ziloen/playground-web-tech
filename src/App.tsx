@@ -1,6 +1,6 @@
 import { ConfigProvider, theme } from 'antd'
 import { Suspense } from 'react'
-import { HashRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import routes from '~react-pages'
 
 function Routes() {
@@ -9,7 +9,7 @@ function Routes() {
 
 export default function App() {
   return (
-    <HashRouter>
+    <BrowserRouter basename="/playground-web-tech">
       <ConfigProvider
         theme={{
           algorithm: theme.darkAlgorithm,
@@ -22,6 +22,6 @@ export default function App() {
           <Routes />
         </Suspense>
       </ConfigProvider>
-    </HashRouter>
+    </BrowserRouter>
   )
 }
