@@ -1,9 +1,11 @@
 import '@fontsource-variable/fira-code'
 import '@fontsource-variable/noto-sans-sc'
 import { useMotionValue } from 'framer-motion'
+import { useId } from 'react'
 
 export default function VariableFont() {
   const wght = useMotionValue(400)
+  const datalistId = useId()
 
   return (
     <div>
@@ -11,18 +13,39 @@ export default function VariableFont() {
       </div>
 
       <div className="flex items-center">
-        <span>wght</span>
+        <span>wght:&nbsp;</span>
 
-        <input
-          type="range"
-          defaultValue={400}
-          onChange={e => {
-            wght.set(+e.target.value)
-          }}
-          min={100}
-          max={900}
-          step={1}
-        />
+        <div className="flex flex-col gap-2">
+          <input
+            type="range"
+            list={datalistId}
+            defaultValue={400}
+            onChange={e => {
+              wght.set(+e.target.value)
+            }}
+            min={100}
+            max={900}
+            step={1}
+          />
+
+          <datalist
+            id={datalistId}
+            className="flex min-w-0 grow writing-vertical-lr flex-col text-center text-sm justify-between opacity-65 leading-none"
+            style={{
+              textCombineUpright: 'all',
+            }}
+          >
+            <option value="100" label="100" />
+            <option value="200" label="200" />
+            <option value="300" label="300" />
+            <option value="400" label="400" />
+            <option value="500" label="500" />
+            <option value="600" label="600" />
+            <option value="700" label="700" />
+            <option value="800" label="800" />
+            <option value="900" label="900" />
+          </datalist>
+        </div>
       </div>
 
       <motion.div
