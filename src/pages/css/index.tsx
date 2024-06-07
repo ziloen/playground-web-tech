@@ -7,8 +7,8 @@ export default function CSSPage() {
       <div className="text-sm resizable-x w-[800px] max-w-full">
         <EllipsisMiddle text={testString} />
       </div>
-      <div className="text-sm resizable-x w-[350px] max-w-full">
-        <ShowMore text={testString.slice(0, testString.length / 2)} />
+      <div className="text-sm resizable-x w-[750px] max-w-full">
+        <ShowMore text={testString} />
       </div>
 
       <div>
