@@ -10,11 +10,20 @@ body,
   padding: 0;
 }
 
-html.dark {
-  background: #121212;
-  color: white;
+html {
+  @apply font-sans;
+  background: light-dark(white, #121212);
+  color: light-dark(black, theme("colors.light-gray.100"));
 }
 
-body {
-  @apply font-sans;
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-theme="auto"] {
+  color-scheme: dark light;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
 }
