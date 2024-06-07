@@ -46,7 +46,7 @@ function EllipsisMiddle({ text }: {
         <div
           className="w-1/2 overflow-hidden whitespace-nowrap"
           dir="rtl"
-          style={{ textOverflow: `"\u200C"` }}
+          style={{ textOverflow: `""` }}
         >
           {text}
         </div>
