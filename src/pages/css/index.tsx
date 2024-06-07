@@ -7,8 +7,8 @@ export default function CSSPage() {
       <div className="text-sm resizable-x w-[800px] max-w-full">
         <EllipsisMiddle text={testString} />
       </div>
-      <div className="text-sm resizable-x w-[750px] max-w-full">
-        <ShowMore text={testString} />
+      <div className="text-sm resizable-x w-[350px] max-w-full">
+        <ShowMore text={testString.slice(0, testString.length / 2)} />
       </div>
 
       <div>
@@ -130,22 +130,28 @@ function ShowMore({ text }: {
 
   if (isShowMore) {
     return (
-      <div className="bg-dark-gray-700 leading-[2em] overflow-hidden">
+      <div className="relative bg-dark-gray-700 leading-[2em] overflow-hidden">
         <span>{text}</span>
 
-        {/* TODO: hide this when not overflow */}
-        <span
-          className="cursor-pointer inline-block text-purple-400 float-end mx-2"
-          onClick={() => setIsShowMore(false)}
-        >
+        <span className="inline-block text-transparent float-end mx-2">
           Show less
         </span>
+
+        <div
+          className="absolute bottom-0 cursor-pointer text-purple-400 right-2"
+          onClick={() => setIsShowMore(false)}
+          style={{
+            top: `max(1lh, calc(100% - 1lh))`,
+          }}
+        >
+          Show less
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="relative leading-[2em] h-[2em] bg-dark-gray-700">
+    <div className="relative leading-[2em] h-[1lh] bg-dark-gray-700">
       {/* When not overflow */}
       <div className="max-h-[4em] w-fit overflow-visible">{text}</div>
 
