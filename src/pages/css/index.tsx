@@ -7,6 +7,9 @@ export default function CSSPage() {
       <div className="text-sm resizable-x w-[800px] max-w-full">
         <EllipsisMiddle text={testString} />
       </div>
+      <div className="text-sm resizable-x w-[750px] max-w-full">
+        <ShowMore text={testString} />
+      </div>
 
       <div>
         <Subgrid />
@@ -114,6 +117,56 @@ function AspectRatio() {
           <div className="size-[99999px]">
             Hack
           </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ShowMore({ text }: {
+  text: string
+}) {
+  const [isShowMore, setIsShowMore] = useState(false)
+
+  if (isShowMore) {
+    return (
+      <div className="bg-dark-gray-700 leading-[2em] overflow-hidden">
+        <span>{text}</span>
+
+        {/* TODO: hide this when not overflow */}
+        <span
+          className="cursor-pointer inline-block text-purple-400 float-end mx-2"
+          onClick={() => setIsShowMore(false)}
+        >
+          Show less
+        </span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative leading-[2em] h-[2em] bg-dark-gray-700">
+      {/* When not overflow */}
+      <div className="max-h-[4em] w-fit overflow-visible">{text}</div>
+
+      {/* When overflow, this will cover above text */}
+      <div className="relative top-[-4em] bg-inherit flex" title={text}>
+        {/* Left part */}
+        <div
+          className="overflow-hidden whitespace-nowrap text-ellipsis"
+          style={{
+            maskImage: 'linear-gradient(to left, transparent, black 10em)',
+          }}
+        >
+          {text}
+        </div>
+
+        {/* Right part */}
+        <div
+          className="w-max cursor-pointer ml-2 text-purple-400 shrink-0"
+          onClick={() => setIsShowMore((prev) => !prev)}
+        >
+          Show more
         </div>
       </div>
     </div>
