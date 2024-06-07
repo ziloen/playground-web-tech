@@ -75,6 +75,10 @@ export default defineConfig(({ command, mode }) => {
       },
     },
 
+    optimizeDeps: {
+      include: ['lodash-es'],
+    },
+
     build: {
       cssMinify: 'lightningcss',
     },
