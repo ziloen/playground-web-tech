@@ -133,7 +133,7 @@ function ShowMore({ text }: {
       <div className="relative bg-dark-gray-700 leading-[2em] overflow-hidden">
         <span>{text}</span>
 
-        <span className="inline-block text-transparent float-end mx-2">
+        <span className="inline-block text-transparent float-end ml-2">
           Show less
         </span>
 
