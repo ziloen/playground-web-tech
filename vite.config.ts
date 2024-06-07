@@ -80,7 +80,7 @@ export default defineConfig(({ command, mode }) => {
     },
 
     build: {
-      cssMinify: 'lightningcss',
+      cssMinify: 'esbuild',
     },
 
     // https://github.com/vitest-dev/vitest
