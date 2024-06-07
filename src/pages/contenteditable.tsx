@@ -1,8 +1,8 @@
 /* eslint-disable unicorn/prefer-dom-node-text-content */
 import { useMotionValue } from 'framer-motion'
 import type { InputEventInputType as InputType, KeyboardEventKey } from 'ts-lib-enhance'
+import { createContext, useContextSelector } from 'use-context-selector'
 import { useEventListener } from '~/hooks'
-import { defineStore, reactivity, ref } from '~/stores'
 import styles from './contenteditable.module.css'
 
 const MAX_LENGTH = 100
@@ -15,11 +15,10 @@ const isChromium = (() => {
   return brands.some(({ brand }) => brand === 'Chromium')
 })()
 
-export default reactivity(function ContentEditableText() {
+export default function ContentEditableText() {
   const inputRef = useRef<HTMLDivElement>(null!)
-  const messageStore = useMessageStore()
   const currentLength = useMotionValue(0)
-  const messages = messageStore.messages
+  const messages = useMessages()
 
   useEventListener('beforeinput', onBeforeInput, { target: inputRef })
 
@@ -101,7 +100,15 @@ export default reactivity(function ContentEditableText() {
       </div>
     </div>
   )
+}
+
+const messageContext = createContext({
+  messages: [] as MessageType[],
 })
+
+function useMessages() {
+  return useContextSelector(messageContext, s => s.messages)
+}
 
 function Message({ text }: { text: string }) {
   return (
@@ -254,14 +261,6 @@ function getMentionsFromTarget(target: HTMLElement) {
 
   return mentions
 }
-
-const useMessageStore = defineStore(() => {
-  const messages = ref<MessageType[]>([])
-
-  return {
-    messages,
-  }
-})
 
 function getSelectionStartPosition() {
 }
