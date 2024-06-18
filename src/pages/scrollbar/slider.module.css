@@ -87,7 +87,7 @@
       background-color: var(--thumb-background);
       cursor: pointer;
       border: none;
-      margin-top: calc(-1 * (var(--thumb-height) / 2));
+      margin-top: calc(-1 * (var(--thumb-height) - var(--track-height)) / 2);
     }
 
     &:hover {
