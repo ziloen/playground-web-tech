@@ -66,12 +66,16 @@ export default defineConfig(({ command, mode }) => {
 
     css: {
       devSourcemap: true,
-      // transformer: 'lightningcss',
-      // lightningcss: {
-      //   include: Features.Colors | Features.Nesting | Features.MediaQueries,
-      // },
       postcss: {
-        plugins: [PostcssPresetEnv({ stage: 0 }), tailwindcss()],
+        plugins: [
+          PostcssPresetEnv({
+            stage: 0,
+            features: {
+              'logical-properties-and-values': false,
+            },
+          }),
+          tailwindcss(),
+        ],
       },
     },
 

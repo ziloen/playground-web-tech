@@ -13,12 +13,8 @@
   --thumb-background: var(--progress-background);
   --thumb-hover-background: #f2f2f2;
 
-
-
-
-
   &::-moz-range-track {
-    height: var(--track-height);
+    block-size: var(--track-height);
     border-radius: 0;
     cursor: pointer;
     background: var(--track-background);
@@ -28,7 +24,8 @@
 
   &::-moz-range-progress {
     appearance: none;
-    height: var(--track-height);
+    block-size: var(--track-height);
+    width: var(--track-height);
 
     border-radius: 0;
     background-color: var(--progress-background);
@@ -38,8 +35,8 @@
     appearance: none;
     cursor: pointer;
     border: none;
-    height: var(--thumb-height);
-    width: var(--thumb-width);
+    block-size: var(--thumb-height);
+    inline-size: var(--thumb-width);
     border-radius: var(--thumb-radius);
     background-color: var(--thumb-background);
   }
@@ -64,30 +61,38 @@
     &::-webkit-slider-runnable-track {
       cursor: pointer;
       border-radius: 0;
-      height: var(--track-height);
+      block-size: var(--track-height);
       background-color: var(--track-background);
+      background-clip: content-box;
+      box-sizing: content-box;
+      border-block-width: calc((var(--thumb-height) - var(--track-height)) / 2);
+      border-inline-width: 0;
+      border-style: solid;
+      border-color: transparent;
     }
 
     &::before {
       user-select: none;
       content: '';
       position: absolute;
+      inset-block: 0;
+      margin-block: auto;
       pointer-events: none;
       display: block;
-      width: calc(var(--value) * 100% - var(--value) * var(--thumb-width));
+      inline-size: calc(var(--value) * 100% - var(--value) * var(--thumb-width));
       background-color: var(--progress-background);
-      height: var(--track-height);
+      block-size: var(--track-height);
     }
 
     &::-webkit-slider-thumb {
       appearance: none;
-      height: var(--thumb-height);
-      width: var(--thumb-width);
+      block-size: var(--thumb-height);
+      inline-size: var(--thumb-width);
       border-radius: var(--thumb-radius);
       background-color: var(--thumb-background);
       cursor: pointer;
       border: none;
-      margin-top: calc(-1 * (var(--thumb-height) - var(--track-height)) / 2);
+      margin-block-start: calc(-1 * (var(--thumb-height) - var(--track-height)) / 2);
     }
 
     &:hover {
