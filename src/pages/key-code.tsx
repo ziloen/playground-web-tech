@@ -1,18 +1,58 @@
+import { Switch } from 'antd'
 import type { KeyboardEventKey } from 'ts-lib-enhance'
 import { useEventListener } from '~/hooks'
+
+const properties: {
+  key: keyof KeyboardEvent
+  deprecated?: boolean
+}[] = [
+  { key: 'key' },
+  { key: 'code' },
+  { key: 'location' },
+  { key: 'shiftKey' },
+  { key: 'ctrlKey' },
+  { key: 'altKey' },
+  { key: 'metaKey' },
+  { key: 'keyCode', deprecated: true },
+  { key: 'charCode', deprecated: true },
+  { key: 'which', deprecated: true },
+]
 
 export default function KeyCode() {
   const ref = useRef<HTMLDivElement>(null)
   const [event, setEvent] = useState<KeyboardEvent | null>(null)
+  const [preventDefault, setPreventDefault] = useState(false)
+  const [stopPropagation, setStopPropagation] = useState(false)
+  const [hideDeprecated, setHideDeprecated] = useState(true)
 
   useEventListener('keydown', e => {
+    if (preventDefault) e.preventDefault()
+    if (stopPropagation) e.stopPropagation()
+
     setEvent(e)
   }, {
     target: ref,
   })
 
   return (
-    <div className='p-2 flex flex-col gap-2'>
+    <div className="p-2 flex flex-col gap-2">
+      <div>
+        <div>
+          Prevent default
+          <Switch value={preventDefault} onChange={setPreventDefault} />
+        </div>
+
+        <div>
+          Stop propagation
+          <Switch value={stopPropagation} onChange={setStopPropagation} />
+        </div>
+
+        <div>
+          Hide deprecated properties
+          <Switch value={hideDeprecated} onChange={setHideDeprecated} />
+        </div>
+      </div>
+
       <div
         ref={ref}
         tabIndex={0}
@@ -33,10 +73,18 @@ export default function KeyCode() {
           className="grid gap-2"
           style={{ gridTemplateColumns: 'repeat(auto-fit, 200px)' }}
         >
-          <Item title="key" value={event.key} />
-          <Item title="keyCode" value={event.keyCode} deprecated />
-          <Item title="code" value={event.code} />
-          <Item title="charCode" value={event.charCode} deprecated />
+          {properties.map((item) => {
+            if (hideDeprecated && item.deprecated) return null
+
+            return (
+              <Item
+                key={item.key}
+                title={item.key}
+                value={event[item.key] as string | number | boolean}
+                deprecated={item.deprecated}
+              />
+            )
+          })}
         </div>
       )}
     </div>
@@ -51,12 +99,12 @@ function Item({
 }: {
   title: string
   description?: string
-  value?: string | number
+  value?: string | number | boolean
   deprecated?: boolean
 }) {
   return (
     <div
-      className={clsx('w-[200px] bg-dark-gray-500 h-[250px]', deprecated && 'text-light-gray-600')}
+      className={clsx('w-[200px] bg-dark-gray-500 h-[100px]', deprecated && 'text-light-gray-600')}
     >
       <div
         className={clsx(
@@ -67,8 +115,8 @@ function Item({
         {title}
       </div>
 
-      <div className="text-center whitespace-pre">
-        {value}
+      <div className="text-center whitespace-pre py-2">
+        {String(value)}
       </div>
 
       <div>
