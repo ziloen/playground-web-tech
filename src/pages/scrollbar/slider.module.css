@@ -1,0 +1,103 @@
+.slider {
+  appearance: none;
+  background: none;
+  --track-background: #666666;
+  --track-hover-background: #999999;
+  --track-height: 3px;
+
+  --progress-background: #404040;
+
+  --thumb-height: 24px;
+  --thumb-width: 8px;
+  --thumb-radius: 4px;
+  --thumb-background: var(--progress-background);
+  --thumb-hover-background: #f2f2f2;
+
+
+
+
+
+  &::-moz-range-track {
+    height: var(--track-height);
+    border-radius: 0;
+    cursor: pointer;
+    background: var(--track-background);
+    border-radius: 25px;
+    overflow: hidden;
+  }
+
+  &::-moz-range-progress {
+    appearance: none;
+    height: var(--track-height);
+
+    border-radius: 0;
+    background-color: var(--progress-background);
+  }
+
+  &::-moz-range-thumb {
+    appearance: none;
+    cursor: pointer;
+    border: none;
+    height: var(--thumb-height);
+    width: var(--thumb-width);
+    border-radius: var(--thumb-radius);
+    background-color: var(--thumb-background);
+  }
+
+  &:hover {
+    &::-moz-range-track {
+      background-color: var(--track-hover-background);
+    }
+
+    &::-moz-range-thumb {
+      background-color: var(--thumb-hover-background);
+    }
+  }
+}
+
+@supports (-webkit-appearance: none) {
+  .slider {
+    position: relative;
+    isolation: isolate;
+    user-select: none;
+
+    &::-webkit-slider-runnable-track {
+      cursor: pointer;
+      border-radius: 0;
+      height: var(--track-height);
+      background-color: var(--track-background);
+    }
+
+    &::before {
+      user-select: none;
+      content: '';
+      position: absolute;
+      pointer-events: none;
+      display: block;
+      width: calc(var(--value) * 100% - var(--value) * var(--thumb-width));
+      background-color: var(--progress-background);
+      height: var(--track-height);
+    }
+
+    &::-webkit-slider-thumb {
+      appearance: none;
+      height: var(--thumb-height);
+      width: var(--thumb-width);
+      border-radius: var(--thumb-radius);
+      background-color: var(--thumb-background);
+      cursor: pointer;
+      border: none;
+      margin-top: calc(-1 * (var(--thumb-height) / 2));
+    }
+
+    &:hover {
+      &::-webkit-slider-runnable-track {
+        background-color: var(--track-hover-background);
+      }
+
+      &::-webkit-slider-thumb {
+        background-color: var(--thumb-hover-background);
+      }
+    }
+  }
+}
