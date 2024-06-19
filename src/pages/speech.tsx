@@ -30,6 +30,7 @@ export default function WebSpeechAPIPage() {
 
     return null
   })
+  const [pitch, setPitch] = useState(1)
 
   const groupByLang = useMemo(() => {
     if (!voiceList) return null
@@ -113,26 +114,38 @@ export default function WebSpeechAPIPage() {
     <div>
       <h1>Web Speech API</h1>
 
+      <Select<string, VoiceOptionGroup>
+        showSearch
+        className="min-w-40"
+        virtual
+        value={selectedVoice}
+        onChange={setSelectedVoice}
+        popupMatchSelectWidth={false}
+        optionRender={({ data }) => {
+          asType<VoiceOption>(data)
+          return (
+            <div className="flex items-center gap-2">
+              <span>{data.voice.name}</span>
+              {!data.voice.localService && (
+                <CarbonCloud className="text-lg shrink-0 text-blue-600" />
+              )}
+            </div>
+          )
+        }}
+        options={options}
+      />
+
+      <Select />
+
       <div>
-        <Select<string, VoiceOptionGroup>
-          showSearch
-          className="min-w-40"
-          virtual
-          value={selectedVoice}
-          onChange={setSelectedVoice}
-          popupMatchSelectWidth={false}
-          optionRender={({ data }) => {
-            asType<VoiceOption>(data)
-            return (
-              <div className="flex items-center gap-2">
-                <span>{data.voice.name}</span>
-                {!data.voice.localService && (
-                  <CarbonCloud className="text-lg shrink-0 text-blue-600" />
-                )}
-              </div>
-            )
-          }}
-          options={options}
+        <span>pitch</span>
+        <input
+          type="range"
+          value={pitch}
+          onChange={e => setPitch(Number(e.currentTarget.value))}
+          min={0}
+          max={2}
+          step={0.01}
         />
       </div>
 
@@ -148,7 +161,8 @@ export default function WebSpeechAPIPage() {
           utterance.text = inputText
           // const utterance = new SpeechSynthesisUtterance(inputText)
           utterance.voice = voiceList?.find(voice => voice.name === selectedVoice) ?? null
-          utterance.lang = utterance.voice?.lang ?? 'en-US'
+          utterance.lang = 'zh-CN'
+          utterance.pitch = pitch
           if (speechSynthesis.speaking) {
             speechSynthesis.cancel()
           }
