@@ -29,6 +29,7 @@
     ],
     "types": [
       "vite/client",
+      "unplugin-icons/types/react",
       "vite-plugin-pages/client-react",
       "ts-lib-enhance",
       "ts-lib-enhance/highlight",
