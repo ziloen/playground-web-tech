@@ -1,1 +1,3 @@
-export * from "./useEventListener"
+export * from './useEventListener'
+export { useNextEffect } from './useNextEffect'
+
