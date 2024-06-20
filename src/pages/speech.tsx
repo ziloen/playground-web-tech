@@ -15,6 +15,13 @@ interface VoiceOptionGroup extends DefaultOptionType {
   options: VoiceOption[]
 }
 
+// @ts-expect-error navigator has no type
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const isChrome = navigator.userAgentData
+  // @ts-expect-error navigator has no type
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  && navigator.userAgentData.brands.some(brand => brand.brand === 'Google Chrome')
+
 export default function WebSpeechAPIPage() {
   const [inputText, setInputText] = useState(defaultText)
   const [selectedVoice, setSelectedVoice] = useState<string>('')
@@ -61,13 +68,6 @@ export default function WebSpeechAPIPage() {
   const startedRef = useRef(false)
 
   useEffect(() => {
-    // @ts-expect-error navigator has no type
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const isChrome = navigator.userAgentData
-      // @ts-expect-error navigator has no type
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      && navigator.userAgentData.brands.some(brand => brand.brand === 'Google Chrome')
-
     let timer: ReturnType<typeof setTimeout> | undefined
     if (isChrome) {
       timer = setInterval(() => {
@@ -98,7 +98,7 @@ export default function WebSpeechAPIPage() {
       console.log('start', e)
       startedRef.current = true
       // pause before start will not work, check paused status when start
-      if (pausedRef.current) {
+      if (isChrome && pausedRef.current) {
         console.log('pause after start')
         speechSynthesis.pause()
       }
@@ -244,7 +244,11 @@ export default function WebSpeechAPIPage() {
           if (startedRef.current) {
             speechSynthesis.pause()
           } else {
-            console.log("pause before start, won't work")
+            if (isChrome) {
+              console.log("pause before start, won't work")
+            } else {
+              speechSynthesis.pause()
+            }
           }
           pausedRef.current = true
           console.log('after pause')
