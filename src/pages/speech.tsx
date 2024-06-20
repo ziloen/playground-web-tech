@@ -95,22 +95,25 @@ export default function WebSpeechAPIPage() {
     })
 
     utterance.addEventListener('start', e => {
+      console.log('start', e)
       startedRef.current = true
       // pause before start will not work, check paused status when start
       if (pausedRef.current) {
+        console.log('pause after start')
         speechSynthesis.pause()
       }
-      console.log('start', e)
     })
 
     utterance.addEventListener('end', e => {
-      pausedRef.current = false
       console.log('end', e)
+      pausedRef.current = false
+      startedRef.current = false
     })
 
     utterance.addEventListener('error', e => {
-      startedRef.current = false
       console.log('error', e)
+      startedRef.current = false
+      pausedRef.current = false
     })
 
     utterance.addEventListener('pause', e => {
@@ -200,10 +203,15 @@ export default function WebSpeechAPIPage() {
           utterance.lang = lang
           utterance.pitch = pitch
           if (speechSynthesis.speaking) {
+            console.log('cancel previous speech')
             speechSynthesis.cancel()
           }
 
-          console.log('before speak', speechStatus())
+          console.log('before speak', {
+            lang,
+            voice: utterance.voice,
+            pitch,
+          }, speechStatus())
           speechSynthesis.speak(utterance)
           pausedRef.current = false
           startedRef.current = false
@@ -236,6 +244,8 @@ export default function WebSpeechAPIPage() {
           // pause before start will not work
           if (startedRef.current) {
             speechSynthesis.pause()
+          } else {
+            console.log("pause before start, won't work")
           }
           pausedRef.current = true
           console.log('after pause', speechStatus())
@@ -259,6 +269,7 @@ export default function WebSpeechAPIPage() {
 }
 
 function speechStatus() {
+  return ''
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   return `pending: ${speechSynthesis.pending}, speaking: ${speechSynthesis.speaking}, paused: ${speechSynthesis.paused}`
   return {
