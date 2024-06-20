@@ -114,28 +114,37 @@ export default function WebSpeechAPIPage() {
     <div>
       <h1>Web Speech API</h1>
 
-      <Select<string, VoiceOptionGroup>
-        showSearch
-        className="min-w-40"
-        virtual
-        value={selectedVoice}
-        onChange={setSelectedVoice}
-        popupMatchSelectWidth={false}
-        optionRender={({ data }) => {
-          asType<VoiceOption>(data)
-          return (
-            <div className="flex items-center gap-2">
-              <span>{data.voice.name}</span>
-              {!data.voice.localService && (
-                <CarbonCloud className="text-lg shrink-0 text-blue-600" />
-              )}
-            </div>
-          )
-        }}
-        options={options}
-      />
+      <div>
+        <span>voice</span>
+        <Select<string, VoiceOptionGroup>
+          showSearch
+          className="min-w-40"
+          virtual={false}
+          value={selectedVoice}
+          dropdownStyle={{
+            maxHeight: '400px',
+          }}
+          onChange={setSelectedVoice}
+          popupMatchSelectWidth={false}
+          optionRender={({ data }) => {
+            asType<VoiceOption>(data)
+            return (
+              <div className="flex items-center gap-2 min-w-max shrink-0">
+                <span>{data.voice.name}</span>
+                {!data.voice.localService && (
+                  <CarbonCloud className="text-lg shrink-0 text-blue-600" />
+                )}
+              </div>
+            )
+          }}
+          options={options}
+        />
+      </div>
 
-      <Select />
+      <div>
+        <span>lang</span>
+        <Select />
+      </div>
 
       <div>
         <span>pitch</span>
