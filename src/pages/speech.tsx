@@ -71,8 +71,8 @@ export default function WebSpeechAPIPage() {
     let timer: ReturnType<typeof setTimeout> | undefined
     if (isChrome) {
       timer = setInterval(() => {
-        console.log('Chrome bug fix', speechStatus())
         if (speechSynthesis.speaking && !pausedRef.current) {
+          console.log('Chrome bug fix')
           speechSynthesis.pause()
           speechSynthesis.resume()
         }
@@ -211,13 +211,12 @@ export default function WebSpeechAPIPage() {
             lang,
             voice: utterance.voice,
             pitch,
-          }, speechStatus())
+          })
           speechSynthesis.speak(utterance)
           pausedRef.current = false
           startedRef.current = false
           console.log(
-            `after speak`,
-            speechStatus()
+            `after speak`
           )
         }}
       >
@@ -226,11 +225,11 @@ export default function WebSpeechAPIPage() {
 
       <Button
         onClick={e => {
-          console.log('before cancel', speechStatus())
+          console.log('before cancel')
           pausedRef.current = false
           startedRef.current = false
           speechSynthesis.cancel()
-          console.log('after cancel', speechStatus())
+          console.log('after cancel')
         }}
       >
         Cancel
@@ -240,7 +239,7 @@ export default function WebSpeechAPIPage() {
 
       <Button
         onClick={e => {
-          console.log('before pause', speechStatus())
+          console.log('before pause')
           // pause before start will not work
           if (startedRef.current) {
             speechSynthesis.pause()
@@ -248,7 +247,7 @@ export default function WebSpeechAPIPage() {
             console.log("pause before start, won't work")
           }
           pausedRef.current = true
-          console.log('after pause', speechStatus())
+          console.log('after pause')
         }}
       >
         Pause
@@ -256,25 +255,14 @@ export default function WebSpeechAPIPage() {
 
       <Button
         onClick={() => {
-          console.log('before resume', speechStatus())
+          console.log('before resume')
           pausedRef.current = false
           speechSynthesis.resume()
-          console.log('after resume', speechStatus())
+          console.log('after resume')
         }}
       >
         Resume
       </Button>
     </div>
   )
-}
-
-function speechStatus() {
-  return ''
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  return `pending: ${speechSynthesis.pending}, speaking: ${speechSynthesis.speaking}, paused: ${speechSynthesis.paused}`
-  return {
-    pending: speechSynthesis.pending,
-    speaking: speechSynthesis.speaking,
-    paused: speechSynthesis.paused,
-  }
 }
