@@ -39,6 +39,8 @@ export default function WebSpeechAPIPage() {
   })
   const [pitch, setPitch] = useState(1)
   const [lang, setLang] = useState('zh-CN')
+  const [volume, setVolume] = useState(1)
+  const [rate, setRate] = useState(1)
 
   const groupByLang = useMemo(() => {
     if (!voiceList) return null
@@ -189,6 +191,38 @@ export default function WebSpeechAPIPage() {
       </div>
 
       <div>
+        <span>volume</span>
+        <input
+          type="range"
+          value={volume}
+          onChange={e => {
+            const value = Number(e.currentTarget.value)
+            setVolume(value)
+            utterance.volume = value
+          }}
+          min={0}
+          max={1}
+          step={0.01}
+        />
+      </div>
+
+      <div>
+        <span>rate</span>
+        <input
+          type="range"
+          value={rate}
+          onChange={e => {
+            const value = Number(e.currentTarget.value)
+            setRate(value)
+            utterance.rate = value
+          }}
+          min={0.1}
+          max={10}
+          step={0.1}
+        />
+      </div>
+
+      <div>
         <Input.TextArea
           value={inputText}
           onChange={e => setInputText(e.currentTarget.value)}
@@ -198,10 +232,10 @@ export default function WebSpeechAPIPage() {
       <Button
         onClick={() => {
           utterance.text = inputText
-          // const utterance = new SpeechSynthesisUtterance(inputText)
           utterance.voice = voiceList?.find(voice => voice.name === selectedVoice) ?? null
           utterance.lang = lang
           utterance.pitch = pitch
+          utterance.volume = volume
           if (speechSynthesis.speaking) {
             console.log('cancel previous speech')
             speechSynthesis.cancel()
