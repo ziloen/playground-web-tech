@@ -1,4 +1,5 @@
 import { asNonNullable, asType } from '@wai-ri/core'
+import { useMemoizedFn } from 'ahooks'
 import { Button, Input, Select } from 'antd'
 import type { BaseOptionType, DefaultOptionType } from 'antd/es/select'
 import { useNextEffect } from '~/hooks'
@@ -133,6 +134,30 @@ export default function WebSpeechAPIPage() {
     return utterance
   }, [])
 
+  const onSpeek = useMemoizedFn(() => {
+    utterance.text = inputText
+    utterance.voice = voiceList?.find(voice => voice.name === selectedVoice) ?? null
+    utterance.lang = lang
+    utterance.pitch = pitch
+    utterance.volume = volume
+    if (speechSynthesis.speaking) {
+      console.log('cancel previous speech')
+      speechSynthesis.cancel()
+    }
+
+    console.log('before speak', {
+      lang,
+      voice: utterance.voice,
+      pitch,
+    })
+    speechSynthesis.speak(utterance)
+    pausedRef.current = false
+    startedRef.current = false
+    console.log(
+      `after speak`
+    )
+  })
+
   return (
     <div>
       <h1>Web Speech API</h1>
@@ -199,6 +224,10 @@ export default function WebSpeechAPIPage() {
             const value = Number(e.currentTarget.value)
             setVolume(value)
             utterance.volume = value
+
+            if (speechSynthesis.speaking) {
+              onSpeek()
+            }
           }}
           min={0}
           max={1}
@@ -230,29 +259,7 @@ export default function WebSpeechAPIPage() {
       </div>
 
       <Button
-        onClick={() => {
-          utterance.text = inputText
-          utterance.voice = voiceList?.find(voice => voice.name === selectedVoice) ?? null
-          utterance.lang = lang
-          utterance.pitch = pitch
-          utterance.volume = volume
-          if (speechSynthesis.speaking) {
-            console.log('cancel previous speech')
-            speechSynthesis.cancel()
-          }
-
-          console.log('before speak', {
-            lang,
-            voice: utterance.voice,
-            pitch,
-          })
-          speechSynthesis.speak(utterance)
-          pausedRef.current = false
-          startedRef.current = false
-          console.log(
-            `after speak`
-          )
-        }}
+        onClick={onSpeek}
       >
         Speak
       </Button>
