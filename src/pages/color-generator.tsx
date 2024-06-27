@@ -80,7 +80,7 @@ export default function ColorGenerator() {
               key={null}
               className="size-[20px]"
               style={{
-                backgroundColor: `oklch(from var(--bg) ${index * 0.088 + 0.1} c h)`,
+                backgroundColor: `oklch(from var(--bg) ${index * 0.1 + 0.1} c h)`,
               }}
             >
             </div>
