@@ -65,8 +65,28 @@ export default function ColorGenerator() {
           '--text': textColor,
         }}
       >
-        Test Button
+        Click
       </button>
+
+      <div
+        className="flex gap-1"
+        style={{
+          '--bg': bgColor,
+        }}
+      >
+        {Array.from({ length: 10 }, (_, index) => {
+          return (
+            <div
+              key={null}
+              className="size-[20px]"
+              style={{
+                backgroundColor: `oklch(from var(--bg) ${index * 0.088 + 0.1} c h)`,
+              }}
+            >
+            </div>
+          )
+        })}
+      </div>
 
       <ColorCompare />
     </div>
