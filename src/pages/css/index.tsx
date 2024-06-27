@@ -178,3 +178,23 @@ function ShowMore({ text }: {
     </div>
   )
 }
+
+function ScrollAutoAnchor() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div>
+      <div className="flex flex-col-reverse overflow-y-auto">
+        <div className="mt-auto"></div>
+
+        <div>
+          <div></div>
+
+          {Array.from({ length: count }).map((_, index) => {
+            return <div key={null}>Item</div>
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
