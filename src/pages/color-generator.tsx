@@ -112,7 +112,6 @@ const colorSpaces = [
 ]
 
 function ColorCompare() {
-  const [steps, setSteps] = useState(10)
   const [[startColor, endColor], setGradient] = useState(['#ffffff', '#000000'])
 
   const gradients = useMemo(() => {
@@ -121,9 +120,32 @@ function ColorCompare() {
     }))
   }, [])
 
+  function generateRandomColor() {
+    const r1 = Math.floor(Math.random() * 256)
+    const g1 = Math.floor(Math.random() * 256)
+    const b1 = Math.floor(Math.random() * 256)
+
+    const r2 = Math.floor(Math.random() * 256)
+    const g2 = Math.floor(Math.random() * 256)
+    const b2 = Math.floor(Math.random() * 256)
+
+    setGradient([
+      `rgb(${r1}, ${g1}, ${b1})`,
+      `rgb(${r2}, ${g2}, ${b2})`,
+    ])
+  }
+
   return (
     <div>
       <div className="flex-align gap-[6px]">
+        <button onClick={generateRandomColor}>
+          <span>Random</span>
+          <div className="flex">
+            <div className="size-[16px]" style={{ background: startColor }} />
+            <div className="size-[16px]" style={{ background: endColor }} />
+          </div>
+        </button>
+
         {colorPalette.map(([start, end], i) => (
           <div
             key={i}
@@ -131,23 +153,23 @@ function ColorCompare() {
             onClick={() => setGradient([start, end])}
           >
             <div
-              className="w-[16px] h-[16px]"
+              className="size-[16px]"
               style={{ background: start }}
             />
             <div
-              className="w-[16px] h-[16px]"
+              className="size-[16px]"
               style={{ background: end }}
             />
           </div>
         ))}
       </div>
 
-      <div>
+      <div className="flex flex-col gap-2">
         {gradients.map(({ name }) => (
           <div key={name} className="flex-between items-center w-[300px]">
             <div>{name}</div>
             <div
-              className="w-[200px] h-[16px] rounded-4px"
+              className="w-[250px] h-[32px] rounded-4px"
               style={{
                 '--start': startColor,
                 '--end': endColor,
