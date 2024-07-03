@@ -8,23 +8,51 @@ export default function DOMToImage() {
     const element = containerRef.current
     if (!element) return
 
-    html2canvas(element, { backgroundColor: 'black' }).then(
+    html2canvas(element, {
+      backgroundColor: null,
+      foreignObjectRendering: false,
+      allowTaint: false,
+      useCORS: true,
+      onclone(document, element) {
+        element.classList.add('w-[300px]')
+        element.style.height = 'auto'
+      },
+    }).then(
       canvas => {
-        const imageUrl = canvas.toDataURL('image/png')
-
-        const a = document.createElement('a')
-        a.href = imageUrl
-        a.download = 'dom-to-image.png'
-        a.click()
+        canvas.toBlob(blob => {
+          if (!blob) return
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'dom-to-image.png'
+          a.click()
+          URL.revokeObjectURL(url)
+        })
       }
     )
   }
 
   return (
     <div>
-      <div className="p-2">
-        <div ref={containerRef} className="text-white border rounded-2xl border-red-200">
-          dom to image
+      <div className="">
+        <div
+          ref={containerRef}
+          className="text-white border rounded-2xl overflow-hidden border-red-200 border-solid h-[100px]"
+        >
+          <div>dom to image</div>
+          <img
+            className="w-full"
+            src="https://images.unsplash.com/photo-1719370281932-299f40a5d8ee?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt=""
+          />
+          <div>dom to image</div>
+          <div>dom to image</div>
+          <div>dom to image</div>
+          <div>dom to image</div>
+          <div>dom to image</div>
+          <div>dom to image</div>
+          <div>dom to image</div>
+          <div>dom to image</div>
         </div>
       </div>
 
