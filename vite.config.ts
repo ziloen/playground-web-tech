@@ -17,8 +17,15 @@ export default defineConfig(({ command, mode }) => {
   const IS_DEV = env.DEV
   const IS_BUILD = command === 'build'
 
+  let base = env.VITE_BASE_URL
+
+  if (env.GITHUB_REPOSITORY) {
+    const slashIndex = env.GITHUB_REPOSITORY.indexOf('/')
+    base = env.GITHUB_REPOSITORY.slice(slashIndex)
+  }
+
   return {
-    base: env.VITE_BASE_URL,
+    base,
     resolve: {
       alias: {
         '~': r('src'),
