@@ -19,9 +19,9 @@ export default defineConfig(({ command, mode }) => {
 
   let base = env.VITE_BASE_URL
 
-  if (env.GITHUB_REPOSITORY) {
-    const slashIndex = env.GITHUB_REPOSITORY.indexOf('/')
-    base = env.GITHUB_REPOSITORY.slice(slashIndex)
+  if (process.env.GITHUB_REPOSITORY) {
+    const slashIndex = process.env.GITHUB_REPOSITORY.indexOf('/')
+    base = process.env.GITHUB_REPOSITORY.slice(slashIndex)
   }
 
   return {
