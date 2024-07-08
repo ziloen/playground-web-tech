@@ -2,7 +2,7 @@ import { asNonNullable, asType } from '@wai-ri/core'
 import { useMemoizedFn } from 'ahooks'
 import { Button, Input, Select } from 'antd'
 import type { BaseOptionType, DefaultOptionType } from 'antd/es/select'
-import { useNextEffect } from '~/hooks'
+import { useGetState, useNextEffect } from '~/hooks'
 import CarbonCloud from '~icons/carbon/cloud'
 
 const defaultText =
@@ -38,10 +38,10 @@ export default function WebSpeechAPIPage() {
 
     return null
   })
-  const [pitch, setPitch] = useState(1)
-  const [lang, setLang] = useState('zh-CN')
-  const [volume, setVolume] = useState(1)
-  const [rate, setRate] = useState(1)
+  const [pitch, setPitch, getPitch] = useGetState(1)
+  const [lang, setLang, getLang] = useGetState('zh-CN')
+  const [volume, setVolume, getVolume] = useGetState(1)
+  const [rate, setRate, getRate] = useGetState(1)
 
   const groupByLang = useMemo(() => {
     if (!voiceList) return null
@@ -137,9 +137,11 @@ export default function WebSpeechAPIPage() {
   const onSpeek = useMemoizedFn(() => {
     utterance.text = inputText
     utterance.voice = voiceList?.find(voice => voice.name === selectedVoice) ?? null
-    utterance.lang = lang
-    utterance.pitch = pitch
-    utterance.volume = volume
+    utterance.lang = getLang()
+    utterance.pitch = getPitch()
+    utterance.volume = getVolume()
+    utterance.rate = getRate()
+
     if (speechSynthesis.speaking) {
       console.log('cancel previous speech')
       speechSynthesis.cancel()
@@ -208,7 +210,13 @@ export default function WebSpeechAPIPage() {
         <input
           type="range"
           value={pitch}
-          onChange={e => setPitch(Number(e.currentTarget.value))}
+          onChange={e => {
+            setPitch(Number(e.currentTarget.value))
+
+            if (speechSynthesis.speaking) {
+              onSpeek()
+            }
+          }}
           min={0}
           max={2}
           step={0.01}
@@ -221,9 +229,7 @@ export default function WebSpeechAPIPage() {
           type="range"
           value={volume}
           onChange={e => {
-            const value = Number(e.currentTarget.value)
-            setVolume(value)
-            utterance.volume = value
+            setVolume(Number(e.currentTarget.value))
 
             if (speechSynthesis.speaking) {
               onSpeek()
@@ -241,9 +247,11 @@ export default function WebSpeechAPIPage() {
           type="range"
           value={rate}
           onChange={e => {
-            const value = Number(e.currentTarget.value)
-            setRate(value)
-            utterance.rate = value
+            setRate(Number(e.currentTarget.value))
+
+            if (speechSynthesis.speaking) {
+              onSpeek()
+            }
           }}
           min={0.1}
           max={10}
