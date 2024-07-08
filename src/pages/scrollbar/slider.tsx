@@ -7,7 +7,7 @@ export default function Slider() {
     <div className="p-2">
       <div className="flex flex-col items-start">
         <input
-          className={styles['slider']}
+          className={styles['windows-slider']}
           type="range"
           step={0.01}
           min={0}
@@ -21,7 +21,7 @@ export default function Slider() {
         />
 
         <input
-          className={styles['slider']}
+          className={styles['windows-slider']}
           type="range"
           step={0.01}
           min={0}
@@ -36,7 +36,7 @@ export default function Slider() {
       </div>
 
       <input
-        className={clsx(styles['slider'], 'writing-vertical-rl')}
+        className={clsx(styles['windows-slider'], 'writing-vertical-rl')}
         type="range"
         step={0.01}
         min={0}
@@ -50,12 +50,28 @@ export default function Slider() {
       />
 
       <input
-        className={clsx(styles['slider'], 'writing-vertical-rl')}
+        className={clsx(styles['windows-slider'], 'writing-vertical-rl')}
         type="range"
         step={0.01}
         min={0}
         max={1}
         dir="rtl"
+        style={{
+          '--value': value,
+        }}
+        value={value}
+        onChange={e => setValue(Number(e.currentTarget.value))}
+      />
+
+      <br />
+
+      <input
+        className={styles['mac-slider']}
+        type="range"
+        step={0.01}
+        min={0}
+        max={1}
+        dir="ltr"
         style={{
           '--value': value,
         }}
