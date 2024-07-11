@@ -20,6 +20,8 @@ export default function CSSPage() {
       </div>
 
       <AspectRatio />
+
+      <SameWidthFlexWrap />
     </div>
   )
 }
@@ -90,6 +92,35 @@ function HolyGrail() {
       <div className="">Center Title</div>
 
       <div className="flex justify-end bg-red-700/15">Short text</div>
+    </div>
+  )
+}
+
+/**
+ * Two item with same width, when any element reach max-content width, it will wrap to next line
+ */
+function SameWidthFlexWrap() {
+  return (
+    <div className="resizable-x w-[300px] flex flex-wrap gap-[12px]">
+      <div
+        className="grow whitespace-nowrap text-center shrink-0 bg-blue-600"
+        style={{
+          flexBasis: 'calc(50% - 6px)',
+          width: 'fit-content',
+        }}
+      >
+        Lorem ipsum
+      </div>
+
+      <div
+        className="grow whitespace-nowrap text-center shrink-0 bg-green-700"
+        style={{
+          flexBasis: 'calc(50% - 6px)',
+          width: 'fit-content',
+        }}
+      >
+        dolor
+      </div>
     </div>
   )
 }
