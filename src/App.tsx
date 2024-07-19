@@ -16,6 +16,7 @@ export default function App() {
           token: {
             motion: false,
           },
+          cssVar: true,
         }}
       >
         <AntApp component={false}>

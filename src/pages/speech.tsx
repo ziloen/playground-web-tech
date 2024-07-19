@@ -1,12 +1,15 @@
 import { asNonNullable, asType } from '@wai-ri/core'
 import { useMemoizedFn } from 'ahooks'
-import { Button, Input, Select } from 'antd'
-import type { BaseOptionType, DefaultOptionType } from 'antd/es/select'
+import { Button, Form, Input, Select, Slider } from 'antd'
+import type { DefaultOptionType } from 'antd/es/select'
 import { useGetState, useNextEffect } from '~/hooks'
 import CarbonCloud from '~icons/carbon/cloud'
 
-const defaultText =
+const defaultZhText =
   `从零开始学习 Web 开发极具挑战性，该教程将为你提供详细的资料，手把手帮助你轻松愉快地学习。无论你是正在学习 Web 开发的学生（自学或参与课程）、寻找材料的老师、编程爱好者，亦或是仅仅想了解一点点 Web 技术，我们都希望你能感到宾至如归。`
+
+const defaultEnText =
+  `If you are a complete beginner, web development can be challenging — we will hold your hand and provide enough detail for you to feel comfortable and learn the topics properly. You should feel at home whether you are a student learning web development (on your own or as part of a class), a teacher looking for class materials, a hobbyist, or someone who just wants to understand more about how web technologies work.`
 
 interface VoiceOption extends DefaultOptionType {
   voice: SpeechSynthesisVoice
@@ -24,7 +27,7 @@ const isChrome = navigator.userAgentData
   && navigator.userAgentData.brands.some(brand => brand.brand === 'Google Chrome')
 
 export default function WebSpeechAPIPage() {
-  const [inputText, setInputText] = useState(defaultText)
+  const [inputText, setInputText, getInputText] = useGetState(defaultZhText)
   const [selectedVoice, setSelectedVoice] = useState<string>('')
   const nextEffect = useNextEffect()
   const [voiceList, setVoiceList] = useState<SpeechSynthesisVoice[] | null>(() => {
@@ -69,6 +72,9 @@ export default function WebSpeechAPIPage() {
 
   const pausedRef = useRef(false)
   const startedRef = useRef(false)
+  const [loading, setLoading, getLoading] = useGetState(false)
+  const [active, setActive, getActive] = useGetState<SpeechSynthesisVoice | null>(null)
+  const [playing, setPlaying, getPlaying] = useGetState(false)
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -94,11 +100,12 @@ export default function WebSpeechAPIPage() {
     const utterance = new SpeechSynthesisUtterance()
 
     utterance.addEventListener('boundary', e => {
-      console.log('boundary', e)
+      console.log('boundary')
     })
 
     utterance.addEventListener('start', e => {
-      console.log('start', e)
+      console.log('%c▶', 'color: #28e172;', 'start')
+
       startedRef.current = true
       // pause before start will not work, check paused status when start
       if (isChrome && pausedRef.current) {
@@ -108,35 +115,40 @@ export default function WebSpeechAPIPage() {
     })
 
     utterance.addEventListener('end', e => {
-      console.log('end', e)
+      console.log('end')
       pausedRef.current = false
       startedRef.current = false
     })
 
     utterance.addEventListener('error', e => {
-      console.log('error', e)
+      console.log('❌', 'error', e.error)
       startedRef.current = false
       pausedRef.current = false
     })
 
     utterance.addEventListener('pause', e => {
-      console.log('pause', e)
+      console.log('pause')
     })
 
     utterance.addEventListener('resume', e => {
-      console.log('resume', e)
+      console.log('resume')
     })
 
     utterance.addEventListener('mark', e => {
-      console.log('mark', e)
+      console.log('mark')
     })
 
     return utterance
   }, [])
 
   const onSpeek = useMemoizedFn(() => {
-    utterance.text = inputText
-    utterance.voice = voiceList?.find(voice => voice.name === selectedVoice) ?? null
+    speak()
+  })
+
+  const speak = useMemoizedFn(() => {
+    const voice = voiceList?.find(voice => voice.name === selectedVoice) ?? null
+    utterance.voice = voice
+    utterance.text = getInputText()
     utterance.lang = getLang()
     utterance.pitch = getPitch()
     utterance.volume = getVolume()
@@ -147,117 +159,118 @@ export default function WebSpeechAPIPage() {
       speechSynthesis.cancel()
     }
 
-    console.log('before speak', {
-      lang,
-      voice: utterance.voice,
-      pitch,
-    })
     speechSynthesis.speak(utterance)
+    console.log('%c▶', 'color: #cdd64f;', 'speak')
     pausedRef.current = false
     startedRef.current = false
-    console.log(
-      `after speak`
-    )
+    setLoading(true)
+    setActive(voice)
+  })
+
+  const pause = useMemoizedFn(() => {
+    if (!speechSynthesis.speaking) return
+    speechSynthesis.pause()
+    console.log('🔘', 'pause')
+    pausedRef.current = true
   })
 
   return (
     <div>
       <h1>Web Speech API</h1>
 
-      <div>
-        <span>voice</span>
-        <Select<string, VoiceOptionGroup>
-          showSearch
-          className="min-w-40"
-          virtual={false}
-          value={selectedVoice}
-          dropdownStyle={{
-            maxHeight: '400px',
-          }}
-          onChange={setSelectedVoice}
-          popupMatchSelectWidth={false}
-          optionRender={({ data }) => {
-            asType<VoiceOption>(data)
-            return (
-              <div className="flex items-center gap-2 min-w-max shrink-0">
-                <span>{data.voice.name}</span>
-                {!data.voice.localService && (
-                  <CarbonCloud className="text-lg shrink-0 text-blue-600" />
-                )}
-              </div>
-            )
-          }}
-          options={options}
-        />
-      </div>
-
-      {groupByLang && (
-        <div>
-          <span>lang</span>
-          <Select
-            value={lang}
-            onChange={setLang}
-            options={Object.keys(groupByLang).map(lang => ({
-              value: lang,
-              label: lang,
-            }))}
+      <Form>
+        <Form.Item label="voice">
+          <Select<string, VoiceOptionGroup>
+            showSearch
+            className="min-w-40"
+            virtual={false}
+            value={selectedVoice}
+            dropdownStyle={{
+              maxHeight: '400px',
+            }}
+            onChange={setSelectedVoice}
+            popupMatchSelectWidth={false}
+            optionRender={({ data }) => {
+              asType<VoiceOption>(data)
+              return (
+                <div className="flex items-center gap-2 min-w-max shrink-0">
+                  <span>{data.voice.name}</span>
+                  {!data.voice.localService && (
+                    <CarbonCloud className="text-lg shrink-0 text-blue-600" />
+                  )}
+                </div>
+              )
+            }}
+            options={options}
           />
-        </div>
-      )}
+        </Form.Item>
 
-      <div>
-        <span>pitch</span>
-        <input
-          type="range"
-          value={pitch}
-          onChange={e => {
-            setPitch(Number(e.currentTarget.value))
+        {groupByLang && (
+          <Form.Item label="lang">
+            <Select
+              value={lang}
+              onChange={lang => {
+                setLang(lang)
+                if (lang === 'en-US') {
+                  setInputText(defaultEnText)
+                }
+              }}
+              options={Object.keys(groupByLang).map(lang => ({
+                value: lang,
+                label: lang,
+              }))}
+            />
+          </Form.Item>
+        )}
 
-            if (speechSynthesis.speaking) {
-              onSpeek()
-            }
-          }}
-          min={0}
-          max={2}
-          step={0.01}
-        />
-      </div>
+        <Form.Item label="pitch">
+          <Slider
+            value={pitch}
+            onChange={e => {
+              setPitch(e)
 
-      <div>
-        <span>volume</span>
-        <input
-          type="range"
-          value={volume}
-          onChange={e => {
-            setVolume(Number(e.currentTarget.value))
+              if (speechSynthesis.speaking) {
+                onSpeek()
+              }
+            }}
+            min={0}
+            max={2}
+            step={0.01}
+          />
+        </Form.Item>
 
-            if (speechSynthesis.speaking) {
-              onSpeek()
-            }
-          }}
-          min={0}
-          max={1}
-          step={0.01}
-        />
-      </div>
+        <Form.Item label="volume">
+          <Slider
+            value={volume}
+            onChange={e => {
+              setVolume(e)
 
-      <div>
-        <span>rate</span>
-        <input
-          type="range"
-          value={rate}
-          onChange={e => {
-            setRate(Number(e.currentTarget.value))
+              if (speechSynthesis.speaking) {
+                onSpeek()
+              }
+            }}
+            min={0}
+            max={1}
+            step={0.01}
+          />
+        </Form.Item>
 
-            if (speechSynthesis.speaking) {
-              onSpeek()
-            }
-          }}
-          min={0.1}
-          max={10}
-          step={0.1}
-        />
-      </div>
+        <Form.Item label="rate">
+          <Slider
+            value={rate}
+            onChange={e => {
+              setRate(e)
+
+              if (speechSynthesis.speaking) {
+                onSpeek()
+              }
+            }}
+            min={0.1}
+            max={10}
+            step={0.1}
+          />
+        </Form.Item>
+      </Form>
 
       <div>
         <Input.TextArea
@@ -274,11 +287,10 @@ export default function WebSpeechAPIPage() {
 
       <Button
         onClick={e => {
-          console.log('before cancel')
           pausedRef.current = false
-          startedRef.current = false
+          startedRef.current = true
           speechSynthesis.cancel()
-          console.log('after cancel')
+          console.log('🟡', 'cancel')
         }}
       >
         Cancel
@@ -316,6 +328,33 @@ export default function WebSpeechAPIPage() {
       >
         Resume
       </Button>
+
+      <div className="grid">
+        <div className="grid-cols-subgrid">
+        </div>
+      </div>
+
+      <table
+        style={{ borderCollapse: 'collapse' }}
+      >
+        <thead style={{ padding: '10px' }}>
+          <tr className="text-center">
+            <th className="px-2 py-1">Status</th>
+            <th className="px-2 py-1">Active</th>
+            <th className="px-2 py-1">Loading</th>
+            <th className="px-2 py-1">Playing</th>
+          </tr>
+        </thead>
+
+        <tbody style={{ textAlign: 'center', color: '#d19a54' }}>
+          <tr>
+            <td>{loading ? '' : ''}</td>
+            <td>{active ? active.name : 'null'}</td>
+            <td>{loading.toString()}</td>
+            <td>{playing.toString()}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   )
 }
