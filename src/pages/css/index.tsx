@@ -62,7 +62,7 @@ function Subgrid() {
     <div
       className="grid min-w-[400px] w-max gap-x-2 gap-y-2"
       style={{
-        // main-start icon[20px] text[max-content] main-end
+        // main-start[1fr] icon[20px] text[max-content] main-end[1fr]
         gridTemplateColumns:
           '[main-start] 1fr [icon-start] 20px [icon-end text-start] max-content [text-end] 1fr [main-end]',
       }}
