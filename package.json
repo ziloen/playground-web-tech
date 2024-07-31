@@ -10,6 +10,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@adobe/react-spectrum": "3.36.1",
     "@atlaskit/pragmatic-drag-and-drop": "1.2.3",
     "@fontsource-variable/fira-code": "5.0.18",
     "@fontsource-variable/noto-sans-sc": "5.0.6",
@@ -59,6 +60,6 @@
     "unplugin-icons": "0.19.1",
     "vite": "^5.3.5",
     "vite-plugin-pages": "^0.32.3",
-    "vitest": "^2.0.4"
+    "vitest": "^2.0.5"
   }
 }

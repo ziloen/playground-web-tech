@@ -1,23 +1,14 @@
 import { Form, Input, Select } from 'antd'
 
-
-
 export default function BorderImage() {
-
   return (
-    <div className='w-full h-full'>
-      {/* <div className='bg-white h-200px w-200px'>
-
-      </div> */}
-
+    <div className="size-full">
       <Setting />
     </div>
   )
 }
 
-
 function Setting() {
-
   return (
     <Form>
       {/* border image 向外延申距离 */}
