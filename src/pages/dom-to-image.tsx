@@ -1,35 +1,22 @@
 import { Button } from 'antd'
-import html2canvas from 'html2canvas'
+import { toSvgElement } from '~/lib/html-to-image'
 
 export default function DOMToImage() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [svgElement, setSvgElement] = useState<SVGElement | null>(null)
 
   function captureDOM() {
     const element = containerRef.current
     if (!element) return
 
-    html2canvas(element, {
-      backgroundColor: null,
-      foreignObjectRendering: false,
-      allowTaint: false,
+    toSvgElement(element, {
       useCORS: true,
-      onclone(document, element) {
-        element.classList.add('w-[300px]')
-        element.style.height = 'auto'
+      style: {
+        height: 'max-content',
       },
-    }).then(
-      canvas => {
-        canvas.toBlob(blob => {
-          if (!blob) return
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = 'dom-to-image.png'
-          a.click()
-          URL.revokeObjectURL(url)
-        })
-      }
-    )
+    }).then((svg) => {
+      setSvgElement(svg)
+    })
   }
 
   return (
@@ -59,6 +46,33 @@ export default function DOMToImage() {
       <Button onClick={captureDOM}>
         Capture
       </Button>
+
+      <div>
+        {svgElement && <TeleportElement element={svgElement} />}
+      </div>
     </div>
   )
+}
+
+function TeleportElement({ element }: { element: Element }) {
+  const ref = useRef<HTMLDivElement>(null!)
+
+  useLayoutEffect(() => {
+    const parent = element.parentNode
+
+    if (!parent) {
+      ref.current.append(element)
+
+      return () => element.remove()
+    }
+
+    const placeholder = document.createComment('Teleport placeholder')
+
+    element.replaceWith(placeholder)
+    ref.current.append(element)
+
+    return () => placeholder.replaceWith(element)
+  }, [element])
+
+  return <div ref={ref} className="contents"></div>
 }

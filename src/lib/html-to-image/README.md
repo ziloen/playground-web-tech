@@ -1,0 +1,1 @@
+forked from [html-to-image](https://github.com/bubkoo/html-to-image)
