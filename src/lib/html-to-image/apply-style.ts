@@ -1,4 +1,4 @@
-import { Options } from './types'
+import type { Options } from './types'
 
 export function applyStyle<T extends HTMLElement>(node: T, options: Options): T {
   const { style } = node
@@ -17,8 +17,8 @@ export function applyStyle<T extends HTMLElement>(node: T, options: Options): T 
 
   const manual = options.style
   if (manual != null) {
-    Object.keys(manual).forEach((key: any) => {
-      style[key] = manual[key] as string
+    Object.keys(manual).forEach((key) => {
+      style[key as 'accentColor'] = manual[key] as string
     })
   }
 

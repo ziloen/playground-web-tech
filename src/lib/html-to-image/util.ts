@@ -20,8 +20,8 @@ export function resolveUrl(url: string, baseUrl: string | null): string {
   const base = doc.createElement('base')
   const a = doc.createElement('a')
 
-  doc.head.appendChild(base)
-  doc.body.appendChild(a)
+  doc.head.append(base)
+  doc.body.append(a)
 
   if (baseUrl) {
     base.href = baseUrl
@@ -38,9 +38,7 @@ export const uuid = (() => {
   let counter = 0
 
   // ref: http://stackoverflow.com/a/6248722/2519373
-  const random = () =>
-    // eslint-disable-next-line no-bitwise
-    `0000${((Math.random() * 36 ** 4) << 0).toString(36)}`.slice(-4)
+  const random = () => `0000${((Math.random() * 36 ** 4) << 0).toString(36)}`.slice(-4)
 
   return () => {
     counter += 1
@@ -55,18 +53,18 @@ export function delay<T>(ms: number) {
     })
 }
 
-export function toArray<T>(arrayLike: any): T[] {
+export function toArray<T>(arrayLike: ArrayLike<unknown>): T[] {
   const arr: T[] = []
 
   for (let i = 0, l = arrayLike.length; i < l; i++) {
-    arr.push(arrayLike[i])
+    arr.push(arrayLike[i] as T)
   }
 
   return arr
 }
 
 function px(node: HTMLElement, styleProperty: string) {
-  const win = node.ownerDocument.defaultView || window
+  const win = node.ownerDocument.defaultView ?? window
   const val = win.getComputedStyle(node).getPropertyValue(styleProperty)
   return val ? parseFloat(val.replace('px', '')) : 0
 }
@@ -96,7 +94,7 @@ export function getPixelRatio() {
   let FINAL_PROCESS
   try {
     FINAL_PROCESS = process
-  } catch (e) {
+  } catch {
     // pass
   }
 
@@ -174,11 +172,10 @@ export function canvasToBlob(
 export function createImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
-    img.decode = () => resolve(img) as any
     img.onload = () => resolve(img)
     img.onerror = reject
     img.crossOrigin = 'anonymous'
-    img.decoding = 'async'
+    img.decoding = 'sync'
     img.src = url
   })
 }
@@ -214,8 +211,8 @@ export function nodeToSvgElement(node: HTMLElement, width: number, height: numbe
   foreignObject.setAttribute('y', '0')
   foreignObject.setAttribute('externalResourcesRequired', 'true')
 
-  svg.appendChild(foreignObject)
-  foreignObject.appendChild(node)
+  svg.append(foreignObject)
+  foreignObject.append(node)
   return svg
 }
 
@@ -227,7 +224,7 @@ export const isInstanceOfElement = <
 ): node is T['prototype'] => {
   if (node instanceof instance) return true
 
-  const nodePrototype = Object.getPrototypeOf(node)
+  const nodePrototype = Object.getPrototypeOf(node) as T['prototype'] | null
 
   if (nodePrototype === null) return false
 

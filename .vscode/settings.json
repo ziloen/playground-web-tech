@@ -14,13 +14,12 @@
     "source.sortImports",
     // remove unused imports & sort imports
     // "source.organizeImports",
-    "source.fixAll.eslint",
+    // "source.fixAll.eslint",
   ],
   // add @container & @media snippet
   "emmet.extensionsPath": [
     ".vscode/emmet"
   ],
-  "eslint.experimental.useFlatConfig": true,
   "eslint.format.enable": false,
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

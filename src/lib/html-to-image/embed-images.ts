@@ -1,7 +1,7 @@
 import { isDataUrl, resourceToDataURL } from './dataurl'
 import { embedResources } from './embed-resources'
 import { getMimeType } from './mimes'
-import { Options } from './types'
+import type { Options } from './types'
 import { isInstanceOfElement, toArray } from './util'
 
 async function embedProp(propName: string, node: HTMLElement, options: Options) {
@@ -14,7 +14,7 @@ async function embedProp(propName: string, node: HTMLElement, options: Options) 
   return false
 }
 
-async function embedBackground<T extends HTMLElement>(clonedNode: T, options: Options) {
+async function embedBackground(clonedNode: HTMLElement, options: Options) {
   if (!(await embedProp('background', clonedNode, options))) {
     await embedProp('background-image', clonedNode, options)
   }
@@ -23,8 +23,8 @@ async function embedBackground<T extends HTMLElement>(clonedNode: T, options: Op
   }
 }
 
-async function embedImageNode<T extends HTMLElement | SVGImageElement>(
-  clonedNode: T,
+async function embedImageNode(
+  clonedNode: HTMLElement | SVGImageElement,
   options: Options
 ) {
   const isImageElement = isInstanceOfElement(clonedNode, HTMLImageElement)
@@ -35,8 +35,8 @@ async function embedImageNode<T extends HTMLElement | SVGImageElement>(
   }
 
   if (
-    !(isImageElement && !isDataUrl(clonedNode.src)) &&
-    !(isInstanceOfElement(clonedNode, SVGImageElement) && !isDataUrl(clonedNode.href.baseVal))
+    !(isImageElement && !isDataUrl(clonedNode.src))
+    && !(isInstanceOfElement(clonedNode, SVGImageElement) && !isDataUrl(clonedNode.href.baseVal))
   ) {
     return
   }
@@ -45,34 +45,36 @@ async function embedImageNode<T extends HTMLElement | SVGImageElement>(
 
   const dataURL = await resourceToDataURL(url, getMimeType(url), options)
   await new Promise((resolve, reject) => {
-    clonedNode.onload = resolve
     clonedNode.onerror = reject
 
-    const image = clonedNode as HTMLImageElement
-    if (image.decode) {
-      image.decode = resolve as any
-    }
-
-    if (image.loading === 'lazy') {
-      image.loading = 'eager'
-    }
-
     if (isImageElement) {
+      if (clonedNode.loading === 'lazy') {
+        clonedNode.loading = 'eager'
+      }
+
       clonedNode.srcset = ''
       clonedNode.src = dataURL
+
+      // `src` should be set before calling `decode`
+      if (clonedNode.decode) {
+        clonedNode.decode().then(resolve)
+      } else {
+        clonedNode.onload = resolve
+      }
     } else {
+      clonedNode.onload = resolve
       clonedNode.href.baseVal = dataURL
     }
   })
 }
 
-async function embedChildren<T extends HTMLElement>(clonedNode: T, options: Options) {
+async function embedChildren(clonedNode: HTMLElement, options: Options) {
   const children = toArray<HTMLElement>(clonedNode.childNodes)
   const deferreds = children.map((child) => embedImages(child, options))
   await Promise.all(deferreds).then(() => clonedNode)
 }
 
-export async function embedImages<T extends HTMLElement>(clonedNode: T, options: Options) {
+export async function embedImages(clonedNode: HTMLElement, options: Options) {
   if (isInstanceOfElement(clonedNode, Element)) {
     await embedBackground(clonedNode, options)
     await embedImageNode(clonedNode, options)

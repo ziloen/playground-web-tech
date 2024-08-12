@@ -13,6 +13,7 @@
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
+    "useUnknownInCatchVariables": false,
     // resolve / build
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

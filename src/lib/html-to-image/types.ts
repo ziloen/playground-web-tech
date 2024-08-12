@@ -1,3 +1,5 @@
+import type { LiteralUnion } from 'type-fest'
+
 export interface Options {
   /**
    * Width in pixels to be applied to node before rendering.
@@ -67,14 +69,16 @@ export interface Options {
   /**
    * The preferred font format. If specified all other font formats are ignored.
    */
-  preferredFontFormat?:
+  preferredFontFormat?: LiteralUnion<
     | 'woff'
     | 'woff2'
     | 'truetype'
     | 'opentype'
     | 'embedded-opentype'
-    | 'svg'
-    | string
+    | 'svg',
+    string
+  >
+
   /**
    * A CSS string to specify for font embeds. If specified only this CSS will
    * be present in the resulting image. Use with `getFontEmbedCSS()` to
@@ -91,9 +95,7 @@ export interface Options {
   type?: string
 
   /**
-   *
-   *the second parameter of  window.fetch (Promise<Response> fetch(input[, init]))
-   *
+   * the second parameter of  window.fetch (Promise<Response> fetch(input[, init]))
    */
   fetchRequestInit?: RequestInit
 }

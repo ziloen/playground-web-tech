@@ -41,8 +41,8 @@ async function cloneIFrameElement(iframe: HTMLIFrameElement) {
   return iframe.cloneNode(false) as HTMLIFrameElement
 }
 
-async function cloneSingleNode<T extends HTMLElement>(
-  node: T,
+async function cloneSingleNode(
+  node: HTMLElement,
   options: Options
 ): Promise<HTMLElement> {
   if (isInstanceOfElement(node, HTMLCanvasElement)) {
@@ -57,11 +57,16 @@ async function cloneSingleNode<T extends HTMLElement>(
     return cloneIFrameElement(node)
   }
 
-  return node.cloneNode(false) as T
+  return node.cloneNode(false) as HTMLElement
 }
 
-const isSlotElement = (node: HTMLElement): node is HTMLSlotElement =>
-  node.tagName != null && node.tagName.toUpperCase() === 'SLOT'
+function isSlotElement(node: HTMLElement): node is HTMLSlotElement {
+  return node.tagName != null && node.tagName.toUpperCase() === 'SLOT'
+}
+
+function isSVGElement(node: Element): node is SVGElement {
+  return node.tagName !== null && node.tagName.toUpperCase() === 'SVG'
+}
 
 async function cloneChildren<T extends HTMLElement>(
   nativeNode: T,
@@ -73,8 +78,8 @@ async function cloneChildren<T extends HTMLElement>(
   if (isSlotElement(nativeNode) && nativeNode.assignedNodes) {
     children = toArray<T>(nativeNode.assignedNodes())
   } else if (
-    isInstanceOfElement(nativeNode, HTMLIFrameElement) &&
-    nativeNode.contentDocument?.body
+    isInstanceOfElement(nativeNode, HTMLIFrameElement)
+    && nativeNode.contentDocument?.body
   ) {
     children = toArray<T>(nativeNode.contentDocument.body.childNodes)
   } else {
@@ -91,7 +96,7 @@ async function cloneChildren<T extends HTMLElement>(
         .then(() => cloneNode(child, options))
         .then((clonedChild: HTMLElement | null) => {
           if (clonedChild) {
-            clonedNode.appendChild(clonedChild)
+            clonedNode.append(clonedChild)
           }
         }),
     Promise.resolve()
@@ -114,20 +119,21 @@ function cloneCSSStyle<T extends HTMLElement>(nativeNode: T, clonedNode: T) {
     toArray<string>(sourceStyle).forEach((name) => {
       let value = sourceStyle.getPropertyValue(name)
       if (name === 'font-size' && value.endsWith('px')) {
-        const reducedFont = Math.floor(parseFloat(value.substring(0, value.length - 2))) - 0.1
+        const reducedFont = Math.floor(parseFloat(value.slice(0, Math.max(0, value.length - 2))))
+          - 0.1
         value = `${reducedFont}px`
       }
 
       if (
-        isInstanceOfElement(nativeNode, HTMLIFrameElement) &&
-        name === 'display' &&
-        value === 'inline'
+        isInstanceOfElement(nativeNode, HTMLIFrameElement)
+        && name === 'display'
+        && value === 'inline'
       ) {
         value = 'block'
       }
 
       if (name === 'd' && clonedNode.getAttribute('d')) {
-        value = `path(${clonedNode.getAttribute('d')})`
+        value = `path(${clonedNode.getAttribute('d') || ''})`
       }
 
       targetStyle.setProperty(name, value, sourceStyle.getPropertyPriority(name))
@@ -178,7 +184,7 @@ async function ensureSVGSymbols<T extends HTMLElement>(clone: T, options: Option
   const processedDefs: { [key: string]: HTMLElement } = {}
   for (let i = 0; i < uses.length; i++) {
     const use = uses[i]
-    const id = use.getAttribute('xlink:href')
+    const id = use.getAttribute('href') || use.getAttribute('xlink:href')
     if (id) {
       const exist = clone.querySelector(id)
       const definition = document.querySelector(id) as HTMLElement
@@ -201,13 +207,13 @@ async function ensureSVGSymbols<T extends HTMLElement>(clone: T, options: Option
     svg.style.display = 'none'
 
     const defs = document.createElementNS(ns, 'defs')
-    svg.appendChild(defs)
+    svg.append(defs)
 
     for (let i = 0; i < nodes.length; i++) {
-      defs.appendChild(nodes[i])
+      defs.append(nodes[i])
     }
 
-    clone.appendChild(svg)
+    clone.append(svg)
   }
 
   return clone

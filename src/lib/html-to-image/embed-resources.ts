@@ -1,6 +1,6 @@
 import { isDataUrl, makeDataUrl, resourceToDataURL } from './dataurl'
 import { getMimeType } from './mimes'
-import { Options } from './types'
+import type { Options } from './types'
 import { resolveUrl } from './util'
 
 const URL_REGEX = /url\((['"]?)([^'"]+?)\1\)/g
@@ -9,14 +9,14 @@ const FONT_SRC_REGEX = /src:\s*(?:url\([^)]+\)\s*format\([^)]+\)[,;]\s*)+/g
 
 function toRegex(url: string): RegExp {
   // eslint-disable-next-line no-useless-escape
-  const escaped = url.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1')
+  const escaped = url.replace(/([.*+?^${}()|\[\]\/\\])/g, String.raw`\$1`)
   return new RegExp(`(url\\(['"]?)(${escaped})(['"]?\\))`, 'g')
 }
 
 export function parseURLs(cssText: string): string[] {
   const urls: string[] = []
 
-  cssText.replace(URL_REGEX, (raw, quotation, url) => {
+  cssText.replace(URL_REGEX, (raw, quotation, url: string) => {
     urls.push(url)
     return raw
   })
@@ -42,7 +42,7 @@ export async function embed(
       dataURL = await resourceToDataURL(resolvedURL, contentType, options)
     }
     return cssText.replace(toRegex(resourceURL), `$1${dataURL}$3`)
-  } catch (error) {
+  } catch {
     // pass
   }
   return cssText
@@ -52,18 +52,17 @@ function filterPreferredFontFormat(str: string, { preferredFontFormat }: Options
   return !preferredFontFormat
     ? str
     : str.replace(FONT_SRC_REGEX, (match: string) => {
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const [src, , format] = URL_WITH_FORMAT_REGEX.exec(match) || []
-          if (!format) {
-            return ''
-          }
-
-          if (format === preferredFontFormat) {
-            return `src: ${src};`
-          }
+      while (true) {
+        const [src, , format] = URL_WITH_FORMAT_REGEX.exec(match) ?? []
+        if (!format) {
+          return ''
         }
-      })
+
+        if (format === preferredFontFormat) {
+          return `src: ${src!};`
+        }
+      }
+    })
 }
 
 export function shouldEmbed(url: string): boolean {

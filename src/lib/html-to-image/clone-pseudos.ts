@@ -39,13 +39,13 @@ function clonePseudoElement<T extends HTMLElement>(nativeNode: T, clonedNode: T,
   const className = uuid()
   try {
     clonedNode.className = `${clonedNode.className} ${className}`
-  } catch (err) {
+  } catch {
     return
   }
 
   const styleElement = document.createElement('style')
-  styleElement.appendChild(getPseudoElementStyle(className, pseudo, style))
-  clonedNode.appendChild(styleElement)
+  styleElement.append(getPseudoElementStyle(className, pseudo, style))
+  clonedNode.append(styleElement)
 }
 
 export function clonePseudoElements<T extends HTMLElement>(nativeNode: T, clonedNode: T) {
