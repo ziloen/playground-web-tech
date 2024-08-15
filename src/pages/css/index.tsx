@@ -22,6 +22,8 @@ export default function CSSPage() {
       <AspectRatio />
 
       <SameWidthFlexWrap />
+
+      <AutoShrinkButton />
     </div>
   )
 }
@@ -101,9 +103,9 @@ function HolyGrail() {
  */
 function SameWidthFlexWrap() {
   return (
-    <div className="resizable-x w-[300px] flex flex-wrap gap-[12px]">
+    <div className="resizable-x w-[300px] flex flex-wrap gap-[12px] bg-dark-gray-700">
       <div
-        className="grow whitespace-nowrap text-center shrink-0 bg-blue-600"
+        className="grow whitespace-nowrap text-center shrink-0 bg-blue-400/20"
         style={{
           flexBasis: 'calc(50% - 6px)',
           width: 'fit-content',
@@ -113,7 +115,7 @@ function SameWidthFlexWrap() {
       </div>
 
       <div
-        className="grow whitespace-nowrap text-center shrink-0 bg-green-700"
+        className="grow whitespace-nowrap text-center shrink-0 bg-green-400/20"
         style={{
           flexBasis: 'calc(50% - 6px)',
           width: 'fit-content',
@@ -226,6 +228,34 @@ function ScrollAutoAnchor() {
           })}
         </div>
       </div>
+    </div>
+  )
+}
+
+function AutoShrinkButton() {
+  return (
+    <div className="text-sm resizable-x w-[350px] max-w-full flex gap-2 bg-dark-gray-700">
+      <div className="flex-1 h-[1lh]">
+        <div className="bg-blue-400/20 gap-x-2 px-2 flex flex-wrap max-h-[2lh] max-w-max">
+          <div className="h-[1lh]">
+            🍕
+          </div>
+
+          <div className="break-all">
+            Button 1
+          </div>
+        </div>
+
+        <div className="relative -top-[2lh] flex bg-dark-gray-700">
+          <div className="bg-blue-400/20 px-2">
+            🍕
+          </div>
+        </div>
+      </div>
+
+      <div className="shrink-0 bg-green-400/20 px-2">Button 2</div>
+
+      <div className="bg-red-400/20 shrink-0 px-2">Button 3</div>
     </div>
   )
 }
