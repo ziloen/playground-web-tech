@@ -24,6 +24,8 @@ export default function CSSPage() {
       <SameWidthFlexWrap />
 
       <AutoShrinkButton />
+
+      <AutoShrinkButton2 />
     </div>
   )
 }
@@ -234,11 +236,11 @@ function ScrollAutoAnchor() {
 
 function AutoShrinkButton() {
   return (
-    <div className="text-sm resizable-x w-[350px] max-w-full flex gap-2 bg-dark-gray-700">
+    <div className="text-sm resizable-x w-[300px] max-w-full flex gap-2 bg-dark-gray-700">
       <div className="flex-1 h-[1lh]">
         <div className="bg-blue-400/20 gap-x-2 px-2 flex flex-wrap max-h-[2lh] max-w-max">
           <div className="h-[1lh]">
-            🍕
+            🏐
           </div>
 
           <div className="break-all">
@@ -248,7 +250,7 @@ function AutoShrinkButton() {
 
         <div className="relative -top-[2lh] flex bg-dark-gray-700">
           <div className="bg-blue-400/20 px-2">
-            🍕
+            🏀
           </div>
         </div>
       </div>
@@ -256,6 +258,46 @@ function AutoShrinkButton() {
       <div className="shrink-0 bg-green-400/20 px-2">Button 2</div>
 
       <div className="bg-red-400/20 shrink-0 px-2">Button 3</div>
+    </div>
+  )
+}
+
+function AutoShrinkButton2() {
+  return (
+    <div className="text-sm resizable-x w-[450px] max-w-full flex gap-2 bg-dark-gray-700">
+      <div className="h-[1lh] mr-auto">
+        <div className='flex gap-2 overflow-hidden'>
+          <div className="bg-blue-400/20 gap-x-2 px-2 flex flex-wrap max-h-[2lh] max-w-max">
+            <div className="h-[1lh]">
+              🏐
+            </div>
+
+            <div className="break-all">
+              Button 1
+            </div>
+          </div>
+
+          <div className="flex gap-2 shrink-0">
+            <div className="shrink-0 bg-green-400/20 px-2 whitespace-nowrap">Button 2</div>
+
+            <div className="bg-red-400/20 shrink-0 px-2 whitespace-nowrap">Button 3</div>
+          </div>
+        </div>
+
+        <div className="relative -top-[2lh] flex gap-2 bg-dark-gray-700">
+          <div className="bg-blue-400/20 px-2">
+            🏀
+          </div>
+
+          <div className="shrink-0 bg-green-400/20 px-2">Button 2</div>
+
+          <div className="bg-red-400/20 shrink-0 px-2">Button 3</div>
+        </div>
+      </div>
+
+      <div className="shrink-0 bg-violet-400/20 px-2">Button 4</div>
+
+      <div className="bg-orange-400/20 shrink-0 px-2">Button 5</div>
     </div>
   )
 }
