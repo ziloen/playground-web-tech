@@ -26,6 +26,8 @@ export default function CSSPage() {
       <AutoShrinkButton />
 
       <AutoShrinkButton2 />
+
+      <AutoShrinkButton3 />
     </div>
   )
 }
@@ -266,7 +268,7 @@ function AutoShrinkButton2() {
   return (
     <div className="text-sm resizable-x w-[450px] max-w-full flex gap-2 bg-dark-gray-700">
       <div className="h-[1lh] mr-auto">
-        <div className='flex gap-2 overflow-hidden'>
+        <div className="flex gap-2 overflow-hidden">
           <div className="bg-blue-400/20 gap-x-2 px-2 flex flex-wrap max-h-[2lh] max-w-max">
             <div className="h-[1lh]">
               🏐
@@ -298,6 +300,23 @@ function AutoShrinkButton2() {
       <div className="shrink-0 bg-violet-400/20 px-2">Button 4</div>
 
       <div className="bg-orange-400/20 shrink-0 px-2">Button 5</div>
+    </div>
+  )
+}
+
+function AutoShrinkButton3() {
+  return (
+    <div className="text-sm w-[100px] resizable-x max-w-full flex gap-2">
+      <div className="h-[1lh]">
+        <div className="flex flex-wrap-reverse flex-row relative">
+          <div className="h-[1lh] shrink-0">Button</div>
+          <div className="w-px h-[1lh]"></div>
+
+          <div className="absolute bottom-[1lh] shrink-0 whitespace-nowrap">
+            AAAA djaiowjdoi
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
