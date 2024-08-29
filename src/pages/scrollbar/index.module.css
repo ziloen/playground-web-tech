@@ -1,9 +1,32 @@
 /* https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar */
 
+/* FIXME: @property not working when style in shadowdom */
+@property --scrollbar-thumb-color {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: white;
+}
+
+@property --scrollbar-thumb-border {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
 .scrollbar {
   --scrollbar-size: 10px;
   --scrollbar-thumb-background-color: oklch(100% 0 0 / 0.2);
   --scrollbar-thumb-background-color-active: oklch(100% 0 0 / 0.5);
+
+  --scrollbar-thumb-color: transparent;
+  --scrollbar-thumb-border: 3px;
+
+  transition: --scrollbar-thumb-color .2s ease, --scrollbar-thumb-border .2s ease;
+  position: relative;
+
+  &:hover {
+    --scrollbar-thumb-color: var(--scrollbar-thumb-background-color);
+  }
 
   &::-webkit-scrollbar {
     width: var(--scrollbar-size);
@@ -13,12 +36,12 @@
 
   &::-webkit-scrollbar-thumb {
     /* hide when not hover */
-    visibility: hidden;
-    background-color: var(--scrollbar-thumb-background-color);
+    /* visibility: hidden; */
+    background-color: var(--scrollbar-thumb-color);
     background-clip: padding-box;
     border-radius: var(--scrollbar-size);
 
-    border-width: 3px;
+    border-width: var(--scrollbar-thumb-border);
     border-style: solid;
     border-color: transparent;
   }
@@ -29,15 +52,12 @@
     background-color: var(--scrollbar-thumb-background-color-active);
   }
 
-  &:hover {
-    &::-webkit-scrollbar-thumb {
-      visibility: visible;
-    }
-  }
 
   &::-webkit-scrollbar-track {
     /* border-radius - scrollbar-size / 2 */
     margin: calc(24px - var(--scrollbar-size) / 2);
+    border-radius: 9999px;
+    background-color: oklab(100% 0 0 / 0.05);
   }
 
   &::-webkit-scrollbar-button,
