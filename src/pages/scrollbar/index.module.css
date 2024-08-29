@@ -13,7 +13,7 @@
 
   &::-webkit-scrollbar-thumb {
     /* hide when not hover */
-    /* visibility: hidden; */
+    visibility: hidden;
     background-color: var(--scrollbar-thumb-background-color);
     background-clip: padding-box;
     border-radius: var(--scrollbar-size);
@@ -21,17 +21,17 @@
     border-width: 3px;
     border-style: solid;
     border-color: transparent;
+  }
 
-    &:hover,
-    &:active {
-      border-width: 1px;
-      background-color: var(--scrollbar-thumb-background-color-active);
-    }
+  &::-webkit-scrollbar-thumb:hover,
+  &::-webkit-scrollbar-thumb:active {
+    border-width: 1px;
+    background-color: var(--scrollbar-thumb-background-color-active);
   }
 
   &:hover {
     &::-webkit-scrollbar-thumb {
-      /* visibility: visible; */
+      visibility: visible;
     }
   }
 
