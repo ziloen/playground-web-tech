@@ -24,7 +24,10 @@
   transition: --scrollbar-thumb-color .2s ease, --scrollbar-thumb-border .2s ease;
   position: relative;
 
-  &:hover {
+  &:hover,
+  &:active,
+  &:focus,
+  &:focus-within {
     --scrollbar-thumb-color: var(--scrollbar-thumb-background-color);
   }
 
@@ -35,8 +38,6 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    /* hide when not hover */
-    /* visibility: hidden; */
     background-color: var(--scrollbar-thumb-color);
     background-clip: padding-box;
     border-radius: var(--scrollbar-size);
@@ -48,8 +49,8 @@
 
   &::-webkit-scrollbar-thumb:hover,
   &::-webkit-scrollbar-thumb:active {
-    border-width: 1px;
-    background-color: var(--scrollbar-thumb-background-color-active);
+    --scrollbar-thumb-border: 1px;
+    --scrollbar-thumb-color: var(--scrollbar-thumb-background-color-active);
   }
 
 
