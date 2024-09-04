@@ -47,10 +47,18 @@
       background-color: var(--scrollbar-thumb-color);
       background-clip: padding-box;
       border-radius: var(--scrollbar-size);
+      border-radius: var(--scrollbar-size) / calc(var(--scrollbar-size) - var(--scrollbar-thumb-border) * 2);
 
-      border-width: var(--scrollbar-thumb-border);
+      border-block-width: 0px;
+      border-inline-width: var(--scrollbar-thumb-border);
       border-style: solid;
       border-color: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb:horizontal {
+      border-block-width: var(--scrollbar-thumb-border);
+      border-inline-width: 0px;
+      border-radius: calc(var(--scrollbar-size) - var(--scrollbar-thumb-border) * 2) / var(--scrollbar-size);
     }
 
     &::-webkit-scrollbar-thumb:hover,
