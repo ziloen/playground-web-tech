@@ -4,10 +4,10 @@ const testString =
 export default function CSSPage() {
   return (
     <div className="flex flex-col gap-4">
-      <div className="text-sm resizable-x w-[800px] max-w-full">
+      <div className="w-[800px] max-w-full text-sm resizable-x">
         <EllipsisMiddle text={testString} />
       </div>
-      <div className="text-sm resizable-x w-[750px] max-w-full">
+      <div className="w-[750px] max-w-full text-sm resizable-x">
         <ShowMore text={testString} />
       </div>
 
@@ -41,14 +41,14 @@ function EllipsisMiddle({ text }: {
   text: string
 }) {
   return (
-    <div className="relative leading-[2em] h-[2em] bg-dark-gray-700 overflow-clip">
+    <div className="relative h-[2em] overflow-clip bg-dark-gray-700 leading-[2em]">
       {/* When not overflow */}
       <div className="max-h-[4em] w-fit">{text}</div>
 
       {/* When overflow, this will cover above text */}
-      <div className="relative top-[-4em] bg-inherit flex" title={text}>
+      <div className="relative top-[-4em] flex bg-inherit" title={text}>
         {/* Left part */}
-        <div className="w-1/2 overflow-hidden whitespace-nowrap text-ellipsis">{text}</div>
+        <div className="w-1/2 overflow-hidden text-ellipsis whitespace-nowrap">{text}</div>
 
         {/* Right part */}
         <div
@@ -66,7 +66,7 @@ function EllipsisMiddle({ text }: {
 function Subgrid() {
   return (
     <div
-      className="grid min-w-[400px] w-max gap-x-2 gap-y-2"
+      className="grid w-max min-w-[400px] gap-x-2 gap-y-2"
       style={{
         // main-start[1fr] icon[20px] text[max-content] main-end[1fr]
         gridTemplateColumns:
@@ -78,7 +78,7 @@ function Subgrid() {
           key={i}
           className="col-[main] grid grid-cols-subgrid border border-solid border-green-600"
         >
-          <div className="col-[icon] bg-blue-500 rounded-full size-[20px]"></div>
+          <div className="col-[icon] size-[20px] rounded-full bg-blue-500"></div>
 
           <div className="col-[text]">{'A'.repeat(i + 1)}</div>
         </div>
@@ -107,9 +107,9 @@ function HolyGrail() {
  */
 function SameWidthFlexWrap() {
   return (
-    <div className="resizable-x w-[300px] flex flex-wrap gap-[12px] bg-dark-gray-700">
+    <div className="flex w-[300px] flex-wrap gap-[12px] bg-dark-gray-700 resizable-x">
       <div
-        className="grow whitespace-nowrap text-center shrink-0 bg-blue-400/20"
+        className="shrink-0 grow whitespace-nowrap bg-blue-400/20 text-center"
         style={{
           flexBasis: 'calc(50% - 6px)',
           width: 'fit-content',
@@ -119,7 +119,7 @@ function SameWidthFlexWrap() {
       </div>
 
       <div
-        className="grow whitespace-nowrap text-center shrink-0 bg-green-400/20"
+        className="shrink-0 grow whitespace-nowrap bg-green-400/20 text-center"
         style={{
           flexBasis: 'calc(50% - 6px)',
           width: 'fit-content',
@@ -135,22 +135,22 @@ function AspectRatio() {
   return (
     <div className="flex">
       {/* Works on Firefox */}
-      <div className="resizable min-h-[40px] min-w-[40px] flex bg-light-gray-900 size-[100px]">
-        <div className="bg-green-900 w-stretch aspect-video max-w-full max-h-full m-auto">
+      <div className="flex size-[100px] min-h-[40px] min-w-[40px] bg-light-gray-900 resizable">
+        <div className="m-auto aspect-video max-h-full max-w-full bg-green-900 w-stretch">
           Only works on Firefox
         </div>
       </div>
 
       {/* Works on All */}
-      <div className="resizable min-h-[40px] min-w-[40px] bg-dark-gray-600 size-[100px] flex">
+      <div className="flex size-[100px] min-h-[40px] min-w-[40px] bg-dark-gray-600 resizable">
         {/* viewBox or el.getBBox() */}
         <svg viewBox="0 0 300 200" className="max-w-full max-h-full m-auto">
           <image href="https://dummyimage.com/300x200/554d3e/ffffff.png&text=300x200 SVG" />
         </svg>
       </div>
 
-      <div className="resizable min-h-[40px] min-w-[40px] flex bg-light-gray-900 size-[100px]">
-        <div className="bg-green-900 min-h-0 min-w-0 overflow-clip aspect-video max-w-full max-h-full m-auto relative">
+      <div className="flex size-[100px] min-h-[40px] min-w-[40px] bg-light-gray-900 resizable">
+        <div className="relative m-auto aspect-video max-h-full min-h-0 min-w-0 max-w-full overflow-clip bg-green-900">
           <div className="size-[99999px]">
             Hack
           </div>
@@ -167,10 +167,10 @@ function ShowMore({ text }: {
 
   if (isShowMore) {
     return (
-      <div className="relative bg-dark-gray-700 leading-[2em] overflow-hidden">
+      <div className="relative overflow-hidden bg-dark-gray-700 leading-[2em]">
         <span>{text}</span>
 
-        <span className="inline-block text-transparent float-end ml-2 pointer-events-none">
+        <span className="pointer-events-none float-end ml-2 inline-block text-transparent">
           Show less
         </span>
 
@@ -266,10 +266,10 @@ function AutoShrinkButton() {
 
 function AutoShrinkButton2() {
   return (
-    <div className="text-sm resizable-x w-[450px] max-w-full flex gap-2 bg-dark-gray-700">
-      <div className="h-[1lh] mr-auto">
+    <div className="flex w-[450px] max-w-full gap-2 bg-dark-gray-700 text-sm resizable-x">
+      <div className="mr-auto h-[1lh]">
         <div className="flex gap-2 overflow-hidden">
-          <div className="bg-blue-400/20 gap-x-2 px-2 flex flex-wrap max-h-[2lh] max-w-max">
+          <div className="flex max-h-[2lh] max-w-max flex-wrap gap-x-2 bg-blue-400/20 px-2">
             <div className="h-[1lh]">
               🏐
             </div>
@@ -279,10 +279,10 @@ function AutoShrinkButton2() {
             </div>
           </div>
 
-          <div className="flex gap-2 shrink-0">
-            <div className="shrink-0 bg-green-400/20 px-2 whitespace-nowrap">Button 2</div>
+          <div className="flex shrink-0 gap-2">
+            <div className="shrink-0 whitespace-nowrap bg-green-400/20 px-2">Button 2</div>
 
-            <div className="bg-red-400/20 shrink-0 px-2 whitespace-nowrap">Button 3</div>
+            <div className="shrink-0 whitespace-nowrap bg-red-400/20 px-2">Button 3</div>
           </div>
         </div>
 
@@ -293,13 +293,13 @@ function AutoShrinkButton2() {
 
           <div className="shrink-0 bg-green-400/20 px-2">Button 2</div>
 
-          <div className="bg-red-400/20 shrink-0 px-2">Button 3</div>
+          <div className="shrink-0 bg-red-400/20 px-2">Button 3</div>
         </div>
       </div>
 
       <div className="shrink-0 bg-violet-400/20 px-2">Button 4</div>
 
-      <div className="bg-orange-400/20 shrink-0 px-2">Button 5</div>
+      <div className="shrink-0 bg-orange-400/20 px-2">Button 5</div>
     </div>
   )
 }
@@ -308,7 +308,7 @@ function AutoShrinkButton3() {
   return (
     <div className="text-sm w-[100px] resizable-x max-w-full flex gap-2">
       <div className="h-[1lh]">
-        <div className="flex flex-wrap-reverse flex-row relative">
+        <div className="relative flex flex-row flex-wrap-reverse">
           <div className="h-[1lh] shrink-0">Button</div>
           <div className="w-px h-[1lh]"></div>
 
