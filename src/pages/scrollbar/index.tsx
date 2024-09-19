@@ -5,11 +5,11 @@ export default function Scrollbar() {
     <div
       className={clsx(
         styles.scrollbar,
-        'w-[200px] h-[400px] bg-[#24292e] overflow-auto rounded-[24px]'
+        'size-[400px] bg-[#24292e] overflow-auto rounded-[24px]'
       )}
     >
-      <div className="h-[100px] bg-emerald"></div>
-      <div className="h-[800px]"></div>
+      <div className="size-[100px] bg-green-800"></div>
+      <div className="size-[800px]"></div>
     </div>
   )
 }
