@@ -78,6 +78,18 @@ export default function Slider() {
         value={value}
         onChange={e => setValue(Number(e.currentTarget.value))}
       />
+
+      <div>
+        <ul className="ps-[1em]">
+          {/* TODO: customize list style */}
+          {/* ::marker */}
+          {/* @counter-style custom */}
+          <li>Item1</li>
+          <li>Item2</li>
+          <li>Item3</li>
+          <li>Item4</li>
+        </ul>
+      </div>
     </div>
   )
 }
