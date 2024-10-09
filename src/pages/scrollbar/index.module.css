@@ -15,11 +15,10 @@
 
 .scrollbar {
   --scrollbar-size: 10px;
-  --scrollbar-track-background-color: oklab(100% 0 0 / 0.05);
-  --scrollbar-thumb-background-color: oklch(100% 0 0 / 0.2);
-  --scrollbar-thumb-background-color-active: oklch(100% 0 0 / 0.5);
+  --track-bg: oklab(100% 0 0 / 0.05);
+  --thumb-bg: oklch(100% 0 0 / 0.2);
+  --thumb-bg-active: oklch(100% 0 0 / 0.5);
 }
-
 
 @supports selector(::-webkit-scrollbar-thumb) {
   .scrollbar {
@@ -28,13 +27,12 @@
 
     transition: --scrollbar-thumb-color .2s ease,
       --scrollbar-thumb-border .2s ease;
-    position: relative;
 
     &:hover,
     &:active,
     &:focus,
     &:focus-within {
-      --scrollbar-thumb-color: var(--scrollbar-thumb-background-color);
+      --scrollbar-thumb-color: var(--thumb-bg);
     }
 
     &::-webkit-scrollbar {
@@ -63,7 +61,7 @@
     &::-webkit-scrollbar-thumb:hover,
     &::-webkit-scrollbar-thumb:active {
       --scrollbar-thumb-border: 1px;
-      --scrollbar-thumb-color: var(--scrollbar-thumb-background-color-active);
+      --scrollbar-thumb-color: var(--thumb-bg-active);
     }
 
 
@@ -71,7 +69,7 @@
       /* border-radius - scrollbar-size / 2 */
       margin: calc(24px - var(--scrollbar-size) / 2);
       border-radius: 9999px;
-      background-color: var(--scrollbar-track-background-color);
+      background-color: var(--track-bg);
     }
 
     &::-webkit-scrollbar-button,
@@ -84,7 +82,7 @@
 @supports not selector(::-webkit-scrollbar-thumb) {
   .scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: transparent var(--scrollbar-track-background-color);
+    scrollbar-color: transparent var(--track-bg);
     scrollbar-arrow-color: red;
 
     transition-property: scrollbar-color;
@@ -95,7 +93,7 @@
     &:active,
     &:focus,
     &:focus-within {
-      scrollbar-color: var(--scrollbar-thumb-background-color) var(--scrollbar-track-background-color);
+      scrollbar-color: var(--thumb-bg) var(--track-bg);
     }
   }
 }

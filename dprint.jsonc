@@ -1,4 +1,6 @@
 {
+  "useTabs": false,
+  "indentWidth": 2,
   // https://dprint.dev/plugins/typescript/config/
   "typescript": {
     "lineWidth": 100,
@@ -33,6 +35,6 @@
     "**/node_modules"
   ],
   "plugins": [
-    "https://plugins.dprint.dev/typescript-0.91.8.wasm"
+    "https://plugins.dprint.dev/typescript-0.93.0.wasm"
   ]
 }
