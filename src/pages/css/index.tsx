@@ -28,6 +28,8 @@ export default function CSSPage() {
       <AutoShrinkButton2 />
 
       <AutoShrinkButton3 />
+
+      <StickyOuterContainer />
     </div>
   )
 }
@@ -317,6 +319,27 @@ function AutoShrinkButton3() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// https://stackoverflow.com/a/64260149/20377846
+function StickyOuterContainer() {
+  return (
+    <div className="max-h-[80px] overflow-y-auto w-[200px] flex flex-col">
+      <div className="">
+        <div className="bg-blue-300">Element 1</div>
+        <div className="bg-blue-400">Element 2</div>
+        <div className="bg-blue-500">Element 3</div>
+        <div className="bg-blue-600">Element 4</div>
+        <div className="bg-blue-700">Element 5</div>
+
+        <div className="sticky float-left bottom-0 bg-orange-400">
+          <div>Sticky Element</div>
+        </div>
+      </div>
+
+      <div className="bg-red-400">Footer</div>
     </div>
   )
 }
