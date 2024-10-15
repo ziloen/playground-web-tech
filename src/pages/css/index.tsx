@@ -46,7 +46,7 @@ function EllipsisMiddle({ text }: {
       <div className="max-h-[4em] w-fit">{text}</div>
 
       {/* When overflow, this will cover above text */}
-      <div className="relative top-[-4em] flex bg-inherit" title={text}>
+      <div className="relative -top-[4em] flex bg-inherit" title={text}>
         {/* Left part */}
         <div className="w-1/2 overflow-hidden text-ellipsis whitespace-nowrap">{text}</div>
 
@@ -193,7 +193,7 @@ function ShowMore({ text }: {
       <div className="max-h-[4em] w-fit overflow-visible">{text}</div>
 
       {/* When overflow, this will cover above text */}
-      <div className="relative top-[-4em] bg-inherit flex" title={text}>
+      <div className="relative -top-[4em] bg-inherit flex" title={text}>
         {/* Left part */}
         <div
           className="overflow-hidden whitespace-nowrap text-ellipsis"
