@@ -45,7 +45,7 @@ async function embedImageNode(
 
   const dataURL = await resourceToDataURL(url, getMimeType(url), options)
   await new Promise((resolve, reject) => {
-    clonedNode.onerror = reject
+    clonedNode.onerror = (options.throwOnImageError ?? false) ? reject : resolve
 
     if (isImageElement) {
       if (clonedNode.loading === 'lazy') {

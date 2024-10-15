@@ -56,6 +56,12 @@ export interface Options {
    * areas for failed images.
    */
   imagePlaceholder?: string
+
+  /**
+   * @default false
+   */
+  throwOnImageError?: boolean
+
   useCORS?: boolean
   /**
    * The pixel ratio of captured image. Defalut is the actual pixel ratio of
