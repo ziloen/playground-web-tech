@@ -61,12 +61,25 @@ export default function DND() {
       setDropTypes(types)
     }, { signal: ac.signal })
 
+    target.addEventListener('paste', e => {
+      console.log('paste', e)
+      const { items, files, types } = logDataTransfer(e.clipboardData)
+
+      setDropItems(items)
+      setDropFiles(files)
+      setDropTypes(types)
+    }, { signal: ac.signal })
+
     return () => ac.abort()
   }, [])
 
   return (
     <div className="relative size-full overflow-clip">
-      <div ref={targetRef} className="size-[200px] rounded-[6px] bg-dark-gray-50">
+      <div
+        ref={targetRef}
+        tabIndex={0}
+        className="size-[200px] focus:outline-blue-400 focus:outline focus:outline-1 rounded-[6px] bg-dark-gray-50"
+      >
       </div>
 
       <div className="flex flex-col gap-4">
@@ -88,6 +101,23 @@ export default function DND() {
         <div>
           <span>types:</span>
           {dropTypes.map((type, i) => <div key={i}>{type}</div>)}
+        </div>
+
+        <div>
+          <button
+            onClick={() => {
+              if (!dropFiles.length) return
+              const file = dropFiles[0]
+              const url = URL.createObjectURL(file)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = file.name
+              a.click()
+              URL.revokeObjectURL(url)
+            }}
+          >
+            DOwnload
+          </button>
         </div>
       </div>
 
