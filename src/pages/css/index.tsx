@@ -28,6 +28,8 @@ export default function CSSPage() {
       <AutoShrinkButton2 />
 
       <AutoShrinkButton3 />
+
+      <FlexAlignFirstLine />
     </div>
   )
 }
@@ -317,6 +319,17 @@ function AutoShrinkButton3() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+/**
+ * https://stackoverflow.com/questions/32118013/align-icon-vertically-to-the-center-of-the-first-line-of-text
+ */
+function FlexAlignFirstLine() {
+  return (
+    <div className="flex">
+      WIP
     </div>
   )
 }
