@@ -95,11 +95,11 @@ function HolyGrail() {
       className="grid max-w-[600px] bg-dark-gray-600"
       style={{ gridTemplateColumns: '1fr auto 1fr' }}
     >
-      <div className="bg-green-600/15">Looooooooooooong text</div>
+      <div className="bg-green-600/15 me-auto">Looooooooooooong text</div>
 
-      <div className="">Center Title</div>
+      <div className="mx-auto bg-violet-300/30">Center Title</div>
 
-      <div className="flex justify-end bg-red-700/15">Short text</div>
+      <div className="flex ms-auto bg-red-700/15">Short text</div>
     </div>
   )
 }
