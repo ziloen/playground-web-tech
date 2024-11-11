@@ -15,8 +15,8 @@
     "module.sortImportDeclarations": "maintain",
     // #region "trailingCommas"
     "trailingCommas": "onlyMultiLine",
-    "arguments.trailingCommas": "never",
-    "parameters.trailingCommas": "never",
+    "arguments.trailingCommas": "onlyMultiLine",
+    "parameters.trailingCommas": "onlyMultiLine",
     "importDeclaration.trailingCommas": "onlyMultiLine",
     // #endregion
     "jsx.multiLineParens": "prefer",
@@ -35,6 +35,6 @@
     "**/node_modules"
   ],
   "plugins": [
-    "https://plugins.dprint.dev/typescript-0.93.0.wasm"
+    "https://plugins.dprint.dev/typescript-0.93.2.wasm"
   ]
 }

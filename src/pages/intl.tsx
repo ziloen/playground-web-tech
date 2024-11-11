@@ -80,7 +80,7 @@ function LanguageSelect({
 
         return {
           label: (
-            <div className="flex-between items-center gap-2em">
+            <div className="flex-between items-center gap-[2em]">
               <span>{displayName}</span>
               <span>{nativeDisplayName}</span>
             </div>
@@ -98,6 +98,7 @@ function LanguageSelect({
       defaultValue={language}
       options={options}
       onChange={onChange}
+      popupClassName="[&_.rc-virtual-list-holder]:scrollbar-gutter-stable [&_.rc-virtual-list-holder]:scrollbar-thin"
       popupMatchSelectWidth={false}
       placement="bottomRight"
       variant="borderless"
