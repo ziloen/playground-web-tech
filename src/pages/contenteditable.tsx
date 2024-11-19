@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prefer-dom-node-text-content */
-import { useMotionValue } from 'framer-motion'
+import { useMotionValue } from 'motion/react'
 import type { InputEventInputType as InputType, KeyboardEventKey } from 'ts-lib-enhance'
 import { createContext, useContextSelector } from 'use-context-selector'
 import { useEventListener } from '~/hooks'
@@ -89,7 +89,7 @@ export default function ContentEditableText() {
           tabIndex={0}
           className={clsx(
             'min-h-[54px] px-[8px] py-[10px] focus:outline-lightBlue-6 inline-block whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-[17px] text-[14px] outline-none max-w-full',
-            styles.contenteditable
+            styles.contenteditable,
           )}
         >
         </div>
@@ -160,7 +160,7 @@ function onBeforeInput(e: InputEvent) {
       document.execCommand(
         'insertHTML',
         false,
-        '<span contenteditable="false" data-mention-id="qqq" class=" underline-white bg-green/20 underline select-text">@qqq</span>'
+        '<span contenteditable="false" data-mention-id="qqq" class=" underline-white bg-green/20 underline select-text">@qqq</span>',
       )
       skipNonEditable()
 

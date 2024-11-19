@@ -6,11 +6,11 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-  const AnimatePresence: typeof import('framer-motion')['AnimatePresence']
+  const AnimatePresence: typeof import('motion/react')['AnimatePresence']
   const Suspense: typeof import('react')['Suspense']
   const clsx: typeof import('clsx')['clsx']
   const forwardRef: typeof import('react')['forwardRef']
-  const motion: typeof import('framer-motion')['motion']
+  const motion: typeof import('motion/react')['motion']
   const useCallback: typeof import('react')['useCallback']
   const useEffect: typeof import('react')['useEffect']
   const useImperativeHandle: typeof import('react')['useImperativeHandle']

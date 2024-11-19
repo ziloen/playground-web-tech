@@ -1,6 +1,6 @@
 import type { ArrayType } from '@wai-ri/core'
 import { Select } from 'antd'
-import { useMotionValue } from 'framer-motion'
+import { useMotionValue } from 'motion/react'
 
 const Languages = [
   'en',

@@ -63,7 +63,7 @@ export default defineConfig(({ command, mode }) => {
               'useState',
             ],
             'react-router-dom': ['useNavigate', 'useParams', 'useRoutes'],
-            'framer-motion': ['motion', 'AnimatePresence'],
+            'motion/react': ['motion', 'AnimatePresence'],
             'react-i18next': ['useTranslation'],
             'clsx': ['clsx'],
           },

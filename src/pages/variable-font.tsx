@@ -1,6 +1,6 @@
 import '@fontsource-variable/fira-code'
 import '@fontsource-variable/noto-sans-sc'
-import { useMotionValue } from 'framer-motion'
+import { useMotionValue } from 'motion/react'
 import { useId } from 'react'
 
 export default function VariableFont() {
