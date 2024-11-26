@@ -370,9 +370,13 @@ export default function WebSpeechAPIPage() {
             recognition.continuous = true
             recognition.lang = 'zh-CN'
             recognition.interimResults = true
+            let notAllowed = false
 
             recognition.addEventListener('error', (e) => {
               console.log('error', e)
+              if (e.error === 'not-allowed') {
+                notAllowed = true
+              }
             })
 
             recognition.addEventListener('start', (e) => {
@@ -401,6 +405,12 @@ export default function WebSpeechAPIPage() {
 
             recognition.addEventListener('end', (e) => {
               console.log('end', e)
+
+              if (notAllowed) {
+                console.log('not allowed')
+                return
+              }
+
               recognition.start()
             })
 
