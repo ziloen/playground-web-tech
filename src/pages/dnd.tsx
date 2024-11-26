@@ -21,12 +21,12 @@ export default function DND() {
     const ac = new AbortController()
     const target = targetRef.current
 
-    target.addEventListener('dragenter', e => {
+    target.addEventListener('dragenter', (e) => {
       e.preventDefault()
 
       console.log(
         'dragenter',
-        e
+        e,
       )
 
       const { items, files, types } = logDataTransfer(e.dataTransfer)
@@ -36,22 +36,22 @@ export default function DND() {
       setDropTypes(types)
     }, { signal: ac.signal })
 
-    target.addEventListener('dragover', e => {
+    target.addEventListener('dragover', (e) => {
       e.preventDefault()
       // console.log('dragover', e)
     }, { signal: ac.signal })
 
-    target.addEventListener('dragleave', e => {
+    target.addEventListener('dragleave', (e) => {
       console.log('dragleave', e)
       setDropItems([])
     }, { signal: ac.signal })
 
-    target.addEventListener('drop', e => {
+    target.addEventListener('drop', (e) => {
       e.preventDefault()
 
       console.log(
         'drop',
-        e
+        e,
       )
 
       const { items, files, types } = logDataTransfer(e.dataTransfer)
@@ -61,7 +61,7 @@ export default function DND() {
       setDropTypes(types)
     }, { signal: ac.signal })
 
-    target.addEventListener('paste', e => {
+    target.addEventListener('paste', (e) => {
       console.log('paste', e)
       const { items, files, types } = logDataTransfer(e.clipboardData)
 
@@ -273,7 +273,7 @@ function Item({ value, items }: { value: string; items: string[] }) {
         onDragEnter: () => setState('drag-over'),
         onDragLeave: () => setState('idle'),
         onDrop: () => setState('idle'),
-      })
+      }),
     )
   }, [value])
 
@@ -286,7 +286,7 @@ function Item({ value, items }: { value: string; items: string[] }) {
         'size-20 rounded-full flex-center',
         state === 'idle' && 'bg-dark-gray-200',
         state === 'dragging' && 'bg-dark-gray-200 opacity-50',
-        state === 'drag-over' && 'bg-dark-gray-400'
+        state === 'drag-over' && 'bg-dark-gray-400',
       )}
     >
       {value}

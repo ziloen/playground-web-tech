@@ -92,7 +92,7 @@ function parseCSS(source: string) {
 
 async function getCSSRules(
   styleSheets: CSSStyleSheet[],
-  options: Options
+  options: Options,
 ): Promise<CSSStyleRule[]> {
   const ret: CSSStyleRule[] = []
   const deferreds: Promise<number | void>[] = []
@@ -112,7 +112,7 @@ async function getCSSRules(
                   try {
                     sheet.insertRule(
                       rule,
-                      rule.startsWith('@import') ? (importIndex += 1) : sheet.cssRules.length
+                      rule.startsWith('@import') ? (importIndex += 1) : sheet.cssRules.length,
                     )
                   } catch (error) {
                     console.error('Error inserting rule from remote css', rule, error)
@@ -122,7 +122,7 @@ async function getCSSRules(
               .catch((e: unknown) => {
                 console.error(
                   'Error loading remote css',
-                  e instanceof Error ? e.toString() : String(e)
+                  e instanceof Error ? e.toString() : String(e),
                 )
               })
 
@@ -142,7 +142,7 @@ async function getCSSRules(
               )
               .catch((err: unknown) => {
                 console.error('Error loading remote stylesheet', err)
-              })
+              }),
           )
         }
         console.error('Error inlining remote css file', e)
@@ -195,14 +195,14 @@ async function parseWebFontRules(node: HTMLElement, options: Options) {
 
 export async function getWebFontCSS(
   node: HTMLElement,
-  options: Options
+  options: Options,
 ): Promise<string> {
   const rules = await parseWebFontRules(node, options)
   const cssTexts = await Promise.all(
     rules.map((rule) => {
       const baseUrl = rule.parentStyleSheet ? rule.parentStyleSheet.href : null
       return embedResources(rule.cssText, baseUrl, options)
-    })
+    }),
   )
 
   return cssTexts.join('\n')
@@ -211,7 +211,7 @@ export async function getWebFontCSS(
 export async function embedWebFonts<T extends HTMLElement>(
   node: T,
   clonedNode: T,
-  options: Options
+  options: Options,
 ) {
   const cssText = options.fontEmbedCSS
     ?? (options.skipFonts ? null : await getWebFontCSS(node, options))

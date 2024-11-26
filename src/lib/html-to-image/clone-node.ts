@@ -43,7 +43,7 @@ async function cloneIFrameElement(iframe: HTMLIFrameElement) {
 
 async function cloneSingleNode(
   node: HTMLElement,
-  options: Options
+  options: Options,
 ): Promise<HTMLElement> {
   if (isInstanceOfElement(node, HTMLCanvasElement)) {
     return cloneCanvasElement(node)
@@ -71,7 +71,7 @@ function isSVGElement(node: Element): node is SVGElement {
 async function cloneChildren<T extends HTMLElement>(
   nativeNode: T,
   clonedNode: T,
-  options: Options
+  options: Options,
 ): Promise<T> {
   let children: T[] = []
 
@@ -99,7 +99,7 @@ async function cloneChildren<T extends HTMLElement>(
             clonedNode.append(clonedChild)
           }
         }),
-    Promise.resolve()
+    Promise.resolve(),
   )
 
   return clonedNode
@@ -155,7 +155,7 @@ function cloneSelectValue<T extends HTMLElement>(nativeNode: T, clonedNode: T) {
   if (isInstanceOfElement(nativeNode, HTMLSelectElement)) {
     const clonedSelect = clonedNode as any as HTMLSelectElement
     const selectedOption = Array.from(clonedSelect.children).find(
-      (child) => nativeNode.value === child.getAttribute('value')
+      (child) => nativeNode.value === child.getAttribute('value'),
     )
 
     if (selectedOption) {
@@ -222,7 +222,7 @@ async function ensureSVGSymbols<T extends HTMLElement>(clone: T, options: Option
 export async function cloneNode<T extends HTMLElement>(
   node: T,
   options: Options,
-  isRoot?: boolean
+  isRoot?: boolean,
 ): Promise<T | null> {
   if (!isRoot && options.filter && !options.filter(node)) {
     return null

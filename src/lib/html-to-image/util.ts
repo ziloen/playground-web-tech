@@ -133,14 +133,14 @@ export function checkCanvasDimensions(canvas: HTMLCanvasElement) {
 
 export function canvasToBlob(
   canvas: HTMLCanvasElement,
-  options: Options = {}
+  options: Options = {},
 ): Promise<Blob | null> {
   if (canvas.toBlob) {
     return new Promise((resolve) => {
       canvas.toBlob(
         resolve,
         options.type ? options.type : 'image/png',
-        options.quality ? options.quality : 1
+        options.quality ? options.quality : 1,
       )
     })
   }
@@ -150,9 +150,9 @@ export function canvasToBlob(
       canvas
         .toDataURL(
           options.type ? options.type : undefined,
-          options.quality ? options.quality : undefined
+          options.quality ? options.quality : undefined,
         )
-        .split(',')[1]
+        .split(',')[1],
     )
     const len = binaryString.length
     const binaryArray = new Uint8Array(len)
@@ -164,7 +164,7 @@ export function canvasToBlob(
     resolve(
       new Blob([binaryArray], {
         type: options.type ? options.type : 'image/png',
-      })
+      }),
     )
   })
 }
@@ -190,7 +190,7 @@ export async function svgToDataURL(svg: SVGElement): Promise<string> {
 export function nodeToDataURL(
   node: HTMLElement,
   width: number,
-  height: number
+  height: number,
 ): Promise<string> {
   const svg = nodeToSvgElement(node, width, height)
   return svgToDataURL(svg)
@@ -220,7 +220,7 @@ export const isInstanceOfElement = <
   T extends typeof Element | typeof HTMLElement | typeof SVGImageElement,
 >(
   node: Element | HTMLElement | SVGImageElement,
-  instance: T
+  instance: T,
 ): node is T['prototype'] => {
   if (node instanceof instance) return true
 

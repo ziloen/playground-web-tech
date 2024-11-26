@@ -24,7 +24,7 @@ interface VoiceOptionGroup extends DefaultOptionType {
 const isChrome = navigator.userAgentData
   // @ts-expect-error navigator has no type
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  && navigator.userAgentData.brands.some(brand => brand.brand === 'Google Chrome')
+  && navigator.userAgentData.brands.some((brand) => brand.brand === 'Google Chrome')
 
 export default function WebSpeechAPIPage() {
   const [inputText, setInputText, getInputText] = useGetState(defaultZhText)
@@ -35,7 +35,7 @@ export default function WebSpeechAPIPage() {
 
     if (list.length) return list
 
-    speechSynthesis.addEventListener('voiceschanged', e => {
+    speechSynthesis.addEventListener('voiceschanged', (e) => {
       nextEffect(() => setVoiceList(speechSynthesis.getVoices()))
     }, { once: true })
 
@@ -48,7 +48,7 @@ export default function WebSpeechAPIPage() {
 
   const groupByLang = useMemo(() => {
     if (!voiceList) return null
-    return Object.groupBy(voiceList, voice => voice.lang)
+    return Object.groupBy(voiceList, (voice) => voice.lang)
   }, [voiceList])
 
   const options = useMemo<VoiceOptionGroup[]>(() => {
@@ -60,7 +60,7 @@ export default function WebSpeechAPIPage() {
       return {
         label: <span>{lang}</span>,
         title: lang,
-        options: voices.map(voice => ({
+        options: voices.map((voice) => ({
           value: voice.name,
           label: voice.name,
 
@@ -99,11 +99,11 @@ export default function WebSpeechAPIPage() {
   const utterance = useMemo<SpeechSynthesisUtterance>(() => {
     const utterance = new SpeechSynthesisUtterance()
 
-    utterance.addEventListener('boundary', e => {
+    utterance.addEventListener('boundary', (e) => {
       console.log('boundary')
     })
 
-    utterance.addEventListener('start', e => {
+    utterance.addEventListener('start', (e) => {
       console.log('%c▶', 'color: #28e172;', 'start')
 
       startedRef.current = true
@@ -114,27 +114,27 @@ export default function WebSpeechAPIPage() {
       }
     })
 
-    utterance.addEventListener('end', e => {
+    utterance.addEventListener('end', (e) => {
       console.log('end')
       pausedRef.current = false
       startedRef.current = false
     })
 
-    utterance.addEventListener('error', e => {
+    utterance.addEventListener('error', (e) => {
       console.log('❌', 'error', e.error)
       startedRef.current = false
       pausedRef.current = false
     })
 
-    utterance.addEventListener('pause', e => {
+    utterance.addEventListener('pause', (e) => {
       console.log('pause')
     })
 
-    utterance.addEventListener('resume', e => {
+    utterance.addEventListener('resume', (e) => {
       console.log('resume')
     })
 
-    utterance.addEventListener('mark', e => {
+    utterance.addEventListener('mark', (e) => {
       console.log('mark')
     })
 
@@ -146,7 +146,7 @@ export default function WebSpeechAPIPage() {
   })
 
   const speak = useMemoizedFn(() => {
-    const voice = voiceList?.find(voice => voice.name === selectedVoice) ?? null
+    const voice = voiceList?.find((voice) => voice.name === selectedVoice) ?? null
     utterance.voice = voice
     utterance.text = getInputText()
     utterance.lang = getLang()
@@ -209,13 +209,13 @@ export default function WebSpeechAPIPage() {
           <Form.Item label="lang">
             <Select
               value={lang}
-              onChange={lang => {
+              onChange={(lang) => {
                 setLang(lang)
                 if (lang === 'en-US') {
                   setInputText(defaultEnText)
                 }
               }}
-              options={Object.keys(groupByLang).map(lang => ({
+              options={Object.keys(groupByLang).map((lang) => ({
                 value: lang,
                 label: lang,
               }))}
@@ -226,7 +226,7 @@ export default function WebSpeechAPIPage() {
         <Form.Item label="pitch">
           <Slider
             value={pitch}
-            onChange={e => {
+            onChange={(e) => {
               setPitch(e)
 
               if (speechSynthesis.speaking) {
@@ -242,7 +242,7 @@ export default function WebSpeechAPIPage() {
         <Form.Item label="volume">
           <Slider
             value={volume}
-            onChange={e => {
+            onChange={(e) => {
               setVolume(e)
 
               if (speechSynthesis.speaking) {
@@ -258,7 +258,7 @@ export default function WebSpeechAPIPage() {
         <Form.Item label="rate">
           <Slider
             value={rate}
-            onChange={e => {
+            onChange={(e) => {
               setRate(e)
 
               if (speechSynthesis.speaking) {
@@ -275,7 +275,7 @@ export default function WebSpeechAPIPage() {
       <div>
         <Input.TextArea
           value={inputText}
-          onChange={e => setInputText(e.currentTarget.value)}
+          onChange={(e) => setInputText(e.currentTarget.value)}
         />
       </div>
 
@@ -286,7 +286,7 @@ export default function WebSpeechAPIPage() {
       </Button>
 
       <Button
-        onClick={e => {
+        onClick={(e) => {
           pausedRef.current = false
           startedRef.current = true
           speechSynthesis.cancel()
@@ -299,7 +299,7 @@ export default function WebSpeechAPIPage() {
       <br />
 
       <Button
-        onClick={e => {
+        onClick={(e) => {
           console.log('before pause')
           // pause before start will not work
           if (startedRef.current) {
@@ -355,6 +355,14 @@ export default function WebSpeechAPIPage() {
           </tr>
         </tbody>
       </table>
+
+      <button
+        onClick={(e) => {
+          console.log()
+        }}
+      >
+        🎤
+      </button>
     </div>
   )
 }

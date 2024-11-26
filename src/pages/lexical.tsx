@@ -41,7 +41,7 @@ type SerializedMentionNode = Spread<
 >
 
 function convertMentionElement(
-  domNode: HTMLElement
+  domNode: HTMLElement,
 ): DOMConversionOutput | null {
   // const textContent = domNode.textContent
   const trigger = domNode.dataset.mentionTrigger
@@ -217,7 +217,7 @@ function MentionsMenuItem({
       key={option.key}
       className={clsx(
         'whitespace-nowrap',
-        isSelected && 'bg-dark-gray-100 text-white'
+        isSelected && 'bg-dark-gray-100 text-white',
       )}
       // eslint-disable-next-line @typescript-eslint/unbound-method
       ref={option.setRefElement}
@@ -258,7 +258,7 @@ function useMentionLookupService(mentionString: string | null) {
 class LRUCache<K, V> extends Map<K, V> {
   constructor(
     public capacity: number,
-    iterable?: Iterable<readonly [K, V]> | null
+    iterable?: Iterable<readonly [K, V]> | null,
   ) {
     super(iterable)
   }
@@ -283,7 +283,7 @@ class LRUCache<K, V> extends Map<K, V> {
 }
 
 function searchService(text: string) {
-  const results = dummyMentionsData.filter(mention =>
+  const results = dummyMentionsData.filter((mention) =>
     mention.toLowerCase().includes(text.toLowerCase())
   )
 
@@ -735,7 +735,7 @@ export default function Editor() {
   }
 
   const options: MentionOptions[] = useMemo(() => {
-    return results.map(result => {
+    return results.map((result) => {
       return new MentionOptions(result, result)
     })
   }, [results])
@@ -744,7 +744,7 @@ export default function Editor() {
     selectedOption: MentionOptions,
     nodeToReplace: TextNode | null,
     closeMenu: () => void,
-    matchingString: string
+    matchingString: string,
   ) => {
     const editor = editorRef.current
     if (!editor) return
@@ -812,7 +812,7 @@ export default function Editor() {
                     />
                   ))}
                 </div>,
-                anchorElementRef.current
+                anchorElementRef.current,
               )
             }}
             onQueryChange={setQueryString}

@@ -25,7 +25,7 @@ async function embedBackground(clonedNode: HTMLElement, options: Options) {
 
 async function embedImageNode(
   clonedNode: HTMLElement | SVGImageElement,
-  options: Options
+  options: Options,
 ) {
   const isImageElement = isInstanceOfElement(clonedNode, HTMLImageElement)
 

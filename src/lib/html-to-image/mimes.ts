@@ -11,7 +11,7 @@ const mimes: { [key: string]: string } = {
   gif: 'image/gif',
   tiff: 'image/tiff',
   svg: 'image/svg+xml',
-  webp: 'image/webp'
+  webp: 'image/webp',
 }
 
 function getExtension(url: string): string {

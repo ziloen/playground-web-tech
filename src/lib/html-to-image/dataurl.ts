@@ -15,7 +15,7 @@ export function makeDataUrl(content: string, mimeType: string) {
 export async function fetchAsDataURL<T>(
   url: string,
   init: RequestInit | undefined,
-  process: (data: { result: string; res: Response }) => T
+  process: (data: { result: string; res: Response }) => T,
 ): Promise<T> {
   const res = await fetch(url, init)
   if (res.status === 404) {
@@ -42,7 +42,7 @@ const cache: { [url: string]: string } = {}
 function getCacheKey(
   url: string,
   contentType: string | undefined,
-  includeQueryParams: boolean | undefined
+  includeQueryParams: boolean | undefined,
 ) {
   let key = url.replace(/\?.*/, '')
 
@@ -61,7 +61,7 @@ function getCacheKey(
 export async function resourceToDataURL(
   resourceUrl: string,
   contentType: string | undefined,
-  options: Options
+  options: Options,
 ) {
   const cacheKey = getCacheKey(resourceUrl, contentType, options.includeQueryParams)
 
@@ -84,7 +84,7 @@ export async function resourceToDataURL(
           contentType = res.headers.get('Content-Type') || ''
         }
         return getContentFromDataUrl(result)
-      }
+      },
     )
     dataURL = makeDataUrl(content, contentType!)
   } catch (error) {

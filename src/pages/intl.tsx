@@ -74,7 +74,7 @@ function LanguageSelect({
 }) {
   const options = useMemo(() => {
     return Intl.DisplayNames.supportedLocalesOf(Languages, { localeMatcher: 'best fit' }).map(
-      lang => {
+      (lang) => {
         const nativeDisplayName = getLanguageDisplayName(lang, lang)
         const displayName = getLanguageDisplayName(language, lang)
 

@@ -3,7 +3,7 @@
 // duviriCycle
 // alerts
 // Riven trading
-// Ticker 
+// Ticker
 export default function Warframe() {
   useEffect(() => {
     const apiBase = 'https://api.warframestat.us'
@@ -11,8 +11,8 @@ export default function Warframe() {
     // url.searchParams.set('language', 'en')
 
     fetch(url)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         console.log(data)
       })
   }, [])

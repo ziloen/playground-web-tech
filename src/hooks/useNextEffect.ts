@@ -31,6 +31,6 @@ export function useNextEffect() {
 
   return useCallback((callback?: () => void) => {
     callback && callbacks.current.push(callback)
-    return new Promise<void>(resolve => callbacks.current.push(resolve))
+    return new Promise<void>((resolve) => callbacks.current.push(resolve))
   }, [])
 }

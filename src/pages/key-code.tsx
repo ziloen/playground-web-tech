@@ -25,7 +25,7 @@ export default function KeyCode() {
   const [stopPropagation, setStopPropagation] = useState(false)
   const [hideDeprecated, setHideDeprecated] = useState(true)
 
-  useEventListener('keydown', e => {
+  useEventListener('keydown', (e) => {
     if (preventDefault) e.preventDefault()
     if (stopPropagation) e.stopPropagation()
 
@@ -109,7 +109,7 @@ function Item({
       <div
         className={clsx(
           'text-center bg-white/20 py-2 font-semibold text-lg',
-          deprecated && 'line-through decoration-[2px]'
+          deprecated && 'line-through decoration-[2px]',
         )}
       >
         {title}

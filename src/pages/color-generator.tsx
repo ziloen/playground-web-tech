@@ -45,10 +45,10 @@ export default function ColorGenerator() {
       }}
     >
       <div className="flex gap-2">
-        <Input value={inputVal} onChange={e => setInputVal(e.currentTarget.value)} />
+        <Input value={inputVal} onChange={(e) => setInputVal(e.currentTarget.value)} />
         <ColorPicker
           value={inputVal}
-          onChange={e => {
+          onChange={(e) => {
             setInputVal(e.toRgbString())
           }}
           destroyTooltipOnHide
@@ -115,7 +115,7 @@ function ColorCompare() {
   const [[startColor, endColor], setGradient] = useState(['#ffffff', '#000000'])
 
   const gradients = useMemo(() => {
-    return colorSpaces.map(space => ({
+    return colorSpaces.map((space) => ({
       name: Color.spaces[space].name,
     }))
   }, [])

@@ -15,7 +15,7 @@ import {
 
 export async function toSvg(
   node: HTMLElement,
-  options: Options = {}
+  options: Options = {},
 ): Promise<string> {
   const { width, height } = getImageSize(node, options)
   const clonedNode = (await cloneNode(node, options, true)) as HTMLElement
@@ -31,7 +31,7 @@ export async function toSvg(
 
 export async function toSvgElement(
   node: HTMLElement,
-  options: Options = {}
+  options: Options = {},
 ) {
   const { width, height } = getImageSize(node, options)
   const clonedNode = (await cloneNode(node, options, true)) as HTMLElement
@@ -47,7 +47,7 @@ export async function toSvgElement(
 
 export async function toCanvas(
   node: HTMLElement,
-  options: Options = {}
+  options: Options = {},
 ): Promise<HTMLCanvasElement> {
   if (options.class) {
     node.classList.add(...options.class)
@@ -83,7 +83,7 @@ export async function toCanvas(
 
 export async function toPixelData(
   node: HTMLElement,
-  options: Options = {}
+  options: Options = {},
 ): Promise<Uint8ClampedArray> {
   const { width, height } = getImageSize(node, options)
   const canvas = await toCanvas(node, options)
@@ -93,7 +93,7 @@ export async function toPixelData(
 
 export async function toPng(
   node: HTMLElement,
-  options: Options = {}
+  options: Options = {},
 ): Promise<string> {
   const canvas = await toCanvas(node, options)
   return canvas.toDataURL()
@@ -101,7 +101,7 @@ export async function toPng(
 
 export async function toJpeg(
   node: HTMLElement,
-  options: Options = {}
+  options: Options = {},
 ): Promise<string> {
   const canvas = await toCanvas(node, options)
   return canvas.toDataURL('image/jpeg', options.quality || 1)
@@ -109,7 +109,7 @@ export async function toJpeg(
 
 export async function toBlob(
   node: HTMLElement,
-  options: Options = {}
+  options: Options = {},
 ): Promise<Blob | null> {
   const canvas = await toCanvas(node, options)
   const blob = await canvasToBlob(canvas)
@@ -118,7 +118,7 @@ export async function toBlob(
 
 export function getFontEmbedCSS(
   node: HTMLElement,
-  options: Options = {}
+  options: Options = {},
 ): Promise<string> {
   return getWebFontCSS(node, options)
 }

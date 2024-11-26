@@ -1,10 +1,10 @@
-import { defineConfig, preset } from "@ziloen/tailwind-config"
+import { defineConfig, preset } from '@ziloen/tailwind-config'
 
 export default defineConfig({
-  content: ["./src/**/*.{html,js,ts,jsx,tsx}"],
-  darkMode: ['variant', [`[data-theme="dark"] &`, `:host([data-theme="dark"]) &`],],
+  content: ['./src/**/*.{html,js,ts,jsx,tsx}'],
+  darkMode: ['variant', [`[data-theme="dark"] &`, `:host([data-theme="dark"]) &`]],
   presets: [preset],
   corePlugins: {
-    preflight: false
-  }
+    preflight: false,
+  },
 })

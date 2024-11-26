@@ -9,7 +9,7 @@ export default function ImageEXIF() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    file.arrayBuffer().then(buffer => {
+    file.arrayBuffer().then((buffer) => {
       const exifData = load(buffer)
       setExifStr(JSON.stringify(exifData, null, 2))
     })

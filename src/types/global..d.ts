@@ -2,7 +2,6 @@
  * declare global util types
  */
 
-
 declare global {
   const IS_PROD: boolean
   const IS_DEV: boolean
@@ -10,3 +9,4 @@ declare global {
 }
 
 export { }
+

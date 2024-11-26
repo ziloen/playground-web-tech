@@ -17,7 +17,7 @@ export default function Slider() {
             '--value': value,
           }}
           value={value}
-          onChange={e => setValue(Number(e.currentTarget.value))}
+          onChange={(e) => setValue(Number(e.currentTarget.value))}
         />
 
         <input
@@ -31,7 +31,7 @@ export default function Slider() {
             '--value': value,
           }}
           value={value}
-          onChange={e => setValue(Number(e.currentTarget.value))}
+          onChange={(e) => setValue(Number(e.currentTarget.value))}
         />
       </div>
 
@@ -46,7 +46,7 @@ export default function Slider() {
           '--value': value,
         }}
         value={value}
-        onChange={e => setValue(Number(e.currentTarget.value))}
+        onChange={(e) => setValue(Number(e.currentTarget.value))}
       />
 
       <input
@@ -60,7 +60,7 @@ export default function Slider() {
           '--value': value,
         }}
         value={value}
-        onChange={e => setValue(Number(e.currentTarget.value))}
+        onChange={(e) => setValue(Number(e.currentTarget.value))}
       />
 
       <br />
@@ -76,7 +76,7 @@ export default function Slider() {
           '--value': value,
         }}
         value={value}
-        onChange={e => setValue(Number(e.currentTarget.value))}
+        onChange={(e) => setValue(Number(e.currentTarget.value))}
       />
 
       <div>

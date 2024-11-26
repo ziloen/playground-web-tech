@@ -21,7 +21,7 @@ function formatCSSProperties(style: CSSStyleDeclaration) {
 function getPseudoElementStyle(
   className: string,
   pseudo: Pseudo,
-  style: CSSStyleDeclaration
+  style: CSSStyleDeclaration,
 ): Text {
   const selector = `.${className}:${pseudo}`
   const cssText = style.cssText ? formatCSSText(style) : formatCSSProperties(style)

@@ -29,7 +29,7 @@ export async function embed(
   resourceURL: string,
   baseURL: string | null,
   options: Options,
-  getContentFromUrl?: (url: string) => Promise<string>
+  getContentFromUrl?: (url: string) => Promise<string>,
 ): Promise<string> {
   try {
     const resolvedURL = baseURL ? resolveUrl(resourceURL, baseURL) : resourceURL
@@ -72,7 +72,7 @@ export function shouldEmbed(url: string): boolean {
 export async function embedResources(
   cssText: string,
   baseUrl: string | null,
-  options: Options
+  options: Options,
 ): Promise<string> {
   if (!shouldEmbed(cssText)) {
     return cssText
@@ -82,6 +82,6 @@ export async function embedResources(
   const urls = parseURLs(filteredCSSText)
   return urls.reduce(
     (deferred, url) => deferred.then((css) => embed(css, url, baseUrl, options)),
-    Promise.resolve(filteredCSSText)
+    Promise.resolve(filteredCSSText),
   )
 }

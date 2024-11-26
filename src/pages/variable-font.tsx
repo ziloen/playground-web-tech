@@ -20,7 +20,7 @@ export default function VariableFont() {
             type="range"
             list={datalistId}
             defaultValue={400}
-            onChange={e => {
+            onChange={(e) => {
               wght.set(+e.target.value)
             }}
             min={100}

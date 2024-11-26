@@ -21,6 +21,7 @@
     // #endregion
     "jsx.multiLineParens": "prefer",
     "importDeclaration.sortNamedImports": "maintain",
+    "arrowFunction.useParentheses": "force",
     "operatorPosition": "nextLine",
     "jsx.bracketPosition": "nextLine",
     "spaceAround": false,

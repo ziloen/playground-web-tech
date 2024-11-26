@@ -37,14 +37,14 @@ export default function ContentEditableText() {
     currentLength.set(length)
   }, { target: inputRef })
 
-  useEventListener('keydown', e => {
+  useEventListener('keydown', (e) => {
     const key = e.key as KeyboardEventKey
 
     if (key === 'Enter') {
     }
   }, { target: inputRef })
 
-  useEventListener('compositionstart', e => {
+  useEventListener('compositionstart', (e) => {
   }, { target: inputRef })
 
   // useEffect(() => {
@@ -107,7 +107,7 @@ const messageContext = createContext({
 })
 
 function useMessages() {
-  return useContextSelector(messageContext, s => s.messages)
+  return useContextSelector(messageContext, (s) => s.messages)
 }
 
 function Message({ text }: { text: string }) {
