@@ -174,6 +174,9 @@ export default function WebSpeechAPIPage() {
     pausedRef.current = true
   })
 
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const [recogText, setRecogText] = useState('')
+
   return (
     <div>
       <h1>Web Speech API</h1>
@@ -358,11 +361,81 @@ export default function WebSpeechAPIPage() {
 
       <button
         onClick={(e) => {
-          console.log()
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+          if (SpeechRecognition) {
+            recognitionRef.current?.stop()
+            setRecogText('')
+            const recognition = recognitionRef.current = new SpeechRecognition()
+
+            recognition.continuous = true
+            recognition.lang = 'zh-CN'
+            recognition.interimResults = true
+
+            recognition.addEventListener('error', (e) => {
+              console.log('error', e)
+            })
+
+            recognition.addEventListener('start', (e) => {
+              console.log('start', e)
+            })
+
+            recognition.addEventListener('nomatch', (e) => {
+              console.log('nomatch', e)
+            })
+
+            recognition.addEventListener('result', (e) => {
+              console.log('result', e.results)
+              let text = ''
+              for (const result of e.results) {
+                for (const alternative of result) {
+                  text += alternative.transcript
+
+                  if (result.isFinal) {
+                    text += ' '
+                  }
+                }
+              }
+
+              setRecogText(text)
+            })
+
+            recognition.addEventListener('end', (e) => {
+              console.log('end', e)
+              recognition.start()
+            })
+
+            recognition.addEventListener('audiostart', (e) => {
+              console.log('audiostart', e)
+            })
+
+            recognition.addEventListener('audioend', (e) => {
+              console.log('audioend', e)
+            })
+
+            recognition.addEventListener('soundstart', (e) => {
+              console.log('soundstart', e)
+            })
+
+            recognition.addEventListener('soundend', (e) => {
+              console.log('soundend', e)
+            })
+
+            recognition.addEventListener('speechstart', (e) => {
+              console.log('speechstart', e)
+            })
+
+            recognition.addEventListener('speechend', (e) => {
+              console.log('speechend', e)
+            })
+
+            recognition.start()
+          }
         }}
       >
         🎤
       </button>
+
+      <span>{recogText}</span>
     </div>
   )
 }

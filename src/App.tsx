@@ -1,4 +1,4 @@
-import { App as AntApp, ConfigProvider, theme } from 'antd'
+import { ConfigProvider, theme } from 'antd'
 import { Suspense } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import routes from '~react-pages'
@@ -19,11 +19,9 @@ export default function App() {
           cssVar: true,
         }}
       >
-        <AntApp component={false}>
-          <Suspense>
-            <Routes />
-          </Suspense>
-        </AntApp>
+        <Suspense>
+          <Routes />
+        </Suspense>
       </ConfigProvider>
     </BrowserRouter>
   )
