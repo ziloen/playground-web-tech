@@ -97,7 +97,7 @@ export default defineConfig(({ command, mode }) => {
     },
 
     optimizeDeps: {
-      include: ['lodash-es'],
+      include: ['lodash-es', 'ahooks'],
     },
 
     build: {

@@ -176,6 +176,8 @@ export default function WebSpeechAPIPage() {
 
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const [recogText, setRecogText] = useState('')
+  const [recogError, setRecogError] = useState('')
+  const [recording, setRecording, getRecording] = useGetState(false)
 
   return (
     <div>
@@ -361,6 +363,11 @@ export default function WebSpeechAPIPage() {
 
       <button
         onClick={(e) => {
+          if (recording) {
+            recognitionRef.current?.stop()
+            return
+          }
+
           const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
           if (SpeechRecognition) {
             recognitionRef.current?.stop()
@@ -368,14 +375,15 @@ export default function WebSpeechAPIPage() {
             const recognition = recognitionRef.current = new SpeechRecognition()
 
             recognition.continuous = true
-            recognition.lang = 'zh-CN'
+            recognition.lang = 'zh-Hans'
             recognition.interimResults = true
-            let notAllowed = false
+            let shouldRetry = true
 
             recognition.addEventListener('error', (e) => {
               console.log('error', e)
-              if (e.error === 'not-allowed') {
-                notAllowed = true
+              setRecogError(e.error)
+              if (['not-allowed', 'network'].includes(e.error)) {
+                shouldRetry = false
               }
             })
 
@@ -406,12 +414,13 @@ export default function WebSpeechAPIPage() {
             recognition.addEventListener('end', (e) => {
               console.log('end', e)
 
-              if (notAllowed) {
-                console.log('not allowed')
-                return
+              if (shouldRetry) {
+                setRecording(true)
+                recognition.start()
+              } else {
+                setRecording(false)
+                console.log('')
               }
-
-              recognition.start()
             })
 
             recognition.addEventListener('audiostart', (e) => {
@@ -439,13 +448,50 @@ export default function WebSpeechAPIPage() {
             })
 
             recognition.start()
+            setRecording(true)
           }
         }}
       >
-        🎤
+        {recording ? '🟥' : '🎤'}
       </button>
 
       <span>{recogText}</span>
+
+      <div className="text-red-400">
+        {recogError}
+      </div>
     </div>
   )
+}
+
+function useRecognition() {
+  const [recording, setRecording, getRecording] = useGetState(false)
+
+  const ref = useRef<SpeechRecognition | null>(null)
+
+  const startRecord = useMemoizedFn(() => {
+    ref.current?.stop()
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    const recognition = ref.current = new SpeechRecognition()
+    recognition.interimResults = true
+    recognition.continuous = true
+    recognition.lang = 'zh-Hans'
+
+    recognition.addEventListener('audioend', (e) => {
+      console.log('audioend', e)
+    })
+
+    recognition.start()
+  })
+
+  const endRecord = useMemoizedFn(() => {
+    setRecording(false)
+    ref.current?.stop()
+  })
+
+  return {
+    recording,
+    startRecord,
+    endRecord,
+  }
 }
