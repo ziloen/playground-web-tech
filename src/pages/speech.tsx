@@ -1,7 +1,8 @@
 import { asNonNullable, asType } from '@wai-ri/core'
 import { useMemoizedFn } from 'ahooks'
-import { Button, Form, Input, Select, Slider } from 'antd'
+import { Button, Form, Input, Select } from 'antd'
 import type { DefaultOptionType } from 'antd/es/select'
+import Slider from '~/components/Slider'
 import { useGetState, useNextEffect } from '~/hooks'
 import CarbonCloud from '~icons/carbon/cloud'
 
@@ -184,106 +185,108 @@ export default function WebSpeechAPIPage() {
     <div>
       <h1>Web Speech API</h1>
 
-      <Form>
-        <Form.Item label="voice">
-          <Select<string, VoiceOptionGroup>
-            showSearch
-            className="min-w-40"
-            virtual={false}
-            value={selectedVoice}
-            dropdownStyle={{
-              maxHeight: '400px',
-            }}
-            onChange={setSelectedVoice}
-            popupMatchSelectWidth={false}
-            optionRender={({ data }) => {
-              asType<VoiceOption>(data)
-              return (
-                <div className="flex items-center gap-2 min-w-max shrink-0">
-                  <span>{data.voice.name}</span>
-                  {!data.voice.localService && (
-                    <CarbonCloud className="text-lg shrink-0 text-blue-600" />
-                  )}
-                </div>
-              )
-            }}
-            options={options}
-          />
-        </Form.Item>
+      <span>voice</span>
+      <Select<string, VoiceOptionGroup>
+        showSearch
+        className="min-w-40"
+        virtual={false}
+        value={selectedVoice}
+        dropdownStyle={{
+          maxHeight: '400px',
+        }}
+        onChange={setSelectedVoice}
+        popupMatchSelectWidth={false}
+        optionRender={({ data }) => {
+          asType<VoiceOption>(data)
+          return (
+            <div className="flex items-center gap-2 min-w-max shrink-0">
+              <span>{data.voice.name}</span>
+              {!data.voice.localService && (
+                <CarbonCloud className="text-lg shrink-0 text-blue-600" />
+              )}
+            </div>
+          )
+        }}
+        options={options}
+      />
 
-        {groupByLang && (
-          <Form.Item label="lang">
-            <Select
-              value={lang}
-              onChange={(lang) => {
-                setLang(lang)
-                if (lang === 'en-US') {
-                  setInputText(defaultEnText)
-                }
-              }}
-              options={Object.keys(groupByLang).map((lang) => ({
-                value: lang,
-                label: lang,
-              }))}
-            />
-          </Form.Item>
-        )}
+      <br />
 
-        <Form.Item label="pitch">
-          <Slider
-            value={pitch}
-            onChange={(e) => {
-              setPitch(e)
+      {groupByLang && (
+        <>
+          <span>lang</span>
 
-              if (speechSynthesis.speaking) {
-                onSpeek()
+          <Select
+            value={lang}
+            onChange={(lang) => {
+              setLang(lang)
+              if (lang === 'en-US') {
+                setInputText(defaultEnText)
               }
             }}
-            min={0}
-            max={2}
-            step={0.01}
+            options={Object.keys(groupByLang).map((lang) => ({
+              value: lang,
+              label: lang,
+            }))}
           />
-        </Form.Item>
 
-        <Form.Item label="volume">
-          <Slider
-            value={volume}
-            onChange={(e) => {
-              setVolume(e)
+          <br />
+        </>
+      )}
 
-              if (speechSynthesis.speaking) {
-                onSpeek()
-              }
-            }}
-            min={0}
-            max={1}
-            step={0.01}
-          />
-        </Form.Item>
+      <span>pitch</span>
+      <Slider
+        value={pitch}
+        onChange={(e) => {
+          setPitch(+e.currentTarget.valueAsNumber)
 
-        <Form.Item label="rate">
-          <Slider
-            value={rate}
-            onChange={(e) => {
-              setRate(e)
+          if (speechSynthesis.speaking) {
+            onSpeek()
+          }
+        }}
+        min={0}
+        max={2}
+        step={0.01}
+      />
 
-              if (speechSynthesis.speaking) {
-                onSpeek()
-              }
-            }}
-            min={0.1}
-            max={10}
-            step={0.1}
-          />
-        </Form.Item>
-      </Form>
+      <br />
 
-      <div>
-        <Input.TextArea
-          value={inputText}
-          onChange={(e) => setInputText(e.currentTarget.value)}
-        />
-      </div>
+      <span>volume</span>
+      <Slider
+        value={volume}
+        onChange={(e) => {
+          setVolume(e.currentTarget.valueAsNumber)
+
+          if (speechSynthesis.speaking) {
+            onSpeek()
+          }
+        }}
+        min={0}
+        max={1}
+        step={0.01}
+      />
+
+      <br />
+
+      <span>rate</span>
+      <Slider
+        value={rate}
+        onChange={(e) => {
+          setRate(e.currentTarget.valueAsNumber)
+
+          if (speechSynthesis.speaking) {
+            onSpeek()
+          }
+        }}
+        min={0.1}
+        max={10}
+        step={0.1}
+      />
+
+      <Input.TextArea
+        value={inputText}
+        onChange={(e) => setInputText(e.currentTarget.value)}
+      />
 
       <Button
         onClick={onSpeek}

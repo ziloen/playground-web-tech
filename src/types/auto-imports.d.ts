@@ -23,3 +23,9 @@ declare global {
   const useState: typeof import('react')['useState']
   const useTranslation: typeof import('react-i18next')['useTranslation']
 }
+// for type re-export
+declare global {
+  // @ts-ignore
+  export type { ComponentProps } from 'react'
+  import('react')
+}

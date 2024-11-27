@@ -1,0 +1,149 @@
+.slider {
+  appearance: none;
+  background: none;
+  margin: 0;
+  border-radius: var(--track-radius);
+  block-size: max(var(--track-height), var(--thumb-height));
+  overflow: clip;
+  /* --track-background: #666666;
+  --track-hover-background: #999999;
+  --track-height: 3px;
+  --track-radius: 0px;
+
+  --progress-background: #404040;
+  --progress-radius: 0px;
+
+  --thumb-height: 24px;
+  --thumb-width: 8px;
+  --thumb-radius: 4px;
+  --thumb-background: var(--progress-background);
+  --thumb-hover-background: #f2f2f2; */
+
+  &::-moz-range-track {
+    cursor: pointer;
+    overflow: clip;
+    block-size: var(--track-height);
+    border-radius: var(--track-radius, 0px);
+    background: var(--track-background);
+  }
+
+  &::-moz-range-progress {
+    appearance: none;
+    block-size: var(--track-height);
+    width: var(--track-height);
+
+    border-radius: var(--progress-radius, 0px);
+    background-color: var(--progress-background);
+    overflow: clip;
+  }
+
+  &::-moz-range-thumb {
+    appearance: none;
+    cursor: pointer;
+    border: none;
+    block-size: var(--thumb-height);
+    inline-size: var(--thumb-width);
+    border-radius: var(--thumb-radius);
+    background-color: var(--thumb-background);
+  }
+
+  &:hover {
+    &::-moz-range-track {
+      background-color: var(--track-hover-background);
+    }
+
+    &::-moz-range-thumb {
+      background-color: var(--thumb-hover-background);
+    }
+  }
+}
+
+@supports (-webkit-appearance: none) {
+  .slider {
+    position: relative;
+    isolation: isolate;
+    user-select: none;
+
+    &::-webkit-slider-runnable-track {
+      cursor: pointer;
+      border-radius: var(--track-radius, 0px);
+      block-size: var(--track-height);
+      background-color: var(--track-background);
+      background-clip: content-box;
+      box-sizing: content-box;
+      border-block-width: calc((var(--thumb-height) - var(--track-height)) / 2);
+      border-inline-width: 0;
+      border-style: solid;
+      border-color: transparent;
+    }
+
+    &::before {
+      user-select: none;
+      content: '';
+      position: absolute;
+      inset-block: 0;
+      margin-block: auto;
+      pointer-events: none;
+      display: block;
+      border-radius: var(--progress-radius, 0px);
+      inline-size: calc(var(--value) * 100% - var(--value) * var(--thumb-width));
+      background-color: var(--progress-background);
+      block-size: var(--track-height);
+    }
+
+    &::-webkit-slider-thumb {
+      appearance: none;
+      block-size: var(--thumb-height);
+      inline-size: var(--thumb-width);
+      border-radius: var(--thumb-radius);
+      background-color: var(--thumb-background);
+      cursor: pointer;
+      border: none;
+      margin-block-start: calc(-1 * (var(--thumb-height) - var(--track-height)) / 2);
+    }
+
+    &:hover {
+      &::-webkit-slider-runnable-track {
+        background-color: var(--track-hover-background);
+      }
+
+      &::-webkit-slider-thumb {
+        background-color: var(--thumb-hover-background);
+      }
+    }
+  }
+}
+
+.windows-slider {
+  composes: slider;
+
+  --track-background: #666666;
+  --track-hover-background: #999999;
+  --track-height: 3px;
+  --track-radius: 0px;
+
+  --progress-background: #404040;
+
+  --thumb-height: 24px;
+  --thumb-width: 8px;
+  --thumb-radius: 4px;
+  --thumb-background: var(--progress-background);
+  --thumb-hover-background: #f2f2f2;
+}
+
+.mac-slider {
+  composes: slider;
+
+  --track-background: #4f4f4f;
+  --track-hover-background: var(--track-background);
+  --track-height: 30px;
+  --track-radius: 8px;
+
+  --progress-background: #ffffff91;
+
+  --thumb-height: 0px;
+  --thumb-width: 0px;
+  --thumb-radius: 4px;
+  --thumb-background: transparent;
+  --thumb-hover-background: transparent;
+}

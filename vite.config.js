@@ -67,6 +67,11 @@ export default defineConfig(({ command, mode }) => {
             'react-i18next': ['useTranslation'],
             'clsx': ['clsx'],
           },
+          {
+            type: true,
+            from: 'react',
+            imports: ['ComponentProps'],
+          },
         ],
         dts: 'src/types/auto-imports.d.ts',
       }),

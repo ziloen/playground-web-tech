@@ -5,6 +5,9 @@
   "[javascriptreact]": {
     "editor.defaultFormatter": "dprint.dprint"
   },
+  "[tailwindcss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[typescript]": {
     "editor.defaultFormatter": "dprint.dprint"
   },
