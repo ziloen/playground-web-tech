@@ -175,9 +175,10 @@ export default function WebSpeechAPIPage() {
   })
 
   const recognitionRef = useRef<SpeechRecognition | null>(null)
-  const [recogText, setRecogText] = useState('')
+  const [recogText, setRecogText, getRecogText] = useGetState('')
   const [recogError, setRecogError] = useState('')
   const [recording, setRecording, getRecording] = useGetState(false)
+  const [resultText, setResultText, getResultText] = useGetState('')
 
   return (
     <div>
@@ -364,6 +365,7 @@ export default function WebSpeechAPIPage() {
       <button
         onClick={(e) => {
           if (recording) {
+            setRecording(false)
             recognitionRef.current?.stop()
             return
           }
@@ -375,19 +377,20 @@ export default function WebSpeechAPIPage() {
             const recognition = recognitionRef.current = new SpeechRecognition()
 
             recognition.continuous = true
-            recognition.lang = 'zh-Hans'
+            recognition.lang = lang
             recognition.interimResults = true
-            let shouldRetry = true
+
+            let error: SpeechRecognitionErrorCode | '' = ''
+            let lastStartTime = 0
 
             recognition.addEventListener('error', (e) => {
               console.log('error', e)
               setRecogError(e.error)
-              if (['not-allowed', 'network'].includes(e.error)) {
-                shouldRetry = false
-              }
+              error = e.error
             })
 
             recognition.addEventListener('start', (e) => {
+              lastStartTime = Date.now()
               console.log('start', e)
             })
 
@@ -414,12 +417,19 @@ export default function WebSpeechAPIPage() {
             recognition.addEventListener('end', (e) => {
               console.log('end', e)
 
-              if (shouldRetry) {
+              const duration = Date.now() - lastStartTime
+              const atLeast = 1000
+
+              if (
+                getRecording()
+                && duration > atLeast
+                && !['not-allowed', 'network'].includes(error)
+              ) {
                 setRecording(true)
                 recognition.start()
               } else {
+                setResultText(getResultText() + getRecogText())
                 setRecording(false)
-                console.log('')
               }
             })
 
@@ -456,6 +466,8 @@ export default function WebSpeechAPIPage() {
       </button>
 
       <span>{recogText}</span>
+
+      <div>{resultText}</div>
 
       <div className="text-red-400">
         {recogError}
