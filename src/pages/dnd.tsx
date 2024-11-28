@@ -116,7 +116,7 @@ export default function DND() {
               URL.revokeObjectURL(url)
             }}
           >
-            DOwnload
+            Download
           </button>
         </div>
       </div>
