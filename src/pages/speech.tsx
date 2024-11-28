@@ -182,106 +182,114 @@ export default function WebSpeechAPIPage() {
   const [resultText, setResultText, getResultText] = useGetState('')
 
   return (
-    <div>
+    <main>
       <h1>Web Speech API</h1>
 
-      <span>voice</span>
-      <Select<string, VoiceOptionGroup>
-        showSearch
-        className="min-w-40"
-        virtual={false}
-        value={selectedVoice}
-        dropdownStyle={{
-          maxHeight: '400px',
+      <div
+        className="grid gap-x-3 gap-y-2"
+        style={{
+          gridTemplateColumns: 'max-content minmax(max-content, 200px)',
+          gridAutoRows: 'min-content',
         }}
-        onChange={setSelectedVoice}
-        popupMatchSelectWidth={false}
-        optionRender={({ data }) => {
-          asType<VoiceOption>(data)
-          return (
-            <div className="flex items-center gap-2 min-w-max shrink-0">
-              <span>{data.voice.name}</span>
-              {!data.voice.localService && (
-                <CarbonCloud className="text-lg shrink-0 text-blue-600" />
-              )}
-            </div>
-          )
-        }}
-        options={options}
-      />
+      >
+        <div className="grid grid-cols-subgrid col-span-full">
+          <span>voice</span>
+          <Select<string, VoiceOptionGroup>
+            showSearch
+            className="min-w-40"
+            virtual={false}
+            value={selectedVoice}
+            dropdownStyle={{
+              maxHeight: '400px',
+            }}
+            onChange={setSelectedVoice}
+            popupMatchSelectWidth={false}
+            optionRender={({ data }) => {
+              asType<VoiceOption>(data)
+              return (
+                <div className="flex items-center gap-2 min-w-max shrink-0">
+                  <span>{data.voice.name}</span>
+                  {!data.voice.localService && (
+                    <CarbonCloud className="text-lg shrink-0 text-blue-600" />
+                  )}
+                </div>
+              )
+            }}
+            options={options}
+          />
+        </div>
 
-      <br />
+        {groupByLang && (
+          <div className="grid grid-cols-subgrid col-span-full">
+            <span>lang</span>
 
-      {groupByLang && (
-        <>
-          <span>lang</span>
+            <Select
+              value={lang}
+              onChange={(lang) => {
+                setLang(lang)
+                if (lang === 'en-US') {
+                  setInputText(defaultEnText)
+                }
+              }}
+              options={Object.keys(groupByLang).map((lang) => ({
+                value: lang,
+                label: lang,
+              }))}
+            />
+          </div>
+        )}
 
-          <Select
-            value={lang}
-            onChange={(lang) => {
-              setLang(lang)
-              if (lang === 'en-US') {
-                setInputText(defaultEnText)
+        <div className="grid grid-cols-subgrid col-span-full">
+          <span>pitch</span>
+          <Slider
+            value={pitch}
+            onChange={(e) => {
+              setPitch(+e.currentTarget.valueAsNumber)
+
+              if (speechSynthesis.speaking) {
+                onSpeek()
               }
             }}
-            options={Object.keys(groupByLang).map((lang) => ({
-              value: lang,
-              label: lang,
-            }))}
+            min={0}
+            max={2}
+            step={0.01}
           />
+        </div>
 
-          <br />
-        </>
-      )}
+        <div className="grid grid-cols-subgrid col-span-full">
+          <span>volume</span>
+          <Slider
+            value={volume}
+            onChange={(e) => {
+              setVolume(e.currentTarget.valueAsNumber)
 
-      <span>pitch</span>
-      <Slider
-        value={pitch}
-        onChange={(e) => {
-          setPitch(+e.currentTarget.valueAsNumber)
+              if (speechSynthesis.speaking) {
+                onSpeek()
+              }
+            }}
+            min={0}
+            max={1}
+            step={0.01}
+          />
+        </div>
 
-          if (speechSynthesis.speaking) {
-            onSpeek()
-          }
-        }}
-        min={0}
-        max={2}
-        step={0.01}
-      />
+        <div className="grid grid-cols-subgrid col-span-full">
+          <span>rate</span>
+          <Slider
+            value={rate}
+            onChange={(e) => {
+              setRate(e.currentTarget.valueAsNumber)
 
-      <br />
-
-      <span>volume</span>
-      <Slider
-        value={volume}
-        onChange={(e) => {
-          setVolume(e.currentTarget.valueAsNumber)
-
-          if (speechSynthesis.speaking) {
-            onSpeek()
-          }
-        }}
-        min={0}
-        max={1}
-        step={0.01}
-      />
-
-      <br />
-
-      <span>rate</span>
-      <Slider
-        value={rate}
-        onChange={(e) => {
-          setRate(e.currentTarget.valueAsNumber)
-
-          if (speechSynthesis.speaking) {
-            onSpeek()
-          }
-        }}
-        min={0.1}
-        max={10}
-        step={0.1}
-      />
+              if (speechSynthesis.speaking) {
+                onSpeek()
+              }
+            }}
+            min={0.1}
+            max={10}
+            step={0.1}
+          />
+        </div>
+      </div>
 
       <Input.TextArea
         value={inputText}
@@ -475,7 +483,7 @@ export default function WebSpeechAPIPage() {
       <div className="text-red-400">
         {recogError}
       </div>
-    </div>
+    </main>
   )
 }
 
