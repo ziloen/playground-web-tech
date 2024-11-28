@@ -1,4 +1,3 @@
-import { Button } from 'antd'
 import { toSvgElement } from '~/lib/html-to-image'
 
 export default function DOMToImage() {
@@ -43,9 +42,9 @@ export default function DOMToImage() {
         </div>
       </div>
 
-      <Button onClick={captureDOM}>
+      <button onClick={captureDOM}>
         Capture
-      </Button>
+      </button>
 
       <div>
         {svgElement && <TeleportElement element={svgElement} />}

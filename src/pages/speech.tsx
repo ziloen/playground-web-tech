@@ -292,9 +292,13 @@ export default function WebSpeechAPIPage() {
       </div>
 
       <Input.TextArea
+        style={{ maxWidth: '600px' }}
+        autoSize={{ minRows: 3 }}
         value={inputText}
         onChange={(e) => setInputText(e.currentTarget.value)}
       />
+
+      <br />
 
       <Button
         onClick={onSpeek}
@@ -351,10 +355,8 @@ export default function WebSpeechAPIPage() {
         </div>
       </div>
 
-      <table
-        style={{ borderCollapse: 'collapse' }}
-      >
-        <thead style={{ padding: '10px' }}>
+      <table className="border-collapse">
+        <thead className="p-[10px]">
           <tr className="text-center">
             <th className="px-2 py-1">Status</th>
             <th className="px-2 py-1">Active</th>

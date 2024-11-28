@@ -1,5 +1,3 @@
-import { Switch } from 'antd'
-import type { KeyboardEventKey } from 'ts-lib-enhance'
 import { useEventListener } from '~/hooks'
 
 const properties: {
@@ -30,27 +28,37 @@ export default function KeyCode() {
     if (stopPropagation) e.stopPropagation()
 
     setEvent(e)
-  }, {
-    target: ref,
-  })
+  }, { target: ref })
 
   return (
     <div className="p-2 flex flex-col gap-2">
       <div>
-        <div>
+        <label>
           Prevent default
-          <Switch value={preventDefault} onChange={setPreventDefault} />
-        </div>
+          <input
+            type="checkbox"
+            checked={preventDefault}
+            onChange={(e) => setPreventDefault(e.currentTarget.checked)}
+          />
+        </label>
 
-        <div>
+        <label>
           Stop propagation
-          <Switch value={stopPropagation} onChange={setStopPropagation} />
-        </div>
+          <input
+            type="checkbox"
+            checked={stopPropagation}
+            onChange={(e) => setStopPropagation(e.currentTarget.checked)}
+          />
+        </label>
 
-        <div>
+        <label>
           Hide deprecated properties
-          <Switch value={hideDeprecated} onChange={setHideDeprecated} />
-        </div>
+          <input
+            type="checkbox"
+            checked={hideDeprecated}
+            onChange={(e) => setHideDeprecated(e.currentTarget.checked)}
+          />
+        </label>
       </div>
 
       <div

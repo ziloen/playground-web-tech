@@ -52,7 +52,7 @@ export default function ColorGenerator() {
             setInputVal(e.toRgbString())
           }}
           destroyTooltipOnHide
-          placement="topRight"
+          placement="rightTop"
         />
       </div>
 
@@ -174,7 +174,7 @@ function ColorCompare() {
                 '--start': startColor,
                 '--end': endColor,
                 background:
-                  `linear-gradient(in ${name.toLowerCase()} to right, var(--start), var(--end)`,
+                  `linear-gradient(90deg in ${name.toLowerCase()}, var(--start), var(--end)`,
               }}
             >
             </div>
