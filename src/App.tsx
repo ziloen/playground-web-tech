@@ -1,4 +1,4 @@
-import { ConfigProvider, theme } from 'antd'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Suspense } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import routes from '~react-pages'
@@ -7,22 +7,17 @@ function Routes() {
   return useRoutes(routes)
 }
 
+// Create a client
+const queryClient = new QueryClient()
+
 export default function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <ConfigProvider
-        theme={{
-          algorithm: theme.darkAlgorithm,
-          token: {
-            motion: false,
-          },
-          cssVar: true,
-        }}
-      >
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Suspense>
           <Routes />
         </Suspense>
-      </ConfigProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }

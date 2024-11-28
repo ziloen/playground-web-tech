@@ -11,12 +11,12 @@
   },
   "type": "module",
   "dependencies": {
-    "@adobe/react-spectrum": "3.38.0",
     "@atlaskit/pragmatic-drag-and-drop": "1.4.0",
     "@fontsource-variable/fira-code": "5.1.0",
     "@fontsource-variable/noto-sans-sc": "5.1.0",
     "@lexical/react": "^0.20.0",
     "@radix-ui/react-select": "2.1.2",
+    "@tanstack/react-query": "5.61.5",
     "@wai-ri/core": "^0.0.103",
     "@wai-ri/react": "^0.0.103",
     "ahooks": "^3.8.1",

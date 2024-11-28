@@ -9,7 +9,7 @@
     "semiColons": "asi",
     "quoteStyle": "preferSingle",
     "jsx.quoteStyle": "preferDouble",
-    "quoteProps": "preserve",
+    "quoteProps": "asNeeded",
     "newLineKind": "lf",
     "useBraces": "maintain",
     "module.sortImportDeclarations": "maintain",
