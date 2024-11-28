@@ -35,7 +35,15 @@ export default function Warframe() {
               <div>
                 {news.message}
               </div>
-              <img className="w-32 hidden" src={news.imageLink} alt="News image" loading="lazy" />
+
+              <img
+                className="w-[36px] aspect-video"
+                src={news.imageLink}
+                alt="News image"
+                decoding="async"
+                fetchPriority="low"
+                loading="lazy"
+              />
             </div>
           )
         })}
