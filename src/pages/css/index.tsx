@@ -30,6 +30,8 @@ export default function CSSPage() {
       <AutoShrinkButton3 />
 
       <FlexAlignFirstLine />
+
+      <GridRepeat />
     </div>
   )
 }
@@ -330,6 +332,32 @@ function FlexAlignFirstLine() {
   return (
     <div className="flex">
       WIP
+    </div>
+  )
+}
+
+function GridRepeat() {
+  return (
+    <div
+      className="grid gap-2 resizable-x [&>div]:bg-red-300 [&>span]:bg-blue-300 [&>span]:justify-self-start"
+      style={{
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100px, 100%), 1fr))',
+      }}
+    >
+      <span className="col-span-full">Title1</span>
+      <div className="">111</div>
+      <span className="col-span-full">Title2</span>
+      <div className="">111</div>
+      <div className="">222</div>
+      <span className="col-span-full">Title3</span>
+      <div className="">111</div>
+      <div className="">222</div>
+      <div className="">333</div>
+      <span className="col-span-full">Title4</span>
+      <div className="">111</div>
+      <div className="">222</div>
+      <div className="">333</div>
+      <div className="">444</div>
     </div>
   )
 }
