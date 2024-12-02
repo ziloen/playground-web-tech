@@ -338,26 +338,36 @@ function FlexAlignFirstLine() {
 
 function GridRepeat() {
   return (
-    <div
-      className="grid gap-2 resizable-x [&>div]:bg-red-300 [&>span]:bg-blue-300 [&>span]:justify-self-start"
-      style={{
-        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100px, 100%), 1fr))',
-      }}
-    >
-      <span className="col-span-full">Title1</span>
-      <div className="">111</div>
-      <span className="col-span-full">Title2</span>
-      <div className="">111</div>
-      <div className="">222</div>
-      <span className="col-span-full">Title3</span>
-      <div className="">111</div>
-      <div className="">222</div>
-      <div className="">333</div>
-      <span className="col-span-full">Title4</span>
-      <div className="">111</div>
-      <div className="">222</div>
-      <div className="">333</div>
-      <div className="">444</div>
+    <div className="resizable-x @container">
+      <div
+        className={clsx(
+          'grid gap-2 [&>div]:bg-red-300 [&>span]:bg-blue-300 [&>span]:justify-self-start',
+          // default
+          'grid-cols-[--template-columns]',
+          // at least 2 items, when width <= item-min-width * 2 + gap * 1
+          '@[<=408px]:grid-cols-[--sm-template-columns]',
+        )}
+        style={{
+          '--item-min-width': '200px',
+          '--template-columns': 'repeat(auto-fit, minmax(min(var(--item-min-width), 100%), 1fr))',
+          '--sm-template-columns': '1fr 1fr',
+        }}
+      >
+        <span className="col-span-full">Title1</span>
+        <div className="">111</div>
+        <span className="col-span-full">Title2</span>
+        <div className="">111</div>
+        <div className="">222</div>
+        <span className="col-span-full">Title3</span>
+        <div className="">111</div>
+        <div className="">222</div>
+        <div className="">333</div>
+        <span className="col-span-full">Title4</span>
+        <div className="">111</div>
+        <div className="">222</div>
+        <div className="">333</div>
+        <div className="">444</div>
+      </div>
     </div>
   )
 }
