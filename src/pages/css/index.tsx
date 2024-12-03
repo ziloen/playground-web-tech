@@ -341,7 +341,11 @@ function GridRepeat() {
     <div className="resizable-x @container">
       <div
         className={clsx(
-          'grid gap-2 [&>div]:bg-red-300 [&>span]:bg-blue-300 [&>span]:justify-self-start',
+          'grid gap-2',
+          // items
+          '[&>div]:bg-red-300',
+          // titles
+          '[&>span]:bg-blue-300 [&>span]:justify-self-start',
           // default
           'grid-cols-[--template-columns]',
           // at least 2 items, when width <= item-min-width * 2 + gap * 1
