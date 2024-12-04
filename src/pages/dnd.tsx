@@ -189,11 +189,22 @@ function logDataTransfer(dataTransfer: DataTransfer | null) {
   const files = Array.from(dataTransfer.files)
   const items = Array.from(dataTransfer.items).map(({ kind, type }) => ({ kind, type }))
   const types = Array.from(dataTransfer.types)
+  const values = items.reduce<Record<string, string>>((previousValue, currentValue) => {
+    const value = dataTransfer.getData(currentValue.type)
+    previousValue[currentValue.type] = value
+    // Firefox bookmarks
+    if (currentValue.type === 'text/x-moz-place' && value) {
+      const json = JSON.parse(value) as Record<string, unknown>
+      console.log(json)
+    }
+    return previousValue
+  }, {})
 
   console.log({
     files,
     items,
     types,
+    values,
   })
 
   return { files, items, types }
