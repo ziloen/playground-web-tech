@@ -12,6 +12,8 @@
   "type": "module",
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "1.4.0",
+    "@ffmpeg/ffmpeg": "0.12.10",
+    "@ffmpeg/util": "0.12.1",
     "@fontsource-variable/fira-code": "5.1.0",
     "@fontsource-variable/noto-sans-sc": "5.1.0",
     "@lexical/react": "^0.21.0",

@@ -65,7 +65,7 @@ export default defineConfig(({ command, mode }) => {
             'react-router-dom': ['useNavigate', 'useParams', 'useRoutes'],
             'motion/react': ['motion', 'AnimatePresence'],
             'react-i18next': ['useTranslation'],
-            'clsx': ['clsx'],
+            clsx: ['clsx'],
           },
           {
             type: true,
@@ -103,10 +103,18 @@ export default defineConfig(({ command, mode }) => {
 
     optimizeDeps: {
       include: ['lodash-es', 'ahooks'],
+      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
     },
 
     build: {
       cssMinify: 'esbuild',
+    },
+
+    server: {
+      headers: {
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'require-corp',
+      },
     },
 
     // https://github.com/vitest-dev/vitest
