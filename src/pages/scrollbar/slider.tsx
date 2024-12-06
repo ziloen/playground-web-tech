@@ -4,24 +4,26 @@ export default function Slider() {
   const [value, setValue] = useState(0)
 
   return (
-    <div className="p-2">
+    <div
+      className="py-2 px-10"
+      style={{
+        '--value': value,
+      }}
+    >
       <div className="flex flex-col items-start">
         <input
-          className={styles['windows-slider']}
+          className={styles['windows10']}
           type="range"
           step={0.01}
           min={0}
           max={1}
           dir="ltr"
-          style={{
-            '--value': value,
-          }}
           value={value}
           onChange={(e) => setValue(Number(e.currentTarget.value))}
         />
 
         <input
-          className={styles['windows-slider']}
+          className={styles['windows10']}
           type="range"
           step={0.01}
           min={0}
@@ -36,29 +38,23 @@ export default function Slider() {
       </div>
 
       <input
-        className={clsx(styles['windows-slider'], 'writing-vertical-rl')}
+        className={clsx(styles['windows10'], 'writing-vertical-rl')}
         type="range"
         step={0.01}
         min={0}
         max={1}
         dir="ltr"
-        style={{
-          '--value': value,
-        }}
         value={value}
         onChange={(e) => setValue(Number(e.currentTarget.value))}
       />
 
       <input
-        className={clsx(styles['windows-slider'], 'writing-vertical-rl')}
+        className={clsx(styles['windows10'], 'writing-vertical-rl')}
         type="range"
         step={0.01}
         min={0}
         max={1}
         dir="rtl"
-        style={{
-          '--value': value,
-        }}
         value={value}
         onChange={(e) => setValue(Number(e.currentTarget.value))}
       />
@@ -66,15 +62,25 @@ export default function Slider() {
       <br />
 
       <input
-        className={styles['mac-slider']}
+        className={styles['mac']}
         type="range"
         step={0.01}
         min={0}
         max={1}
         dir="ltr"
-        style={{
-          '--value': value,
-        }}
+        value={value}
+        onChange={(e) => setValue(Number(e.currentTarget.value))}
+      />
+
+      <br />
+
+      <input
+        className={styles['windows11']}
+        type="range"
+        step={0.01}
+        min={0}
+        max={1}
+        dir="ltr"
         value={value}
         onChange={(e) => setValue(Number(e.currentTarget.value))}
       />

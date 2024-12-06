@@ -5,21 +5,10 @@
   border-radius: var(--track-radius);
   block-size: max(var(--track-height), var(--thumb-height));
   overflow: clip;
-  /* --track-background: #666666;
-  --track-hover-background: #999999;
-  --track-height: 3px;
-  --track-radius: 0px;
-
-  --progress-background: #404040;
-  --progress-radius: 0px;
-
-  --thumb-height: 24px;
-  --thumb-width: 8px;
-  --thumb-radius: 4px;
-  --thumb-background: var(--progress-background);
-  --thumb-hover-background: #f2f2f2; */
+  container-type: inline-size;
 
   &::-moz-range-track {
+    appearance: none;
     cursor: pointer;
     overflow: clip;
     block-size: var(--track-height);
@@ -31,7 +20,6 @@
     appearance: none;
     block-size: var(--track-height);
     width: var(--track-height);
-
     border-radius: var(--progress-radius, 0px);
     background-color: var(--progress-background);
     overflow: clip;
@@ -41,9 +29,13 @@
     appearance: none;
     cursor: pointer;
     border: none;
+    box-sizing: border-box;
     block-size: var(--thumb-height);
     inline-size: var(--thumb-width);
     border-radius: var(--thumb-radius);
+    border-width: var(--thumb-border-width, 0);
+    border-color: var(--thumb-border-color);
+    border-style: solid;
     background-color: var(--thumb-background);
   }
 
@@ -115,7 +107,7 @@
   }
 }
 
-.windows-slider {
+.windows10 {
   composes: slider;
 
   --track-background: #666666;
@@ -133,7 +125,7 @@
 }
 
 
-.mac-slider {
+.mac {
   composes: slider;
 
   --track-background: #4f4f4f;
@@ -148,4 +140,25 @@
   --thumb-radius: 4px;
   --thumb-background: transparent;
   --thumb-hover-background: transparent;
+}
+
+.windows11 {
+  composes: slider;
+
+  --track-background: #9e9e9e;
+  --track-hover-background: var(--track-background);
+  --track-height: 6px;
+  --track-radius: 3px;
+
+  --progress-radius: 3px;
+
+  --progress-background: #b3c5d6;
+
+  --thumb-height: 18px;
+  --thumb-width: 18px;
+  --thumb-radius: 9999px;
+  --thumb-border-width: 5px;
+  --thumb-border-color: #454545;
+  --thumb-background: #b3c5d6;
+  --thumb-hover-background: #b3c5d6;
 }
