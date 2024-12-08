@@ -4,19 +4,27 @@
 // convert to webp / avif / jpegxl at same time to compare size and quality
 
 import { FFmpeg } from '@ffmpeg/ffmpeg'
-import { fetchFile, toBlobURL } from '@ffmpeg/util'
-import { useAsyncEffect } from 'ahooks'
+import { toBlobURL } from '@ffmpeg/util'
+import { FFprobeWorker } from 'ffprobe-wasm'
 
 export default function Compression() {
   const [loaded, setLoaded] = useState(false)
   const [ffmpeg] = useState(() => new FFmpeg())
   const [file, setFile] = useState<File | null>(null)
 
+  useEffect(() => {
+    return () => ffmpeg.terminate()
+  }, [])
+
   const load = async () => {
     const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/esm'
 
-    ffmpeg.on('log', ({ message }) => {
-      console.log(message)
+    ffmpeg.on('log', ({ message, type }) => {
+      console.log(type, message)
+    })
+
+    ffmpeg.on('progress', ({ progress, time }) => {
+      console.log(progress, time)
     })
 
     await ffmpeg.load({
@@ -33,13 +41,10 @@ export default function Compression() {
   }
 
   const getVideoInfo = async (file: File) => {
-    const u8 = await fetchFile(file)
-    await ffmpeg.writeFile(file.name, u8)
+    const worker = new FFprobeWorker()
 
-    await ffmpeg.exec(['-i', file.name, '-f', 'ffmetadata', 'info.txt'])
-    const info = await ffmpeg.readFile('info.txt')
-    const infoText = await new Blob([info], { type: 'text/plain' }).text()
-    console.log(infoText)
+    const fileInfo = await worker.getFileInfo(file)
+    console.log(fileInfo)
 
     // frames, duration, resolution, codec, bitrate, audio codec, audio bitrate
   }
@@ -63,17 +68,11 @@ export default function Compression() {
             </div>
             {file
               && (
-                <div>
-                  <div>
-                    {/* <video controls src={URL.createObjectURL(file)} /> */}
-
-                    <div>{file.name}</div>
-                    <div>{formatBytes(file.size)}</div>
-                  </div>
+                <div className="flex gap-3">
+                  <div>{file.name}</div>
+                  <div>{formatBytes(file.size)}</div>
                 </div>
               )}
-
-            <ConfigForm />
 
             <button>transcode</button>
           </div>
@@ -104,6 +103,6 @@ function formatBytes(bytes: number) {
     bytes /= base
     n++
   }
-
-  return `${bytes.toFixed(2)} ${labels[n]}`
+  
+  return `${bytes.toFixed(2)}${labels[n]}`
 }
