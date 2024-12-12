@@ -1,41 +1,36 @@
 {
-  "useTabs": false,
-  "indentWidth": 2,
-  // https://dprint.dev/plugins/typescript/config/
-  "typescript": {
-    "lineWidth": 100,
-    "indentWidth": 2,
-    "useTabs": false,
-    "semiColons": "asi",
-    "quoteStyle": "preferSingle",
-    "jsx.quoteStyle": "preferDouble",
-    "quoteProps": "asNeeded",
-    "newLineKind": "lf",
-    "useBraces": "maintain",
-    "module.sortImportDeclarations": "maintain",
-    // #region "trailingCommas"
-    "trailingCommas": "onlyMultiLine",
-    "arguments.trailingCommas": "onlyMultiLine",
-    "parameters.trailingCommas": "onlyMultiLine",
-    "importDeclaration.trailingCommas": "onlyMultiLine",
-    // #endregion
-    "jsx.multiLineParens": "prefer",
-    "importDeclaration.sortNamedImports": "maintain",
-    "arrowFunction.useParentheses": "force",
-    "operatorPosition": "nextLine",
-    "jsx.bracketPosition": "nextLine",
-    "spaceAround": false,
-    "spaceSurroundingProperties": true,
-    "binaryExpression.spaceSurroundingBitwiseAndArithmeticOperator": true,
-    "commentLine.forceSpaceAfterSlashes": true,
-    "constructor.spaceBeforeParentheses": false,
-    "constructorType.spaceAfterNewKeyword": true,
-    "constructSignature.spaceAfterNewKeyword": true
-  },
   "excludes": [
     "**/node_modules"
   ],
+  "indentWidth": 2,
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.93.3.wasm"
-  ]
+  ],
+  // https://dprint.dev/plugins/typescript/config/
+  "typescript": {
+    "arrowFunction.useParentheses": "force",
+    "binaryExpression.spaceSurroundingBitwiseAndArithmeticOperator": true,
+    "commentLine.forceSpaceAfterSlashes": true,
+    "constructSignature.spaceAfterNewKeyword": true,
+    "constructor.spaceBeforeParentheses": false,
+    "constructorType.spaceAfterNewKeyword": true,
+    "importDeclaration.sortNamedImports": "maintain",
+    "indentWidth": 2,
+    "jsx.bracketPosition": "nextLine",
+    "jsx.multiLineParens": "prefer",
+    "jsx.quoteStyle": "preferDouble",
+    "lineWidth": 100,
+    "module.sortImportDeclarations": "maintain",
+    "newLineKind": "lf",
+    "operatorPosition": "nextLine",
+    "quoteProps": "asNeeded",
+    "quoteStyle": "preferSingle",
+    "semiColons": "asi",
+    "spaceAround": false,
+    "spaceSurroundingProperties": true,
+    "trailingCommas": "onlyMultiLine",
+    "useBraces": "maintain",
+    "useTabs": false
+  },
+  "useTabs": false
 }
