@@ -5,12 +5,14 @@
 
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { toBlobURL } from '@ffmpeg/util'
+import type { FileInfo } from 'ffprobe-wasm'
 import { FFprobeWorker } from 'ffprobe-wasm'
 
 export default function Compression() {
   const [loaded, setLoaded] = useState(false)
   const [ffmpeg] = useState(() => new FFmpeg())
   const [file, setFile] = useState<File | null>(null)
+  const [fileInfo, setFileInfo] = useState<FileInfo | null>(null)
 
   useEffect(() => {
     return () => ffmpeg.terminate()
@@ -46,35 +48,57 @@ export default function Compression() {
     const fileInfo = await worker.getFileInfo(file)
     console.log(fileInfo)
 
+    setFileInfo(fileInfo)
     // frames, duration, resolution, codec, bitrate, audio codec, audio bitrate
   }
 
   return (
-    <div>
+    <div className="flex flex-col items-center">
       {loaded
         ? (
-          <div>
-            <div
-              className="size-32 border border-dashed border-green-700"
-              onDragEnter={(e) => e.preventDefault()}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault()
-                setFile(e.dataTransfer.files[0])
-                getVideoInfo(e.dataTransfer.files[0])
-              }}
-            >
-              <div>Drop video</div>
-            </div>
+          <div className="self-stretch flex flex-col px-3 mt-4">
+            {!file && (
+              <div
+                className="size-32 my-4 flex-center rounded-md border-dashed bg-dark-gray-700 border-dark-gray-50 border-2 mx-auto"
+                onDragEnter={(e) => e.preventDefault()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  setFile(e.dataTransfer.files[0])
+                  getVideoInfo(e.dataTransfer.files[0])
+                }}
+              >
+                <div
+                  className="rounded-[4px] cursor-pointer px-4 py-2 shadow-blue-600 bg-blue-400 text-white"
+                  style={{
+                    boxShadow: '0 5px 20px var(--tw-shadow-color)',
+                  }}
+                  onClick={() => {}}
+                >
+                  <span className="text-white">
+                    Drop video
+                  </span>
+                </div>
+              </div>
+            )}
             {file
               && (
-                <div className="flex gap-3">
-                  <div>{file.name}</div>
-                  <div>{formatBytes(file.size)}</div>
+                <div className="flex flex-col gap-1 border-dark-gray-300 border border-solid px-2 py-2">
+                  <div>
+                    <span>
+                      {file.name}
+                    </span>
+                  </div>
+                  <div className="text-light-gray-800">{formatBytes(file.size)}</div>
+                  {fileInfo && (
+                    <div className="text-light-gray-800">
+                      Duration: {formatDuration(fileInfo.format.duration)}
+                    </div>
+                  )}
                 </div>
               )}
 
-            <button>transcode</button>
+            <button className="mx-auto">transcode</button>
           </div>
         )
         : <button onClick={load}>load</button>}
@@ -103,6 +127,16 @@ function formatBytes(bytes: number) {
     bytes /= base
     n++
   }
-  
+
   return `${bytes.toFixed(2)}${labels[n]}`
+}
+
+function formatDuration(durationString: string) {
+  const seconds = parseFloat(durationString)
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const secs = Math.floor(seconds % 60)
+  const ms = Math.floor((seconds % 1) * 1000)
+
+  return `${hours}:${minutes}:${secs}.${ms}`
 }
