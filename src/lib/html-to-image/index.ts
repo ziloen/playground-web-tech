@@ -25,8 +25,8 @@ export async function toSvg(
   await embedWebFonts(node, clonedNode, options)
   await embedImages(clonedNode, options)
   applyStyle(clonedNode, options)
-  const datauri = await nodeToDataURL(clonedNode, width, height)
-  return datauri
+
+  return nodeToDataURL(clonedNode, width, height)
 }
 
 export async function toSvgElement(

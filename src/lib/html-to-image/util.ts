@@ -180,18 +180,16 @@ export function createImage(url: string): Promise<HTMLImageElement> {
   })
 }
 
-export async function svgToDataURL(svg: SVGElement): Promise<string> {
-  return Promise.resolve()
-    .then(() => new XMLSerializer().serializeToString(svg))
-    .then(encodeURIComponent)
-    .then((html) => `data:image/svg+xml;charset=utf-8,${html}`)
+export function svgToDataURL(svg: SVGElement): string {
+  const html = new XMLSerializer().serializeToString(svg)
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(html)}`
 }
 
 export function nodeToDataURL(
   node: HTMLElement,
   width: number,
   height: number,
-): Promise<string> {
+): string {
   const svg = nodeToSvgElement(node, width, height)
   return svgToDataURL(svg)
 }
@@ -216,12 +214,12 @@ export function nodeToSvgElement(node: HTMLElement, width: number, height: numbe
   return svg
 }
 
-export const isInstanceOfElement = <
+export function isInstanceOfElement<
   T extends typeof Element | typeof HTMLElement | typeof SVGImageElement,
 >(
   node: Element | HTMLElement | SVGImageElement,
   instance: T,
-): node is T['prototype'] => {
+): node is T['prototype'] {
   if (node instanceof instance) return true
 
   const nodePrototype = Object.getPrototypeOf(node) as T['prototype'] | null
