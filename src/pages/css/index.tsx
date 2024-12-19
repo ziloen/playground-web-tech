@@ -32,6 +32,8 @@ export default function CSSPage() {
       <FlexAlignFirstLine />
 
       <GridRepeat />
+
+      <SizeConstraints />
     </div>
   )
 }
@@ -372,6 +374,37 @@ function GridRepeat() {
         <div className="">333</div>
         <div className="">444</div>
       </div>
+    </div>
+  )
+}
+
+function SizeConstraints() {
+  const [left, setLeft] = useState(0)
+  const [top, setTop] = useState(0)
+  const [width, setWidth] = useState(100)
+
+  return (
+    <div
+      className="size-[300px] bg-dark-gray-500 ms-4 relative"
+      onPointerMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect()
+        const relativeX = e.clientX - rect.left
+        const relativeY = e.clientY - rect.top
+        setLeft(relativeX)
+        setTop(relativeY)
+      }}
+    >
+      <div
+        className="absolute bg-red-400"
+        style={{
+          minWidth: '50px',
+          minHeight: '50px',
+          left: `${left}px`,
+          top: `${top}px`,
+          right: `max(100% - ${left + width}px, 0px)`,
+          bottom: `max(100% - ${top + width}px, 0px)`,
+        }}
+      />
     </div>
   )
 }
