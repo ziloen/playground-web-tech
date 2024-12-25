@@ -4,7 +4,7 @@
 // convert to webp / avif / jpegxl at same time to compare size and quality
 
 import { FFmpeg } from '@ffmpeg/ffmpeg'
-import { toBlobURL } from '@ffmpeg/util'
+import { fetchFile, toBlobURL } from '@ffmpeg/util'
 import type { FileInfo } from 'ffprobe-wasm'
 import { FFprobeWorker } from 'ffprobe-wasm'
 
@@ -50,6 +50,21 @@ export default function Compression() {
 
     setFileInfo(fileInfo)
     // frames, duration, resolution, codec, bitrate, audio codec, audio bitrate
+
+    await ffmpeg.writeFile(file.name, await fetchFile(file))
+    await ffmpeg.ffprobe([
+      '-v',
+      'error',
+      '-show_entries',
+      'format=duration',
+      '-of',
+      'default=noprint_wrappers=1:nokey=1',
+      file.name,
+      '-o',
+      'output.txt',
+    ])
+    const data = await ffmpeg.readFile('output.txt')
+    console.log('ffmpeg.ffprobe', data)
   }
 
   return (
