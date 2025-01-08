@@ -3,6 +3,9 @@
 // remove image exif data or other metadata
 // convert to webp / avif / jpegxl at same time to compare size and quality
 
+// import ffmpegWorkerUrl from '@ffmpeg/core-mt/dist/esm/ffmpeg-core.worker.js?url'
+import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
+import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
 import type { FileInfo } from 'ffprobe-wasm'
@@ -48,7 +51,7 @@ export default function Compression() {
   }, [])
 
   const load = async () => {
-    const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/esm'
+    const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.9/dist/esm'
 
     ffmpeg.on('log', ({ message, type }) => {
       console.log(type, message)
@@ -59,8 +62,8 @@ export default function Compression() {
     })
 
     await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+      coreURL: await toBlobURL(ffmpegCoreUrl, 'text/javascript'),
+      wasmURL: await toBlobURL(ffmpegWasmUrl, 'application/wasm'),
       workerURL: await toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript'),
     })
 
