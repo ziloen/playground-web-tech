@@ -8,6 +8,7 @@ import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
 import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
+import { useMemoizedFn } from 'ahooks'
 import type { FileInfo } from 'ffprobe-wasm'
 import { FFprobeWorker } from 'ffprobe-wasm'
 import { builtinPlugins, optimize } from 'svgo/browser'
@@ -25,6 +26,7 @@ export default function Compression() {
   const [ffmpeg] = useState(() => new FFmpeg())
   const [file, setFile] = useState<File | null>(null)
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null)
+  const [outputBlob, setOutputBlob] = useState<Blob | null>(null)
 
   useEffect(() => {
     Reflect.set(window, 'svgo', optimize)
@@ -54,11 +56,11 @@ export default function Compression() {
     const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.9/dist/esm'
 
     ffmpeg.on('log', ({ message, type }) => {
-      console.log(type, message)
+      console.log('log', type, message)
     })
 
     ffmpeg.on('progress', ({ progress, time }) => {
-      console.log(progress, time)
+      console.log('progess', progress, time)
     })
 
     await ffmpeg.load({
@@ -70,9 +72,24 @@ export default function Compression() {
     setLoaded(true)
   }
 
-  const transcode = async () => {
-    // ffmpeg.writeFile()
-  }
+  const transcode = useMemoizedFn(async () => {
+    if (!file) return
+    await ffmpeg.writeFile(file.name, await fetchFile(file))
+    await ffmpeg.exec([
+      '-i',
+      file.name,
+      '-c:v',
+      'libx264',
+      '-preset',
+      'veryslow',
+      '-crf',
+      '18',
+      'output.mp4',
+    ])
+    const data = await ffmpeg.readFile('output.mp4') as Uint8Array
+    console.log(data)
+    setOutputBlob(new Blob([data], { type: 'video/mp4' }))
+  })
 
   const getVideoInfo = async (file: File) => {
     const worker = new FFprobeWorker()
@@ -111,8 +128,9 @@ export default function Compression() {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   e.preventDefault()
-                  setFile(e.dataTransfer.files[0])
-                  getVideoInfo(e.dataTransfer.files[0])
+                  const file = e.dataTransfer.files[0]
+                  setFile(file)
+                  getVideoInfo(file)
                 }}
               >
                 <div
@@ -145,10 +163,12 @@ export default function Compression() {
                 </div>
               )}
 
-            <button className="mx-auto">transcode</button>
+            <button className="mx-auto" onClick={transcode}>transcode</button>
           </div>
         )
         : <button onClick={load}>load</button>}
+
+      {/* {outputBlob && <video src={URL.createObjectURL(outputBlob)} controls />} */}
     </div>
   )
 }
