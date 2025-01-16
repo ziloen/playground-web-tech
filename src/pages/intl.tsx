@@ -1,6 +1,6 @@
-import type { ArrayType } from '@wai-ri/core'
 import { Select } from 'antd'
 import { useMotionValue } from 'motion/react'
+import type { ArrayValues } from 'type-fest'
 
 const Languages = [
   'en',
@@ -94,7 +94,7 @@ function LanguageSelect({
   }, [language])
 
   return (
-    <Select<string, ArrayType<typeof options>>
+    <Select<string, ArrayValues<typeof options>>
       defaultValue={language}
       options={options}
       onChange={onChange}

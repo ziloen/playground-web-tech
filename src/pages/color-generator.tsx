@@ -3,7 +3,7 @@
 // https://www.radix-ui.com/colors/custom
 // https://github.com/proteanstudio/contrast-tools
 
-import { ColorPicker, Input, Slider } from 'antd'
+import { ColorPicker, Input } from 'antd'
 import Color from 'colorjs.io'
 
 export default function ColorGenerator() {

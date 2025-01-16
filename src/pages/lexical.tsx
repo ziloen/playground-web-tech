@@ -16,7 +16,6 @@ import {
   MenuOption,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin'
-import { useMemoizedFn } from 'ahooks'
 import type {
   DOMConversionMap,
   DOMConversionOutput,
@@ -30,6 +29,7 @@ import type {
 } from 'lexical'
 import { $applyNodeReplacement, $getSelection, CLEAR_EDITOR_COMMAND, DecoratorNode } from 'lexical'
 import { createPortal } from 'react-dom'
+import { useMemoizedFn } from '~/hooks'
 
 type SerializedMentionNode = Spread<
   {

@@ -1,9 +1,8 @@
 import { asNonNullable, asType } from '@wai-ri/core'
-import { useMemoizedFn } from 'ahooks'
-import { Button, Form, Input, Select } from 'antd'
+import { Button, Input, Select } from 'antd'
 import type { DefaultOptionType } from 'antd/es/select'
 import Slider from '~/components/Slider'
-import { useGetState, useNextEffect } from '~/hooks'
+import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
 import CarbonCloud from '~icons/carbon/cloud'
 
 const defaultZhText =

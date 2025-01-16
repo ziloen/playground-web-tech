@@ -8,10 +8,10 @@ import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
 import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
-import { useMemoizedFn } from 'ahooks'
 import type { FileInfo } from 'ffprobe-wasm'
 import { FFprobeWorker } from 'ffprobe-wasm'
 import { builtinPlugins, optimize } from 'svgo/browser'
+import { useMemoizedFn } from '~/hooks'
 
 const test_svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
