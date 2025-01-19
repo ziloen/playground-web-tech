@@ -1,6 +1,7 @@
 import { asNonNullable, asType } from '@wai-ri/core'
 import { Button, Input, Select } from 'antd'
 import type { DefaultOptionType } from 'antd/es/select'
+import { useMotionValue } from 'motion/react'
 import Slider from '~/components/Slider'
 import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
 import CarbonCloud from '~icons/carbon/cloud'
@@ -484,6 +485,8 @@ export default function WebSpeechAPIPage() {
       <div className="text-red-400">
         {recogError}
       </div>
+
+      <AudioVisualization />
     </main>
   )
 }
@@ -518,4 +521,60 @@ function useRecognition() {
     startRecord,
     endRecord,
   }
+}
+
+function AudioVisualization() {
+  const levelMV = useMotionValue(0)
+
+  const startRecording = useMemoizedFn(async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+
+    const audioCtx = new AudioContext()
+    const analyser = audioCtx.createAnalyser()
+    const source = audioCtx.createMediaStreamSource(stream)
+    source.connect(analyser)
+    analyser.fftSize = 2048
+
+    const mediaRecorder = new MediaRecorder(stream)
+
+    mediaRecorder.addEventListener('dataavailable', (e) => {
+      console.log(e.type, e, e.data)
+    })
+
+    mediaRecorder.addEventListener('stop', (e) => {
+      console.log(e.type, e)
+    })
+
+    mediaRecorder.start()
+
+    visualize(analyser)
+  })
+
+  const visualize = useMemoizedFn((analyser: AnalyserNode) => {
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount)
+    analyser.getByteFrequencyData(frequencyData)
+
+    const level = frequencyData.reduce((acc, cur) => acc + cur, 0) / frequencyData.length
+
+    console.log(level)
+    levelMV.set(level)
+
+    requestAnimationFrame(() => visualize(analyser))
+  })
+
+  return (
+    <div>
+      <button onClick={startRecording}>🎙</button>
+
+      <div className="w-[200px] h-2">
+        <motion.div
+          className="h-full bg-red-300"
+          style={{
+            width: levelMV,
+          }}
+        >
+        </motion.div>
+      </div>
+    </div>
+  )
 }
