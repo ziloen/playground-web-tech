@@ -563,17 +563,17 @@ function AudioVisualization() {
     source.connect(analyser)
     analyser.fftSize = 2048
 
-    const mediaRecorder = new MediaRecorder(stream)
+    // const mediaRecorder = new MediaRecorder(stream)
 
-    mediaRecorder.addEventListener('dataavailable', (e) => {
-      console.log(e.type, e, e.data)
-    })
+    // mediaRecorder.addEventListener('dataavailable', (e) => {
+    //   console.log(e.type, e, e.data)
+    // })
 
-    mediaRecorder.addEventListener('stop', (e) => {
-      console.log(e.type, e)
-    })
+    // mediaRecorder.addEventListener('stop', (e) => {
+    //   console.log(e.type, e)
+    // })
 
-    mediaRecorder.start()
+    // mediaRecorder.start()
     setStartTime(Date.now())
     setRecording(true)
     visualize(analyser)
@@ -649,9 +649,12 @@ function AudioVisualization() {
       </button>
 
       <div
-        className="h-8 w-[600px] flex items-center gap-0.5 overflow-visible relative"
+        className="h-8 w-[600px] flex items-center gap-0.5 overflow-visible relative transition-all duration-200"
         style={{
-          maskImage: 'linear-gradient(to right, transparent, black 11%, black 89%, transparent)',
+          maskPosition: recording ? '0% 0%, 0% 0%' : '-32px 0%, 32px 0%',
+          maskImage:
+            'linear-gradient(to right, transparent, #000 11%, black 89%, transparent 89%), linear-gradient(to left, transparent, #000 11%, #000 89%, transparent 89%)',
+          maskRepeat: 'no-repeat',
         }}
       >
         {children}
