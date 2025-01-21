@@ -1,9 +1,11 @@
 import { asNonNullable, asType } from '@wai-ri/core'
 import { Button, Input, Select } from 'antd'
 import type { DefaultOptionType } from 'antd/es/select'
-import { useMotionValue, useTime } from 'motion/react'
+import { useMotionValue, useTime, useTransform, type MotionValue } from 'motion/react'
+import { memo, useDeferredValue } from 'react'
 import Slider from '~/components/Slider'
 import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
+import { LRUCache } from '~/utils'
 import CarbonCloud from '~icons/carbon/cloud'
 
 const defaultZhText =
@@ -524,21 +526,19 @@ function useRecognition() {
 }
 
 type AudioSegment = {
-  startTime: number
-  endTime: number
   volume: number
-  key: string
 }
 
 function AudioVisualization() {
-  const MAX_SEGMENT = 150
-  const [visualizationData, setVisualizationData, getVisualizationData] = useGetState<
-    AudioSegment[]
-  >([])
+  const [visualizationData, setVisualizationData, getVisualizationData] = useGetState(() =>
+    new LRUCache<number, AudioSegment>(200)
+  )
 
-  const lastRecordedTime = useRef(0)
-
-  const time = useTime()
+  const [startTime, setStartTime] = useState(Infinity)
+  const [now, nowMV] = useNow()
+  const [recording, setRecording] = useState(false)
+  const stopTimeMV = useMotionValue(0)
+  const streamRef = useRef<MediaStream | null>(null)
 
   const startRecording = useMemoizedFn(async () => {
     const stream = await navigator.mediaDevices.getDisplayMedia({
@@ -554,6 +554,8 @@ function AudioVisualization() {
       },
       systemAudio: 'include',
     })
+
+    streamRef.current = stream
 
     const audioCtx = new AudioContext()
     const analyser = audioCtx.createAnalyser()
@@ -572,55 +574,151 @@ function AudioVisualization() {
     })
 
     mediaRecorder.start()
-
+    setStartTime(Date.now())
+    setRecording(true)
     visualize(analyser)
   })
 
-  const visualize = useMemoizedFn((analyser: AnalyserNode) => {
-    const frequencyData = new Uint8Array(analyser.frequencyBinCount)
-    analyser.getByteFrequencyData(frequencyData)
-
-    const level = frequencyData.reduce((acc, cur) => acc + cur, 0) / frequencyData.length
-
-    const now = Date.now()
-    if (lastRecordedTime.current) {
-      if (getVisualizationData().length > MAX_SEGMENT) {
-        setVisualizationData(getVisualizationData().slice(-MAX_SEGMENT))
-      }
-
-      setVisualizationData(
-        getVisualizationData().concat({
-          startTime: lastRecordedTime.current,
-          endTime: now,
-          volume: level,
-          key: crypto.randomUUID(),
-        }),
-      )
-    }
-    lastRecordedTime.current = now
-
-    requestAnimationFrame(() => visualize(analyser))
+  const stopRecording = useMemoizedFn(() => {
+    stopTimeMV.set(now)
+    setRecording(false)
+    streamRef.current?.getTracks().forEach((track) => track.stop())
   })
 
+  const visualize = useMemoizedFn((analyser: AnalyserNode) => {
+    const update = () => {
+      const frequencyData = new Uint8Array(analyser.frequencyBinCount)
+      analyser.getByteFrequencyData(frequencyData)
+
+      let sum = 0
+
+      for (let i = 0; i < frequencyData.length; i++) {
+        sum += frequencyData[i]
+      }
+
+      const level = sum / frequencyData.length
+
+      const now = Date.now()
+      const nearest = Math.floor(now / 125) * 125
+
+      getVisualizationData().set(nearest, {
+        volume: level,
+      })
+
+      requestAnimationFrame(update)
+    }
+
+    requestAnimationFrame(update)
+  })
+
+  const end = useMemo(() => {
+    if (recording) {
+      return (Math.floor(now / 125)) * 125
+    } else {
+      return (Math.floor(stopTimeMV.get() / 125)) * 125
+    }
+  }, [now, recording])
+
+  const children = useMemo(() => {
+    const result = []
+
+    // length 150
+    for (let i = 149; i >= 0; i--) {
+      const t = end - (i * 125)
+
+      result.push(
+        <WaveItem
+          key={t}
+          nowMV={nowMV}
+          stopTimeMV={stopTimeMV}
+          startTime={startTime}
+          recording={recording}
+          t={t}
+          visualizationData={visualizationData}
+        />,
+      )
+    }
+
+    return result
+  }, [end, recording])
+
   return (
-    <div>
-      <button onClick={startRecording}>🎙</button>
+    <div className="w-[600px] bg-white">
+      <button onClick={() => recording ? stopRecording() : startRecording()}>
+        {recording ? '🔴' : '🎙'}
+      </button>
 
-      <div className="h-8 flex items-center gap-0.5 overflow-visible">
-        {visualizationData.map((segment) => {
-          const clampedVolume = Math.max(0, Math.min(200, segment.volume))
-
-          return (
-            <motion.div
-              key={segment.key}
-              className="w-0.5 rounded-full bg-light-gray-500 shrink-0"
-              style={{
-                height: `${(clampedVolume * 0.14) + 4}px`,
-              }}
-            />
-          )
-        })}
+      <div
+        className="h-8 w-[600px] flex items-center gap-0.5 overflow-visible relative"
+        style={{
+          maskImage: 'linear-gradient(to right, transparent, black 11%, black 89%, transparent)',
+        }}
+      >
+        {children}
       </div>
     </div>
   )
+}
+
+const WaveItem = /* #__PURE__ */ memo(function WaveItem(
+  {
+    t,
+    visualizationData,
+    nowMV,
+    startTime,
+    recording,
+    stopTimeMV,
+  }: {
+    t: number
+    visualizationData: Map<number, AudioSegment>
+    nowMV: MotionValue<number>
+    stopTimeMV: MotionValue<number>
+    recording: boolean
+    startTime: number
+  },
+) {
+  const height = useMemo(() => {
+    return ((visualizationData.get(t)?.volume ?? 0) * 28 / 255) + 4
+  }, [t, visualizationData])
+
+  const x = useTransform(() => {
+    return -0.032 * (nowMV.get() - t)
+  })
+
+  const endX = useTransform(() => {
+    return -0.032 * (stopTimeMV.get() - t)
+  })
+
+  return (
+    <motion.div
+      style={{ x: recording ? x : endX, height }}
+      transition={{ type: 'tween' }}
+      className={clsx(
+        'w-0.5 end-0 rounded shrink-0 absolute',
+        t <= startTime ? 'bg-[#0A0D332E]' : 'bg-[#0A0D3399]',
+      )}
+    />
+  )
+}, (prev, next) => prev.startTime === next.startTime && prev.recording === next.recording)
+
+function useNow(): [number, MotionValue<number>] {
+  const [now, setNow] = useState(() => Date.now())
+  const nowMV = useMotionValue(now)
+
+  useEffect(() => {
+    let raf: number
+
+    const update = () => {
+      const now = Date.now()
+      setNow(now)
+      nowMV.set(now)
+      raf = requestAnimationFrame(update)
+    }
+
+    raf = requestAnimationFrame(update)
+
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
+  return [now, nowMV]
 }
