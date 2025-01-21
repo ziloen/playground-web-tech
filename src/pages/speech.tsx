@@ -1,7 +1,7 @@
 import { asNonNullable, asType } from '@wai-ri/core'
 import { Button, Input, Select } from 'antd'
 import type { DefaultOptionType } from 'antd/es/select'
-import { useMotionValue } from 'motion/react'
+import { useMotionValue, useTime } from 'motion/react'
 import Slider from '~/components/Slider'
 import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
 import CarbonCloud from '~icons/carbon/cloud'
@@ -523,11 +523,37 @@ function useRecognition() {
   }
 }
 
+type AudioSegment = {
+  startTime: number
+  endTime: number
+  volume: number
+  key: string
+}
+
 function AudioVisualization() {
-  const levelMV = useMotionValue(0)
+  const MAX_SEGMENT = 150
+  const [visualizationData, setVisualizationData, getVisualizationData] = useGetState<
+    AudioSegment[]
+  >([])
+
+  const lastRecordedTime = useRef(0)
+
+  const time = useTime()
 
   const startRecording = useMemoizedFn(async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      video: {
+        width: 0,
+        height: 0,
+        frameRate: 0,
+        displaySurface: 'monitor',
+      },
+      audio: {
+        // @ts-expect-error navigator has no type
+        suppressLocalAudioPlayback: false,
+      },
+      systemAudio: 'include',
+    })
 
     const audioCtx = new AudioContext()
     const analyser = audioCtx.createAnalyser()
@@ -556,8 +582,22 @@ function AudioVisualization() {
 
     const level = frequencyData.reduce((acc, cur) => acc + cur, 0) / frequencyData.length
 
-    console.log(level)
-    levelMV.set(level)
+    const now = Date.now()
+    if (lastRecordedTime.current) {
+      if (getVisualizationData().length > MAX_SEGMENT) {
+        setVisualizationData(getVisualizationData().slice(-MAX_SEGMENT))
+      }
+
+      setVisualizationData(
+        getVisualizationData().concat({
+          startTime: lastRecordedTime.current,
+          endTime: now,
+          volume: level,
+          key: crypto.randomUUID(),
+        }),
+      )
+    }
+    lastRecordedTime.current = now
 
     requestAnimationFrame(() => visualize(analyser))
   })
@@ -566,14 +606,20 @@ function AudioVisualization() {
     <div>
       <button onClick={startRecording}>🎙</button>
 
-      <div className="w-[200px] h-2">
-        <motion.div
-          className="h-full bg-red-300"
-          style={{
-            width: levelMV,
-          }}
-        >
-        </motion.div>
+      <div className="h-8 flex items-center gap-0.5 overflow-visible">
+        {visualizationData.map((segment) => {
+          const clampedVolume = Math.max(0, Math.min(200, segment.volume))
+
+          return (
+            <motion.div
+              key={segment.key}
+              className="w-0.5 rounded-full bg-light-gray-500 shrink-0"
+              style={{
+                height: `${(clampedVolume * 0.14) + 4}px`,
+              }}
+            />
+          )
+        })}
       </div>
     </div>
   )
