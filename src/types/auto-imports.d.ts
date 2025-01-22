@@ -9,7 +9,6 @@ declare global {
   const AnimatePresence: typeof import('motion/react')['AnimatePresence']
   const Suspense: typeof import('react')['Suspense']
   const clsx: typeof import('clsx')['clsx']
-  const forwardRef: typeof import('react')['forwardRef']
   const motion: typeof import('motion/react')['motion']
   const useCallback: typeof import('react')['useCallback']
   const useEffect: typeof import('react')['useEffect']

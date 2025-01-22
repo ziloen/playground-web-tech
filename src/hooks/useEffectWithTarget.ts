@@ -1,7 +1,7 @@
 // https://github.com/alibaba/hooks/blob/master/packages/hooks/src/utils/useEffectWithTarget.ts
 
 import { isFunction } from 'lodash-es'
-import type { DependencyList, EffectCallback, MutableRefObject } from 'react'
+import type { DependencyList, EffectCallback, RefObject } from 'react'
 import { useEffect, useRef } from 'react'
 
 export function useEffectWithTarget(
@@ -14,7 +14,7 @@ export function useEffectWithTarget(
   const lastElementRef = useRef<(TargetType | null | undefined)[]>([])
   const lastDepsRef = useRef<DependencyList>([])
 
-  const unLoadRef = useRef<undefined | (() => any) | void>()
+  const unLoadRef = useRef<undefined | (() => any) | void>(undefined)
 
   useEffect(() => {
     const targets = Array.isArray(target) ? target : [target]
@@ -59,7 +59,7 @@ type TargetType = HTMLElement | Element | Window | Document
 export type BasicTarget<T extends TargetType = Element> =
   | (() => TargetValue<T>)
   | TargetValue<T>
-  | MutableRefObject<TargetValue<T>>
+  | RefObject<TargetValue<T>>
 
 export function getTargetElement<T extends TargetType>(
   target: BasicTarget<T>,

@@ -53,7 +53,6 @@ export default defineConfig(({ command, mode }) => {
           {
             react: [
               'Suspense',
-              'forwardRef',
               'useCallback',
               'useEffect',
               'useImperativeHandle',
