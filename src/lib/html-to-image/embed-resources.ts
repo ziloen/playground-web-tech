@@ -8,8 +8,7 @@ const URL_WITH_FORMAT_REGEX = /url\([^)]+\)\s*format\((["']?)([^"']+)\1\)/g
 const FONT_SRC_REGEX = /src:\s*(?:url\([^)]+\)\s*format\([^)]+\)[,;]\s*)+/g
 
 function toRegex(url: string): RegExp {
-  // eslint-disable-next-line no-useless-escape
-  const escaped = url.replace(/([.*+?^${}()|\[\]\/\\])/g, String.raw`\$1`)
+  const escaped = url.replace(/([.*+?^${}()|[\]/\\])/g, String.raw`\$1`)
   return new RegExp(`(url\\(['"]?)(${escaped})(['"]?\\))`, 'g')
 }
 
