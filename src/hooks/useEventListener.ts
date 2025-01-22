@@ -1,5 +1,6 @@
-import { useEventListener as ahookUseEventListener } from 'ahooks'
-import type { BasicTarget } from 'ahooks/lib/utils/domTarget'
+import type { BasicTarget } from './useEffectWithTarget'
+import { getTargetElement, useEffectWithTarget } from './useEffectWithTarget'
+import { useLatest } from './useLatest'
 
 type noop = (...p: any) => void
 
@@ -12,7 +13,36 @@ type Options<
   passive?: boolean
 }
 
-export const useEventListener = ahookUseEventListener as {
+export const useEventListener = ((eventName: string, handler: noop, options: Options = {}) => {
+  const handlerRef = useLatest(handler)
+
+  useEffectWithTarget(
+    () => {
+      const targetElement = getTargetElement(options.target, window)
+      if (!targetElement?.addEventListener) {
+        return
+      }
+
+      const eventListener = (event: Event) => {
+        return handlerRef.current(event)
+      }
+
+      targetElement.addEventListener(eventName, eventListener, {
+        capture: options.capture,
+        once: options.once,
+        passive: options.passive,
+      })
+
+      return () => {
+        targetElement.removeEventListener(eventName, eventListener, {
+          capture: options.capture,
+        })
+      }
+    },
+    [eventName, options.capture, options.once, options.passive],
+    options.target,
+  )
+}) as {
   <K extends keyof HTMLElementEventMap>(
     eventName: K,
     handler: (ev: HTMLElementEventMap[K]) => void,

@@ -1,9 +1,10 @@
 /* eslint-disable unicorn/prefer-dom-node-text-content */
+import styles from './contenteditable.module.css'
+
 import { useMotionValue } from 'motion/react'
 import type { InputEventInputType as InputType, KeyboardEventKey } from 'ts-lib-enhance'
 import { createContext, useContextSelector } from 'use-context-selector'
 import { useEventListener } from '~/hooks'
-import styles from './contenteditable.module.css'
 
 const MAX_LENGTH = 100
 
