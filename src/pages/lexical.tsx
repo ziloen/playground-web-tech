@@ -56,7 +56,7 @@ function convertMentionElement(
   return null
 }
 
-class MentionNode extends DecoratorNode<JSX.Element> {
+class MentionNode extends DecoratorNode<React.ReactNode> {
   #value: string
   #trigger: string
   #id: string
@@ -161,7 +161,7 @@ class MentionNode extends DecoratorNode<JSX.Element> {
     return null
   }
 
-  decorate(editor: LexicalEditor, config: EditorConfig): JSX.Element {
+  decorate(editor: LexicalEditor, config: EditorConfig): React.ReactNode {
     return (
       <MentionComponent
         trigger={this.#trigger}
@@ -184,7 +184,7 @@ function $createMentionNode(trigger: string, value: string, id: string): Mention
 }
 
 class MentionOptions extends MenuOption {
-  constructor(id: string, public label: string, public avatar?: JSX.Element) {
+  constructor(id: string, public label: string, public avatar?: React.ReactNode) {
     super(id)
   }
 }
