@@ -1,8 +1,12 @@
+import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
+import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
+import { FFmpeg } from '@ffmpeg/ffmpeg'
+import { fetchFile, toBlobURL } from '@ffmpeg/util'
 import { asNonNullable, asType } from '@wai-ri/core'
 import { Button, Input, Select } from 'antd'
 import type { DefaultOptionType } from 'antd/es/select'
-import { useMotionValue, useTime, useTransform, type MotionValue } from 'motion/react'
-import { memo, useDeferredValue } from 'react'
+import { useMotionValue, useTransform, type MotionValue } from 'motion/react'
+import { memo } from 'react'
 import Slider from '~/components/Slider'
 import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
 import { LRUCache } from '~/utils'
@@ -539,9 +543,10 @@ function AudioVisualization() {
   const [recording, setRecording] = useState(false)
   const stopTimeMV = useMotionValue(0)
   const streamRef = useRef<MediaStream | null>(null)
+  const recorderRef = useRef<MediaRecorder | null>(null)
 
   const startRecording = useMemoizedFn(async () => {
-    const stream = await navigator.mediaDevices.getDisplayMedia({
+    const stream = streamRef.current = await navigator.mediaDevices.getDisplayMedia({
       video: {
         width: 0,
         height: 0,
@@ -555,7 +560,8 @@ function AudioVisualization() {
       systemAudio: 'include',
     })
 
-    streamRef.current = stream
+    // disable video
+    stream.getVideoTracks().forEach((track) => track.stop())
 
     const audioCtx = new AudioContext()
     const analyser = audioCtx.createAnalyser()
@@ -563,18 +569,42 @@ function AudioVisualization() {
     source.connect(analyser)
     analyser.fftSize = 2048
 
-    // const mediaRecorder = new MediaRecorder(stream)
+    const mimeType = 'audio/webm;codecs=opus'
 
-    // mediaRecorder.addEventListener('dataavailable', (e) => {
-    //   console.log(e.type, e, e.data)
-    // })
+    const mediaRecorder = recorderRef.current = new MediaRecorder(stream, {
+      mimeType: mimeType,
+      audioBitsPerSecond: 128_000,
+    })
 
-    // mediaRecorder.addEventListener('stop', (e) => {
-    //   console.log(e.type, e)
-    // })
+    const chunks: Blob[] = []
 
-    // mediaRecorder.start()
-    setStartTime(Date.now())
+    const startTime = Date.now()
+
+    mediaRecorder.addEventListener('dataavailable', (e) => {
+      console.log(e.type, e, e.data)
+      chunks.push(e.data)
+    })
+
+    mediaRecorder.addEventListener('stop', async (e) => {
+      console.log(e.type, e)
+
+      if (mediaRecorder.state === 'inactive') {
+        const blob = await fixWebmDuration(new Blob(chunks, { type: mimeType }))
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'audio.webm'
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+    })
+
+    mediaRecorder.addEventListener('error', (e) => {
+      console.log(e.type, e)
+    })
+
+    mediaRecorder.start()
+    setStartTime(startTime)
     setRecording(true)
     visualize(analyser)
   })
@@ -583,6 +613,9 @@ function AudioVisualization() {
     stopTimeMV.set(now)
     setRecording(false)
     streamRef.current?.getTracks().forEach((track) => track.stop())
+    streamRef.current = null
+    recorderRef.current?.stop()
+    recorderRef.current = null
   })
 
   const visualize = useMemoizedFn((analyser: AnalyserNode) => {
@@ -724,4 +757,34 @@ function useNow(): [number, MotionValue<number>] {
   }, [])
 
   return [now, nowMV]
+}
+
+async function fixWebmDuration(blob: Blob) {
+  const ffmpeg = new FFmpeg()
+
+  const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.9/dist/esm'
+
+  await ffmpeg.load({
+    coreURL: await toBlobURL(ffmpegCoreUrl, 'text/javascript'),
+    wasmURL: await toBlobURL(ffmpegWasmUrl, 'application/wasm'),
+    workerURL: await toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript'),
+  })
+
+  await ffmpeg.writeFile('input.webm', await fetchFile(blob))
+
+  await ffmpeg.exec([
+    '-i',
+    'input.webm',
+    '-c',
+    'copy',
+    '-map_metadata',
+    '0',
+    '-fflags',
+    '+genpts',
+    'output.webm',
+  ])
+
+  const data = await ffmpeg.readFile('output.webm')
+
+  return new Blob([data], { type: blob.type })
 }
