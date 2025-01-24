@@ -589,11 +589,11 @@ function AudioVisualization() {
       console.log(e.type, e)
 
       if (mediaRecorder.state === 'inactive') {
-        const blob = await fixWebmDuration(new Blob(chunks, { type: mimeType }))
+        const blob = await webmToMp3(new Blob(chunks, { type: mimeType }))
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = 'audio.webm'
+        a.download = 'audio.mp3'
         a.click()
         URL.revokeObjectURL(url)
       }
@@ -759,7 +759,7 @@ function useNow(): [number, MotionValue<number>] {
   return [now, nowMV]
 }
 
-async function fixWebmDuration(blob: Blob) {
+async function webmToMp3(blob: Blob): Promise<Blob> {
   const ffmpeg = new FFmpeg()
 
   const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.9/dist/esm'
@@ -775,16 +775,19 @@ async function fixWebmDuration(blob: Blob) {
   await ffmpeg.exec([
     '-i',
     'input.webm',
-    '-c',
-    'copy',
+    '-vn',
+    '-c:a',
+    'libmp3lame',
+    '-b:a',
+    '0',
     '-map_metadata',
     '0',
     '-fflags',
     '+genpts',
-    'output.webm',
+    'output.mp3',
   ])
 
-  const data = await ffmpeg.readFile('output.webm')
+  const data = await ffmpeg.readFile('output.mp3')
 
-  return new Blob([data], { type: blob.type })
+  return new Blob([data], { type: 'audio/mpeg' })
 }

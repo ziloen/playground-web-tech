@@ -157,7 +157,7 @@ export function canvasToBlob(
     const len = binaryString.length
     const binaryArray = new Uint8Array(len)
 
-    for (let i = 0; i < len; i += 1) {
+    for (let i = 0; i < len; i++) {
       // eslint-disable-next-line unicorn/prefer-code-point
       binaryArray[i] = binaryString.charCodeAt(i)
     }
