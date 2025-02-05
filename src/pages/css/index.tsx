@@ -408,3 +408,11 @@ function SizeConstraints() {
     </div>
   )
 }
+
+
+// TODO: dynamic line-clamp
+// When container height change, line-clamp should be updated
+
+// TODO: multi dynamic sticky elments stack with dynamic height (or fixed height)
+// 可以点击按钮设置列表项是否 sticky，可以多个 sticky
+// sticky 时，滚动出范围时，会自动堆叠到下一个 sticky 元素的下面

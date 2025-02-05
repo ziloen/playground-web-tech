@@ -7,4 +7,31 @@ export default defineConfig({
   corePlugins: {
     preflight: false,
   },
+  theme: {
+    extend: {
+      fontFamily: {
+        'noto-sans-sc': [
+          'Noto Sans SC Variable',
+          'ui-sans-serif',
+          'system-ui',
+          'sans-serif',
+          'Apple Color Emoji',
+          'Segoe UI Emoji',
+          'Segoe UI Symbol',
+          'Noto Color Emoji',
+        ],
+        'fira-code': [
+          'Fira Code Variable',
+          'ui-monospace',
+          'SFMono-Regular',
+          'Menlo',
+          'Monaco',
+          'Consolas',
+          'Liberation Mono',
+          'Courier New',
+          'monospace',
+        ],
+      },
+    },
+  },
 })
