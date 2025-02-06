@@ -3,6 +3,9 @@
 // remove image exif data or other metadata
 // convert to webp / avif / jpegxl at same time to compare size and quality
 
+// References:
+// https://github.com/addyosmani/squish
+
 // import ffmpegWorkerUrl from '@ffmpeg/core-mt/dist/esm/ffmpeg-core.worker.js?url'
 import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
 import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
