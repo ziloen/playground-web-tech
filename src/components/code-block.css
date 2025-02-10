@@ -1,0 +1,96 @@
+/* https://github.com/highlightjs/highlight.js/blob/main/src/styles/atom-one-dark.css */
+
+pre code.hljs {
+  display: block;
+  font-family: 'Fira Code Variable',
+    'ui-monospace',
+    'SFMono-Regular',
+    'Menlo',
+    'Monaco',
+    'Consolas',
+    'Liberation Mono',
+    'Courier New',
+    'monospace';
+  font-size: 14px;
+}
+
+.hljs {
+  color: #abb2bf;
+  background: #23272e;
+}
+
+.hljs::selection,
+.hljs ::selection {
+  background-color: #67769660;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #7f848e;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd;
+}
+
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst,
+.hljs-params {
+  color: #e06c75;
+}
+
+.hljs-literal {
+  color: #d19a66;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379;
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number,
+.hljs-property {
+  color: #e5c07b;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61afef;
+}
+
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e5c07b;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-link {
+  text-decoration: underline;
+}

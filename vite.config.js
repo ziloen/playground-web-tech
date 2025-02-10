@@ -30,6 +30,7 @@ export default defineConfig(({ command, mode }) => {
       alias: {
         '~': r('src'),
         '~cwd': cwd,
+        'micromark-extension-math': 'micromark-extension-llm-math',
       },
     },
 
