@@ -31,7 +31,7 @@
     "lexical": "^0.24.0",
     "lodash-es": "^4.17.21",
     "micromark-extension-llm-math": "3.1.0",
-    "motion": "12.4.1",
+    "motion": "12.4.2",
     "radix-ui": "1.1.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -40,7 +40,7 @@
     "react-router-dom": "^7.1.5",
     "rehype-highlight": "7.0.2",
     "rehype-katex": "7.0.1",
-    "remark-gfm": "4.0.0",
+    "remark-gfm": "4.0.1",
     "remark-math": "6.0.0",
     "svgo": "4.0.0-rc.1",
     "use-context-selector": "2.0.0"

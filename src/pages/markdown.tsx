@@ -15,11 +15,18 @@ supportedTypes.forEach(type => {
 
 const testMath = `\\(L_C\\)\n\\[\nL_C\n\\]`
 
+const testUrlWithSpace = `[test url with space](https://www.google.com/search?q=markdown url with space)`
+const testUrlNoSpace = `[test url no space](https://www.google.com/search?q=markdown+url+with+space)`
+const testUrlWithParentheses = `[Some stupid Mixpanel link](https://mixpanel.com/report/380063/insights#~(displayOptions~(chartType~'bar~plotStyle~'standard~analysis~'linear~value~'relative)~sorting~(bar~(sortBy~'column~colSortAttrs~(~(sortBy~'value~sortOrder~'desc)~(sortBy~'value~sortOrder~'desc)))~line~(sortBy~'value~sortOrder~'desc)~table~(sortBy~'column~colSortAttrs~(~(sortBy~'label~sortOrder~'asc)~(sortBy~'label~sortOrder~'asc))))~columnWidths~(bar~())~title~'~sections~(show~(~(dataset~'!mixpanel~value~(name~'Board*20Viewed)~resourceType~'events~profileType~null~search~'~math~'total~property~null))~group~(~(dataset~'!mixpanel~value~'!browser~resourceType~'events~profileType~null~search~'~propertyType~'string~typeCast~null~unit~null))~filter~(clauses~(~(dataset~'!mixpanel~value~'Application~resourceType~'events~profileType~null~search~'~filterType~'string~defaultType~'string~filterOperator~'equals~filterValue~(~'webapp)))~determiner~'all)~time~(~(dateRangeType~'in*20the*20last~unit~'day~window~(value~30~unit~'day))))))`
+
 export default function MarkdownPage() {
   return (
     <div>
       <Markdown>{testCodeBlock}</Markdown>
       <Markdown>{testMath}</Markdown>
+      <Markdown>{testUrlWithSpace}</Markdown>
+      <Markdown>{testUrlNoSpace}</Markdown>
+      <Markdown>{testUrlWithParentheses}</Markdown>
     </div>
   )
 }
