@@ -14,7 +14,7 @@ import type { Options as RemarkGfmOptions } from 'remark-gfm'
 import remarkGfm from 'remark-gfm'
 import type { Options as RemarkMathOptions } from 'remark-math'
 import remarkMath from 'remark-math'
-import { visit } from 'unist-util-visit'
+import { CONTINUE, EXIT, SKIP, visit } from 'unist-util-visit'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
 
@@ -47,19 +47,21 @@ export function Markdown({ children }: { children: string }) {
 }
 
 const components: Components = {
-  code(props) {
-    const inline = props.node!.properties!.inline as boolean
-    const rawText = props.node!.properties!.text as string
-    const language = props.node!.properties!.language as string | null
+  code({ node, className, children }) {
+    const inline = node!.properties!.inline as boolean
+    const rawText = node!.properties!.text as string
+    const language = node!.properties!.language as string | null
 
     if (inline) {
-      return <code className={props.className}>{props.children}</code>
+      return <code className={className}>{children}</code>
     }
 
     return (
-      <code className={clsx(props.className, '')}>
+      <code className={className}>
         {/* Header */}
         <div className="flex items-center bg-blue-800 px-4">
+          <span className="">{language}</span>
+
           <button
             className="ms-auto"
             onClick={() => {
@@ -71,9 +73,18 @@ const components: Components = {
         </div>
 
         <div className="overflow-x-auto px-2 pb-2 pt-1 scrollbar-thin">
-          {props.children}
+          {children}
         </div>
       </code>
+    )
+  },
+  table({ children }) {
+    return (
+      <div className="overflow-x-auto scrollbar-thin">
+        <table className="w-max max-h-full tabular-nums">
+          {children}
+        </table>
+      </div>
     )
   },
 }
@@ -85,8 +96,14 @@ function rehypePlugin() {
 }
 
 function remarkPlugin() {
-  return (tree: InlineCode | Code) => {
-    visit(tree, ['inlineCode', 'code'], (node) => {
+  return (tree: Node) => {
+    // console.log('remarkPlugin', tree)
+
+    visit(tree, (node, index, parent) => {
+      // console.log('link', structuredClone(node))
+    })
+
+    visit(tree as InlineCode | Code, ['inlineCode', 'code'], (node, index, parent) => {
       node.data ??= {}
       node.data.hProperties ??= {}
       node.data.hProperties.inline = node.type === 'inlineCode'
