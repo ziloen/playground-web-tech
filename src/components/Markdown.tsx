@@ -3,7 +3,7 @@ import '@fontsource-variable/noto-sans-sc'
 
 import './markdown.css'
 
-import type { Node, Root } from 'hast'
+import type { Code, InlineCode, Node } from 'mdast'
 import type { Components } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import type { Options as HighlightOptions } from 'rehype-highlight'
@@ -51,9 +51,29 @@ const components: Components = {
     const inline = props.node!.properties!.inline as boolean
     const rawText = props.node!.properties!.text as string
 
-    console.log('code', { inline, rawText })
+    if (inline) {
+      return <code className={props.className}>{props.children}</code>
+    }
 
-    return <code className={props.className}>{props.children}</code>
+    return (
+      <code className={clsx(props.className, '')}>
+        {/* Header */}
+        <div className="flex items-center bg-blue-800 px-4">
+          <button
+            className="ms-auto"
+            onClick={() => {
+              navigator.clipboard.writeText(rawText)
+            }}
+          >
+            Copy
+          </button>
+        </div>
+
+        <div className="overflow-x-auto px-2 pb-2 pt-1 scrollbar-thin">
+          {props.children}
+        </div>
+      </code>
+    )
   },
 }
 
@@ -64,16 +84,11 @@ function rehypePlugin() {
 }
 
 function remarkPlugin() {
-  return (tree: Node) => {
+  return (tree: InlineCode | Code) => {
     visit(tree, ['inlineCode', 'code'], (node) => {
       node.data ??= {}
-      // @ts-expect-error data is any
       node.data.hProperties ??= {}
-      // @ts-expect-error data is any
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       node.data.hProperties.inline = node.type === 'inlineCode'
-      // @ts-expect-error value is any
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       node.data.hProperties.text = node.value
     })
   }
