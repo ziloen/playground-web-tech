@@ -50,6 +50,7 @@ const components: Components = {
   code(props) {
     const inline = props.node!.properties!.inline as boolean
     const rawText = props.node!.properties!.text as string
+    const language = props.node!.properties!.language as string | null
 
     if (inline) {
       return <code className={props.className}>{props.children}</code>
@@ -90,6 +91,7 @@ function remarkPlugin() {
       node.data.hProperties ??= {}
       node.data.hProperties.inline = node.type === 'inlineCode'
       node.data.hProperties.text = node.value
+      node.data.hProperties.language = node.type === 'code' ? node.lang : null
     })
   }
 }
