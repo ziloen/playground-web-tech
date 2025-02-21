@@ -15,6 +15,7 @@ import remarkGfm from 'remark-gfm'
 import type { Options as RemarkMathOptions } from 'remark-math'
 import remarkMath from 'remark-math'
 import { CONTINUE, EXIT, SKIP, visit } from 'unist-util-visit'
+import type { VFile } from 'vfile'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
 
@@ -90,13 +91,13 @@ const components: Components = {
 }
 
 function rehypePlugin() {
-  return (tree: Node) => {
+  return (tree: Node, file: VFile) => {
     // console.log('rehypePlugin', tree)
   }
 }
 
 function remarkPlugin() {
-  return (tree: Node) => {
+  return (tree: Node, file: VFile) => {
     // console.log('remarkPlugin', tree)
 
     visit(tree, (node, index, parent) => {
