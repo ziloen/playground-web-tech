@@ -6,15 +6,11 @@ import './markdown.css'
 import type { Code, InlineCode, Node } from 'mdast'
 import type { Components } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
-import type { Options as HighlightOptions } from 'rehype-highlight'
 import rehypeHighlight from 'rehype-highlight'
-import type { Options as KatexOptions } from 'rehype-katex'
 import rehypeKatex from 'rehype-katex'
-import type { Options as RemarkGfmOptions } from 'remark-gfm'
 import remarkGfm from 'remark-gfm'
-import type { Options as RemarkMathOptions } from 'remark-math'
 import remarkMath from 'remark-math'
-import type { PluggableList, Plugin } from 'unified'
+import type { PluggableList, Plugin, PluginTuple } from 'unified'
 import { CONTINUE, EXIT, SKIP, visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 
@@ -79,21 +75,28 @@ const components: Components = {
   },
 }
 
-const rehypePlugins: PluggableList = [
+const rehypePlugins: PluggableList = pluginList([
   [rehypeHighlight, {
     detect: true,
-  } as HighlightOptions],
+  }],
   [rehypeKatex, {
     errorColor: '',
-  } as KatexOptions],
+  }],
   [rehypePlugin],
-]
+])
 
-const remarkPlugins: PluggableList = [
-  [remarkGfm, {} as RemarkGfmOptions],
-  [remarkMath, {} as RemarkMathOptions],
+const remarkPlugins = pluginList([
+  [remarkGfm, {}],
+  [remarkMath, {}],
   [remarkPlugin],
-]
+])
+
+/*#__NO_SIDE_EFFECTS__*/
+function pluginList<
+  const T extends Plugin<any[], any, any>[],
+>(plugins: { [K in (keyof T)]: [T[K], ...Parameters<T[K]>] }): PluggableList {
+  return plugins
+}
 
 function rehypePlugin() {
   return (tree: Node, file: VFile) => {
