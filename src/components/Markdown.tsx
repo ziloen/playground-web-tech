@@ -10,7 +10,7 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-import type { PluggableList, Plugin, PluginTuple } from 'unified'
+import type { PluggableList, Plugin } from 'unified'
 import { CONTINUE, EXIT, SKIP, visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 
@@ -75,13 +75,9 @@ const components: Components = {
   },
 }
 
-const rehypePlugins: PluggableList = pluginList([
-  [rehypeHighlight, {
-    detect: true,
-  }],
-  [rehypeKatex, {
-    errorColor: '',
-  }],
+const rehypePlugins = pluginList([
+  [rehypeHighlight, {}],
+  [rehypeKatex, { errorColor: '' }],
   [rehypePlugin],
 ])
 
