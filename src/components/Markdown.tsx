@@ -14,6 +14,7 @@ import type { Options as RemarkGfmOptions } from 'remark-gfm'
 import remarkGfm from 'remark-gfm'
 import type { Options as RemarkMathOptions } from 'remark-math'
 import remarkMath from 'remark-math'
+import type { PluggableList, Plugin } from 'unified'
 import { CONTINUE, EXIT, SKIP, visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 
@@ -26,20 +27,8 @@ import type { VFile } from 'vfile'
 export function Markdown({ children }: { children: string }) {
   return (
     <ReactMarkdown
-      rehypePlugins={[
-        [rehypeHighlight, {
-          detect: true,
-        } as HighlightOptions],
-        [rehypeKatex, {
-          errorColor: '',
-        } as KatexOptions],
-        [rehypePlugin],
-      ]}
-      remarkPlugins={[
-        [remarkGfm, {} as RemarkGfmOptions],
-        [remarkMath, {} as RemarkMathOptions],
-        [remarkPlugin],
-      ]}
+      rehypePlugins={rehypePlugins}
+      remarkPlugins={remarkPlugins}
       components={components}
     >
       {children}
@@ -89,6 +78,22 @@ const components: Components = {
     )
   },
 }
+
+const rehypePlugins: PluggableList = [
+  [rehypeHighlight, {
+    detect: true,
+  } as HighlightOptions],
+  [rehypeKatex, {
+    errorColor: '',
+  } as KatexOptions],
+  [rehypePlugin],
+]
+
+const remarkPlugins: PluggableList = [
+  [remarkGfm, {} as RemarkGfmOptions],
+  [remarkMath, {} as RemarkMathOptions],
+  [remarkPlugin],
+]
 
 function rehypePlugin() {
   return (tree: Node, file: VFile) => {
