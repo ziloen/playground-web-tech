@@ -100,7 +100,15 @@ function rehypePlugin() {
     console.log('rehypePlugin', structuredClone(tree))
 
     visit(tree, (node, index, parent) => {
-      // console.log('link', structuredClone(node))
+      if (
+        node.type === 'element'
+        && node.tagName === 'code'
+        && parent
+        && parent.type === 'element'
+        && parent.tagName === 'pre'
+      ) {
+        parent.properties ??= {}
+      }
     })
   }
 }
@@ -110,6 +118,7 @@ function remarkPlugin() {
     console.log('remarkPlugin', structuredClone(tree))
 
     visit(tree, (node, index, parent) => {
+      // Add `iniline` / `text` / `language` to code node
       if (node.type === 'code' || node.type === 'inlineCode') {
         node.data ??= {}
         node.data.hProperties ??= {}
