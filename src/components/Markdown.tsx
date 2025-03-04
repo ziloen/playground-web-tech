@@ -3,7 +3,8 @@ import '@fontsource-variable/noto-sans-sc'
 
 import './markdown.css'
 
-import type { Code, InlineCode, Node } from 'mdast'
+import type { Nodes as HastNodes } from 'hast'
+import type { Nodes as MdastNodes } from 'mdast'
 import type { Components } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
@@ -46,7 +47,7 @@ const components: Components = {
       <code className={className}>
         {/* Header */}
         <div className="flex items-center bg-blue-800 px-4">
-          <span className="">{language}</span>
+          <span>{language}</span>
 
           <button
             className="ms-auto"
@@ -64,7 +65,7 @@ const components: Components = {
       </code>
     )
   },
-  table({ children }) {
+  table({ children, node }) {
     return (
       <div className="overflow-x-auto scrollbar-thin">
         <table className="w-max max-h-full tabular-nums">
@@ -95,20 +96,28 @@ function pluginList<
 }
 
 function rehypePlugin() {
-  return (tree: Node, file: VFile) => {
-    // console.log('rehypePlugin', tree)
+  return (tree: HastNodes, file: VFile) => {
+    console.log('rehypePlugin', structuredClone(tree))
+
+    visit(tree, (node, index, parent) => {
+      // console.log('link', structuredClone(node))
+    })
   }
 }
 
 function remarkPlugin() {
-  return (tree: Node, file: VFile) => {
-    // console.log('remarkPlugin', tree)
+  return (tree: MdastNodes, file: VFile) => {
+    console.log('remarkPlugin', structuredClone(tree))
 
     visit(tree, (node, index, parent) => {
       // console.log('link', structuredClone(node))
     })
 
-    visit(tree as InlineCode | Code, ['inlineCode', 'code'], (node, index, parent) => {
+    visit(tree, (node, index, parent) => {
+      if (node.type !== 'code' && node.type !== 'inlineCode') {
+        return CONTINUE
+      }
+
       node.data ??= {}
       node.data.hProperties ??= {}
       node.data.hProperties.inline = node.type === 'inlineCode'
