@@ -34,9 +34,9 @@ export function Markdown({ children }: { children: string }) {
 
 const components: Components = {
   code({ node, className, children }) {
-    const inline = node!.properties!.inline as boolean
-    const rawText = node!.properties!.text as string
-    const language = node!.properties!.language as string | null
+    const inline = node!.properties.inline as boolean
+    const rawText = node!.properties.text as string
+    const language = node!.properties.language as string | null
 
     if (inline) {
       return <code className={className}>{children}</code>
