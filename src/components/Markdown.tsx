@@ -110,19 +110,16 @@ function remarkPlugin() {
     console.log('remarkPlugin', structuredClone(tree))
 
     visit(tree, (node, index, parent) => {
-      // console.log('link', structuredClone(node))
-    })
-
-    visit(tree, (node, index, parent) => {
-      if (node.type !== 'code' && node.type !== 'inlineCode') {
-        return CONTINUE
+      if (node.type === 'code' || node.type === 'inlineCode') {
+        node.data ??= {}
+        node.data.hProperties ??= {}
+        node.data.hProperties.inline = node.type === 'inlineCode'
+        node.data.hProperties.text = node.value
+        node.data.hProperties.language = node.type === 'code' ? node.lang : null
       }
 
-      node.data ??= {}
-      node.data.hProperties ??= {}
-      node.data.hProperties.inline = node.type === 'inlineCode'
-      node.data.hProperties.text = node.value
-      node.data.hProperties.language = node.type === 'code' ? node.lang : null
+      if (node.type === 'table') {
+      }
     })
   }
 }
