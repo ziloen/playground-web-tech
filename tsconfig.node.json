@@ -6,6 +6,7 @@
     "moduleResolution": "bundler",
     "strictNullChecks": true,
     "allowJs": true,
+    "erasableSyntaxOnly": true,
     "emitDeclarationOnly": true,
     // "noEmit": true,
     "allowSyntheticDefaultImports": true,
