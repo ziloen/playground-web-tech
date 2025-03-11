@@ -3,9 +3,9 @@ import '@fontsource-variable/noto-sans-sc'
 
 import './markdown.css'
 
-import type { Nodes as HastNodes } from 'hast'
+import type { Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { Nodes as MdastNodes } from 'mdast'
-import type { Components } from 'react-markdown'
+import type { Components as MarkdownComponents } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
@@ -26,18 +26,24 @@ export function Markdown({ children }: { children: string }) {
     <ReactMarkdown
       rehypePlugins={rehypePlugins}
       remarkPlugins={remarkPlugins}
-      components={components}
+      components={components as MarkdownComponents}
     >
       {children}
     </ReactMarkdown>
   )
 }
 
+type Components = {
+  [Key in keyof React.JSX.IntrinsicElements]?:
+    | React.ComponentType<React.JSX.IntrinsicElements[Key] & { node: HastElement }>
+    | keyof React.JSX.IntrinsicElements
+}
+
 const components: Components = {
   code({ node, className, children }) {
-    const inline = node!.properties.inline as boolean
-    const rawText = node!.properties.text as string
-    const language = node!.properties.language as string | null
+    const inline = node.properties.inline as boolean
+    const rawText = node.properties.text as string
+    const language = node.properties.language as string | null
 
     if (inline) {
       return <code className={className}>{children}</code>
@@ -74,6 +80,11 @@ const components: Components = {
       </div>
     )
   },
+  a({ children, className, href, ...rest }) {
+    console.log('a', { children, className, href, ...rest })
+
+    return <a className={className} href={href} {...rest}>{children}</a>
+  },
 }
 
 const rehypePlugins = pluginList([
@@ -91,7 +102,7 @@ const remarkPlugins = pluginList([
 /*#__NO_SIDE_EFFECTS__*/
 function pluginList<
   const T extends Plugin<any[], any, any>[],
->(plugins: { [K in (keyof T)]: [T[K], ...Parameters<T[K]>] }): PluggableList {
+>(plugins: { [K in (keyof T)]: [T[K], ...Parameters<NoInfer<T>[K]>] }): PluggableList {
   return plugins
 }
 
@@ -100,6 +111,7 @@ function rehypePlugin() {
     console.log('rehypePlugin', structuredClone(tree))
 
     visit(tree, (node, index, parent) => {
+      // Add `codeBlock` to `pre` node
       if (
         node.type === 'element'
         && node.tagName === 'code'
@@ -108,6 +120,7 @@ function rehypePlugin() {
         && parent.tagName === 'pre'
       ) {
         parent.properties ??= {}
+        parent.properties.codeBlock = true
       }
     })
   }
