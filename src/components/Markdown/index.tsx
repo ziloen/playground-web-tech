@@ -21,6 +21,8 @@ import type { VFile } from 'vfile'
 // TODO: make `\[` and `\]` work for block math
 // TODO: make `\(` and `\)` work for inline math
 
+// TODO: custom footnote style [^1](https://example.com)
+
 export function Markdown({ children }: { children: string }) {
   return (
     <ReactMarkdown
@@ -80,10 +82,12 @@ const components: Components = {
       </div>
     )
   },
-  a({ children, className, href, ...rest }) {
-    console.log('a', { children, className, href, ...rest })
-
-    return <a className={className} href={href} {...rest}>{children}</a>
+  a({ children, className, href, node, ...rest }) {
+    return (
+      <a className={className} href={href} {...rest}>
+        {children}
+      </a>
+    )
   },
 }
 
@@ -120,7 +124,6 @@ function rehypePlugin() {
         && parent.tagName === 'pre'
       ) {
         parent.properties ??= {}
-        parent.properties.codeBlock = true
       }
     })
   }
