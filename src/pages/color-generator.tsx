@@ -137,7 +137,7 @@ function ColorCompare() {
 
   return (
     <div>
-      <div className="flex-align gap-[6px]">
+      <div className="flex items-center gap-[6px]">
         <button onClick={generateRandomColor}>
           <span>Random</span>
           <div className="flex">
@@ -166,7 +166,7 @@ function ColorCompare() {
 
       <div className="flex flex-col gap-2">
         {gradients.map(({ name }) => (
-          <div key={name} className="flex-between items-center w-[300px]">
+          <div key={name} className="flex justify-between items-center w-[300px]">
             <div>{name}</div>
             <div
               className="w-[250px] h-[32px] rounded-4px"

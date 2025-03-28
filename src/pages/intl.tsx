@@ -53,7 +53,7 @@ export default function IntlPage() {
   return (
     <div className="w-full h-full flex flex-col">
       {/* Header */}
-      <div className="px-[20px] py-[8px] bg-white/10 flex-between items-center">
+      <div className="px-[20px] py-[8px] bg-white/10 flex justify-between items-center">
         <div>Intl</div>
         <LanguageSelect language={language} onChange={setLanguage} />
       </div>
@@ -80,7 +80,7 @@ function LanguageSelect({
 
         return {
           label: (
-            <div className="flex-between items-center gap-[2em]">
+            <div className="flex justify-between items-center gap-[2em]">
               <span>{displayName}</span>
               <span>{nativeDisplayName}</span>
             </div>
