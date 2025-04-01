@@ -35,20 +35,6 @@ export default function Warframe() {
       }}
     >
       {data.news.toReversed().map((news, index) => {
-        console.log(Temporal)
-        const date = Temporal.Instant.from(news.date).toZonedDateTimeISO('UTC')
-        const now = Temporal.Now.zonedDateTimeISO('UTC')
-
-        const diff = date.until(now, {
-          largestUnit: 'years',
-          smallestUnit: 'days',
-        })
-
-        const rtf = new Intl.RelativeTimeFormat('en', {
-          style: 'narrow',
-          numeric: 'always',
-        })
-
         return (
           <a
             href={news.link}
@@ -75,11 +61,7 @@ export default function Warframe() {
 
             <div className="grid gap-3 grid-cols-subgrid col-span-2">
               <span>
-                {diff.years > 0
-                  ? rtf.format(diff.years, 'year')
-                  : diff.months > 0
-                  ? rtf.format(diff.months, 'month')
-                  : rtf.format(diff.days, 'day')}
+                {getRelativeString(news.date)}
               </span>
 
               <span>
@@ -91,4 +73,28 @@ export default function Warframe() {
       })}
     </div>
   )
+}
+
+function getRelativeString(date: string) {
+  const dateTime = Temporal.Instant.from(date).toZonedDateTimeISO('UTC')
+  const now = Temporal.Now.zonedDateTimeISO('UTC')
+  const diff = dateTime.since(now, {
+    largestUnit: 'years',
+    smallestUnit: 'minutes',
+  })
+
+  const rtf = new Intl.RelativeTimeFormat('en', {
+    style: 'narrow',
+    numeric: 'always',
+  })
+
+  const units = ['years', 'months', 'days', 'hours', 'minutes'] as const
+
+  for (const unit of units) {
+    if (diff[unit] !== 0) {
+      return rtf.format(diff[unit], unit)
+    }
+  }
+
+  return 'now'
 }
