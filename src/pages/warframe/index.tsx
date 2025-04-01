@@ -45,9 +45,9 @@ export default function Warframe() {
             className="grid relative border border-solid bg-dark-gray-900 border-dark-gray-300 rounded-sm p-2 gap-2 no-underline text-light-gray-200 visited:text-light-gray-900 grid-cols-subgrid col-span-full"
           >
             {index === 0 && (
-              <div className="col-span-full w-full relative contain-inline-size">
+              <div className="col-span-full flex w-full contain-inline-size">
                 <img
-                  className="w-full block h-auto"
+                  className="w-full"
                   src={news.imageLink}
                   alt="News image"
                   decoding="async"
