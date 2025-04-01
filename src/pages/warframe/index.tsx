@@ -47,7 +47,7 @@ export default function Warframe() {
             {index === 0 && (
               <div className="col-span-full w-full relative contain-inline-size">
                 <img
-                  className="w-full block h-auto object-cover object-center"
+                  className="w-full block h-auto"
                   src={news.imageLink}
                   alt="News image"
                   decoding="async"
