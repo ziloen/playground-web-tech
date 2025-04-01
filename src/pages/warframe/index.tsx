@@ -32,6 +32,7 @@ export default function Warframe() {
       className="grid gap-1 w-fit max-w-[500px]"
       style={{
         gridTemplateColumns: 'max-content 1fr',
+        gridAutoRows: 'max-content',
       }}
     >
       {data.news.toReversed().map((news, index) => {
@@ -44,19 +45,23 @@ export default function Warframe() {
             className="grid relative border border-solid bg-dark-gray-900 border-dark-gray-300 rounded-sm p-2 gap-2 no-underline text-light-gray-200 visited:text-light-gray-900 grid-cols-subgrid col-span-full"
           >
             {index === 0 && (
-              <img
-                className="aspect-video col-span-full w-full"
+              <div
+                className="col-span-full w-full relative"
                 style={{
-                  contain: 'size',
-                  containIntrinsicSize: '0 auto',
+                  contain: 'inline-size',
+                  containIntrinsicSize: '0px auto',
                 }}
-                src={news.imageLink}
-                alt="News image"
-                decoding="async"
-                fetchPriority="low"
-                loading="lazy"
-                crossOrigin="anonymous"
-              />
+              >
+                <img
+                  className="w-full block h-auto object-cover object-center"
+                  src={news.imageLink}
+                  alt="News image"
+                  decoding="async"
+                  fetchPriority="low"
+                  loading="lazy"
+                  crossOrigin="anonymous"
+                />
+              </div>
             )}
 
             <div className="grid gap-3 grid-cols-subgrid col-span-2">
