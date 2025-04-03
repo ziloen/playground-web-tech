@@ -114,8 +114,8 @@ async function getCSSRules(
                       rule,
                       rule.startsWith('@import') ? (importIndex += 1) : sheet.cssRules.length,
                     )
-                  } catch (error) {
-                    console.error('Error inserting rule from remote css', rule, error)
+                  } catch (error: unknown) {
+                    console.error('Error inserting rule from remote css', { rule, error })
                   }
                 })
               )
@@ -137,7 +137,7 @@ async function getCSSRules(
               .then((metadata) => embedFonts(metadata, options))
               .then((cssText) =>
                 parseCSS(cssText).forEach((rule) => {
-                  inline.insertRule(rule, sheet.cssRules.length)
+                  inline.insertRule(rule, inline.cssRules.length)
                 })
               )
               .catch((err: unknown) => {
@@ -209,12 +209,11 @@ export async function getWebFontCSS(
 }
 
 export async function embedWebFonts<T extends HTMLElement>(
-  node: T,
   clonedNode: T,
   options: Options,
 ) {
   const cssText = options.fontEmbedCSS
-    ?? (options.skipFonts ? null : await getWebFontCSS(node, options))
+    ?? (options.skipFonts ? null : await getWebFontCSS(clonedNode, options))
 
   if (cssText) {
     const styleNode = document.createElement('style')

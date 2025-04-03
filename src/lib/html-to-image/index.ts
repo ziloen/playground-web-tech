@@ -22,7 +22,7 @@ export async function toSvg(
   if (options.class) {
     node.classList.remove(...options.class)
   }
-  await embedWebFonts(node, clonedNode, options)
+  await embedWebFonts(clonedNode, options)
   await embedImages(clonedNode, options)
   applyStyle(clonedNode, options)
 
@@ -38,7 +38,7 @@ export async function toSvgElement(
   if (options.class) {
     node.classList.remove(...options.class)
   }
-  await embedWebFonts(node, clonedNode, options)
+  await embedWebFonts(clonedNode, options)
   await embedImages(clonedNode, options)
   applyStyle(clonedNode, options)
   const svg = nodeToSvgElement(clonedNode, width, height)

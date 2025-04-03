@@ -29,6 +29,9 @@ export function Markdown({ children }: { children: string }) {
       rehypePlugins={rehypePlugins}
       remarkPlugins={remarkPlugins}
       components={components as MarkdownComponents}
+      remarkRehypeOptions={{
+        footnoteBackContent: null,
+      }}
     >
       {children}
     </ReactMarkdown>

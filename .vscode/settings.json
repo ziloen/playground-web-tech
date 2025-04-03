@@ -30,5 +30,8 @@
     ".vscode/emmet"
   ],
   "eslint.format.enable": false,
+  "typescript.preferences.autoImportSpecifierExcludeRegexes": [
+    "^mermaid/dist*"
+  ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }

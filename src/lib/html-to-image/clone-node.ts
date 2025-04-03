@@ -60,12 +60,8 @@ async function cloneSingleNode(
   return node.cloneNode(false) as HTMLElement
 }
 
-function isSlotElement(node: HTMLElement): node is HTMLSlotElement {
+function isSlotElement(node: Element): node is HTMLSlotElement {
   return node.tagName != null && node.tagName.toUpperCase() === 'SLOT'
-}
-
-function isSVGElement(node: Element): node is SVGElement {
-  return node.tagName !== null && node.tagName.toUpperCase() === 'SVG'
 }
 
 async function cloneChildren<T extends HTMLElement>(

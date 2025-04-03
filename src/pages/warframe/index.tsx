@@ -7,6 +7,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { asNonNullable } from '@wai-ri/core'
 import { Temporal } from 'temporal-polyfill'
+import type { WorldState } from '~/api/warframe'
 import { getWorldStateApi } from '~/api/warframe'
 
 export default function Warframe() {
@@ -27,6 +28,14 @@ export default function Warframe() {
 
   console.log(data)
 
+  return (
+    <div>
+      <News data={data} />
+    </div>
+  )
+}
+
+function News({ data }: { data: WorldState }) {
   return (
     <div
       className="grid gap-1 w-fit max-w-[500px]"
