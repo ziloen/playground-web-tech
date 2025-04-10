@@ -11,7 +11,7 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-import type { PluggableList, Plugin } from 'unified'
+import type { PluggableList, Plugin, Processor } from 'unified'
 import { CONTINUE, EXIT, SKIP, visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 
@@ -22,6 +22,8 @@ import type { VFile } from 'vfile'
 // TODO: make `\(` and `\)` work for inline math
 
 // TODO: custom footnote style [^1](https://example.com)
+
+// TODO: disable `indentedCode`
 
 export function Markdown({ children }: { children: string }) {
   return (
@@ -113,7 +115,7 @@ function pluginList<
   return plugins
 }
 
-function rehypePlugin() {
+function rehypePlugin(this: Processor) {
   return (tree: HastNodes, file: VFile) => {
     console.log('rehypePlugin', structuredClone(tree))
 
@@ -132,7 +134,7 @@ function rehypePlugin() {
   }
 }
 
-function remarkPlugin() {
+function remarkPlugin(this: Processor) {
   return (tree: MdastNodes, file: VFile) => {
     console.log('remarkPlugin', structuredClone(tree))
 

@@ -5,9 +5,6 @@
   "[javascriptreact]": {
     "editor.defaultFormatter": "dprint.dprint"
   },
-  "[tailwindcss]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
   "[typescript]": {
     "editor.defaultFormatter": "dprint.dprint"
   },
@@ -31,7 +28,8 @@
   ],
   "eslint.format.enable": false,
   "typescript.preferences.autoImportSpecifierExcludeRegexes": [
-    "^mermaid/dist*"
+    "^mermaid/dist*",
+    "^typescript$",
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib"
 }
