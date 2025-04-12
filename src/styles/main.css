@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "@ziloen/tailwind-config/preset.css";
 
 html,
 body,
@@ -24,7 +22,7 @@ body,
 html {
   @apply font-sans;
   background: light-dark(white, #121212);
-  color: light-dark(black, theme("colors.light-gray.100"));
+  color: light-dark(black, --theme(--color-light-gray-200));
 }
 
 html[data-theme="dark"] {

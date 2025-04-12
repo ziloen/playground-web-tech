@@ -57,7 +57,7 @@ export default function ColorGenerator() {
       </div>
 
       <button
-        className="px-[8px] py-[4px] bg-[--bg] hover:bg-[--hover-bg] active:bg-[--active-bg] text-[--text] appearance-none border-none"
+        className="px-[8px] py-[4px] bg-(--bg) hover:bg-(--hover-bg) active:bg-(--active-bg) text-(--text) appearance-none border-none"
         style={{
           '--bg': bgColor,
           '--hover-bg': hoverColor,

@@ -1,9 +1,9 @@
 /// <reference types="vitest" />
 
+import tailwindcss from '@tailwindcss/postcss'
 import react from '@vitejs/plugin-react-swc'
 import { resolve as r } from 'node:path'
 import PostcssPresetEnv from 'postcss-preset-env'
-import tailwindcss from 'tailwindcss'
 import AutoImport from 'unplugin-auto-import/vite'
 import unpluginIcons from 'unplugin-icons/vite'
 import { defineConfig, loadEnv } from 'vite'
@@ -95,6 +95,8 @@ export default defineConfig(({ command, mode }) => {
               'logical-overscroll-behavior': false,
               'logical-properties-and-values': false,
               'light-dark-function': false,
+
+              'cascade-layers': false,
             },
           }),
           tailwindcss(),

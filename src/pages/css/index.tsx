@@ -349,9 +349,9 @@ function GridRepeat() {
           // titles
           '[&>span]:bg-blue-300 [&>span]:justify-self-start',
           // default
-          'grid-cols-[--template-columns]',
+          'grid-cols-(--template-columns)',
           // at least 2 items, when width <= item-min-width * 2 + gap * 1
-          '@[<=408px]:grid-cols-[--sm-template-columns]',
+          '@[<=408px]:grid-cols-(--sm-template-columns)',
         )}
         style={{
           '--item-min-width': '200px',
