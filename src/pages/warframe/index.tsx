@@ -10,6 +10,12 @@ import { Temporal } from 'temporal-polyfill'
 import type { WorldState } from '~/api/warframe'
 import { getWorldStateApi } from '~/api/warframe'
 
+// TODO:
+// 深度科研 deepArchimedea
+// 时光科研 temporalArchimedea
+// 猎杀执刑官 archonHunt
+// 1999日历 calendar
+// 钢铁之路商品 steelPath.currentReward steelPath.rotation
 export default function Warframe() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['warframe-world-state'],

@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 
 import tailwindcss from '@tailwindcss/postcss'
-import react from '@vitejs/plugin-react-swc'
+import react from '@vitejs/plugin-react'
 import { resolve as r } from 'node:path'
 import PostcssPresetEnv from 'postcss-preset-env'
 import AutoImport from 'unplugin-auto-import/vite'
