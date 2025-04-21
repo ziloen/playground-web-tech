@@ -19,6 +19,7 @@ export default function Index() {
   )
 }
 
+/*#__NO_SIDE_EFFECTS__*/
 function flatRoutes(
   routes: RouteObject[],
   parentPath: string = '',

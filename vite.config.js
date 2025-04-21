@@ -44,9 +44,7 @@ export default defineConfig(({ command, mode }) => {
       react(),
 
       // https://github.com/hannoeru/vite-plugin-pages
-      Pages({
-        importMode: 'async',
-      }),
+      Pages({}),
 
       // https://github.com/antfu/unplugin-auto-import
       AutoImport({

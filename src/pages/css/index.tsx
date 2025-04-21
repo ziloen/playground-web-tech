@@ -409,7 +409,6 @@ function SizeConstraints() {
   )
 }
 
-
 // TODO: dynamic line-clamp
 // When container height change, line-clamp should be updated
 

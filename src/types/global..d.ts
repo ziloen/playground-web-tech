@@ -8,5 +8,4 @@ declare global {
   const IS_BUILD: boolean
 }
 
-export { }
-
+export {}

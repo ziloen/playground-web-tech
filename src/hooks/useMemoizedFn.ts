@@ -2,7 +2,7 @@
 import { useRef } from 'react'
 
 export function useMemoizedFn<T extends (this: any, ...args: any[]) => any>(
-  fn: T
+  fn: T,
 ): T {
   const fnRef = useRef<T>(fn)
   const memoizedFn = useRef<T | undefined>(undefined)
@@ -10,7 +10,7 @@ export function useMemoizedFn<T extends (this: any, ...args: any[]) => any>(
   fnRef.current = fn
 
   if (!memoizedFn.current) {
-    memoizedFn.current = function (this, ...args) {
+    memoizedFn.current = function(this, ...args) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return fnRef.current.apply(this, args)
     } as T
