@@ -23,8 +23,6 @@ import type { VFile } from 'vfile'
 
 // TODO: custom footnote style [^1](https://example.com)
 
-// TODO: disable `indentedCode`
-
 export function Markdown({ children }: { children: string }) {
   return (
     <ReactMarkdown
@@ -135,6 +133,13 @@ function rehypePlugin(this: Processor) {
 }
 
 function remarkPlugin(this: Processor) {
+  // disable `indentedCode` in micromark
+  // https://github.com/micromark/micromark#case-turn-off-constructs
+  // https://github.com/zestedesavoir/zmarkdown/issues/416#issuecomment-982812961
+  const data = this.data()
+  const list = (data.micromarkExtensions ??= [])
+  list.push({ disable: { null: ['codeIndented'] } })
+
   return (tree: MdastNodes, file: VFile) => {
     console.log('remarkPlugin', structuredClone(tree))
 
