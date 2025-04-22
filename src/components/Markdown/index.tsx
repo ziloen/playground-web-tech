@@ -9,7 +9,7 @@ import type { Components as MarkdownComponents } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
-import remarkGfm from 'remark-gfm'
+import remarkGfmNoAutoLink from 'remark-gfm-no-autolink'
 import remarkMath from 'remark-math'
 import type { PluggableList, Plugin, Processor } from 'unified'
 import { CONTINUE, EXIT, SKIP, visit } from 'unist-util-visit'
@@ -87,7 +87,13 @@ const components: Components = {
   },
   a({ children, className, href, node, ...rest }) {
     return (
-      <a className={className} href={href} {...rest}>
+      <a
+        className={className}
+        target="_blank"
+        rel="noreferrer"
+        href={href}
+        {...rest}
+      >
         {children}
       </a>
     )
@@ -101,7 +107,7 @@ const rehypePlugins = pluginList([
 ])
 
 const remarkPlugins = pluginList([
-  [remarkGfm, {}],
+  [remarkGfmNoAutoLink, {}],
   [remarkMath, {}],
   [remarkPlugin],
 ])
@@ -136,6 +142,7 @@ function remarkPlugin(this: Processor) {
   // disable `indentedCode` in micromark
   // https://github.com/micromark/micromark#case-turn-off-constructs
   // https://github.com/zestedesavoir/zmarkdown/issues/416#issuecomment-982812961
+  // https://github.com/micromark/micromark/tree/main/packages/micromark-core-commonmark#api
   const data = this.data()
   const list = (data.micromarkExtensions ??= [])
   list.push({ disable: { null: ['codeIndented'] } })
