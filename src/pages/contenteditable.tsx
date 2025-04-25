@@ -1,10 +1,11 @@
 /* eslint-disable unicorn/prefer-dom-node-text-content */
 import styles from './contenteditable.module.css'
 
+import { asType } from '@wai-ri/core'
 import { useMotionValue } from 'motion/react'
-import type { InputEventInputType as InputType, KeyboardEventKey } from 'ts-lib-enhance'
+import type { RefCallback } from 'react'
+import type { InputEventInputType, KeyboardEventKey } from 'ts-lib-enhance'
 import { createContext, useContextSelector } from 'use-context-selector'
-import { useEventListener } from '~/hooks'
 
 const MAX_LENGTH = 100
 
@@ -17,40 +18,45 @@ const isChromium = (() => {
 })()
 
 export default function ContentEditableText() {
-  const inputRef = useRef<HTMLDivElement>(null!)
+  // const inputRef = useRef<HTMLDivElement>(null!)
   const currentLength = useMotionValue(0)
   const messages = useMessages()
 
-  useEventListener('beforeinput', onBeforeInput, { target: inputRef })
+  const inputRef = useCallback<RefCallback<HTMLDivElement>>((el) => {
+    if (!el) return
 
-  useEventListener('input', (e: InputEvent) => {
-    const inputType = e.inputType as InputType
-    if (inputType === 'insertParagraph') {
-      // const text = transformContent(inputRef.current)
-      // if (!text) return
-      // messages.push({ text })
-      // inputRef.current.innerHTML = ''
-      const mentions = getMentionsFromTarget(inputRef.current)
-      console.log(mentions)
-    }
+    const ac = new AbortController()
 
-    const length = inputRef.current.innerText.length ?? 0
-    currentLength.set(length)
-  }, { target: inputRef })
+    el.addEventListener('beforeinput', onBeforeInput, { signal: ac.signal })
 
-  useEventListener('keydown', (e) => {
-    const key = e.key as KeyboardEventKey
+    el.addEventListener('input', (e) => {
+      asType<InputEvent>(e)
+      const inputType = e.inputType as InputEventInputType
+      if (inputType === 'insertParagraph') {
+        // const text = transformContent(el)
+        // if (!text) return
+        // messages.push({ text })
+        // el.innerHTML = ''
+        const mentions = getMentionsFromTarget(el)
+        console.log(mentions)
+      }
 
-    if (key === 'Enter') {
-    }
-  }, { target: inputRef })
+      const length = el.innerText.length ?? 0
+      currentLength.set(length)
+    }, { signal: ac.signal })
 
-  useEventListener('compositionstart', (e) => {
-  }, { target: inputRef })
+    el.addEventListener('keydown', (e) => {
+      const key = e.key as KeyboardEventKey
 
-  // useEffect(() => {
-  //   document.execCommand('defaultParagraphSeparator', false, 'br')
-  // }, [])
+      if (key === 'Enter') {
+      }
+    }, { signal: ac.signal })
+
+    el.addEventListener('compositionstart', (e) => {
+    }, { signal: ac.signal })
+
+    return () => ac.abort()
+  }, [])
 
   return (
     <div
@@ -126,7 +132,7 @@ type MessageType = {
 /** remove style before input */
 function onBeforeInput(e: InputEvent) {
   const { dataTransfer, data } = e
-  const inputType = e.inputType as InputType
+  const inputType = e.inputType as InputEventInputType
   // prevent format input
   if (inputType.startsWith('format')) return e.preventDefault()
 

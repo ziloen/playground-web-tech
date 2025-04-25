@@ -1,4 +1,5 @@
-import { useEventListener } from '~/hooks'
+import type { RefCallback } from 'react'
+import { useGetState } from '~/hooks'
 
 const properties: {
   key: keyof KeyboardEvent
@@ -17,18 +18,25 @@ const properties: {
 ]
 
 export default function KeyCode() {
-  const ref = useRef<HTMLDivElement>(null)
   const [event, setEvent] = useState<KeyboardEvent | null>(null)
-  const [preventDefault, setPreventDefault] = useState(false)
-  const [stopPropagation, setStopPropagation] = useState(false)
+  const [preventDefault, setPreventDefault, getPreventDefault] = useGetState(false)
+  const [stopPropagation, setStopPropagation, getStopPropagation] = useGetState(false)
   const [hideDeprecated, setHideDeprecated] = useState(true)
 
-  useEventListener('keydown', (e) => {
-    if (preventDefault) e.preventDefault()
-    if (stopPropagation) e.stopPropagation()
+  const ref = useCallback<RefCallback<HTMLDivElement>>((el) => {
+    if (!el) return
 
-    setEvent(e)
-  }, { target: ref })
+    const ac = new AbortController()
+
+    el.addEventListener('keydown', (e) => {
+      if (getPreventDefault()) e.preventDefault()
+      if (getStopPropagation()) e.stopPropagation()
+
+      setEvent(e)
+    }, { signal: ac.signal })
+
+    return () => ac.abort()
+  }, [])
 
   return (
     <div className="p-2 flex flex-col gap-2">
