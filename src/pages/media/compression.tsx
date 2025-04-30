@@ -6,8 +6,8 @@
 // References:
 // https://github.com/addyosmani/squish
 
-// import ffmpegWorkerUrl from '@ffmpeg/core-mt/dist/esm/ffmpeg-core.worker.js?url'
 import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
+import ffmpegWorkerUrl from '@ffmpeg/core-mt/worker?url'
 import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
@@ -56,7 +56,7 @@ export default function Compression() {
   }, [])
 
   const load = async () => {
-    const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.9/dist/esm'
+    const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.10/dist/esm'
 
     ffmpeg.on('log', ({ message, type }) => {
       console.log('log', type, message)

@@ -1,9 +1,10 @@
 /// <reference types="vitest" />
 
-import tailwindcss from '@tailwindcss/postcss'
+import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import browserslistToEsbuild from 'browserslist-to-esbuild'
+import { Features } from 'lightningcss'
 import { resolve as r } from 'node:path'
-import PostcssPresetEnv from 'postcss-preset-env'
 import AutoImport from 'unplugin-auto-import/vite'
 import unpluginIcons from 'unplugin-icons/vite'
 import { defineConfig, loadEnv } from 'vite'
@@ -23,6 +24,8 @@ export default defineConfig(({ command, mode }) => {
     const slashIndex = process.env.GITHUB_REPOSITORY.indexOf('/')
     base = process.env.GITHUB_REPOSITORY.slice(slashIndex)
   }
+
+  const target = '> 0.5%, last 2 versions, Firefox ESR, not dead'
 
   return {
     base,
@@ -74,6 +77,8 @@ export default defineConfig(({ command, mode }) => {
         dts: 'src/types/auto-imports.d.ts',
       }),
 
+      tailwindcss(),
+
       unpluginIcons({
         compiler: 'jsx',
         jsx: 'react',
@@ -82,33 +87,30 @@ export default defineConfig(({ command, mode }) => {
     ],
 
     css: {
-      devSourcemap: true,
-      postcss: {
-        plugins: [
-          PostcssPresetEnv({
-            stage: 0,
-            features: {
-              'float-clear-logical-values': false,
-              'logical-overflow': false,
-              'logical-overscroll-behavior': false,
-              'logical-properties-and-values': false,
-              'light-dark-function': false,
+      transformer: 'lightningcss',
+      lightningcss: {
+        // https://lightningcss.dev/transpilation.html#feature-flags
+        include: Features.Colors | Features.Nesting | Features.MediaRangeSyntax,
+        exclude: Features.LogicalProperties,
 
-              'cascade-layers': false,
-            },
-          }),
-          tailwindcss(),
-        ],
+        cssModules: {
+          generateScopedName: '[hash:base64:8]',
+        },
+      },
+      devSourcemap: true,
+      modules: {
+        generateScopedName: '[hash:base64:8]',
       },
     },
 
     optimizeDeps: {
       include: ['lodash-es'],
-      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
+      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util', '@ffmpeg/core'],
     },
 
     build: {
-      cssMinify: 'esbuild',
+      cssMinify: 'lightningcss',
+      target: browserslistToEsbuild(target),
     },
 
     server: {

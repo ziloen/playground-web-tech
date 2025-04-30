@@ -30,27 +30,23 @@ function Setting() {
       <Field.Root name="border-image-repeat" className="grid grid-cols-subgrid col-span-full">
         <Field.Label>{'border-image-repeat'}</Field.Label>
 
-        <Select.Root defaultValue={'stretch'}>
-          <Select.Trigger
-            className="min-h-[1lh] min-w-[10ch] rounded-sm border-2 border-solid border-[buttonborder] bg-[field] select-none focus-visible:-outline-offset-1 focus-visible:outline-blue-500 focus-visible:outline-2 focus-visible:outline-blue-400"
-            style={{
-              borderCollapse: 'separate',
-            }}
-          >
+        <Select.Root defaultValue={'stretch'} alignItemToTrigger={false}>
+          <Select.Trigger className="min-h-[1lh] px-3 py-2 border min-w-[200px] rounded-md border-solid border-dark-gray-200 bg-dark-gray-800 select-none focus-visible:outline-2 w-fit focus-visible:-outline-offset-1 focus-visible:outline-blue-500 hover:bg-dark-gray-700 shadow-xl">
             <Select.Value placeholder="stretch" />
+
+            <div></div>
           </Select.Trigger>
 
           <Select.Portal>
             <Select.Positioner
               align="start"
-              alignOffset={2}
               sideOffset={8}
               className="outline-none"
             >
-              <Select.Popup className="max-h-(--available-height) overflow-y-auto bg-[canvas] outline-none">
+              <Select.Popup className="max-h-(--available-height) min-w-[200px] overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 outline-none shadow-xl">
                 {['stretch', 'repeat', 'round', 'space'].map((item) => (
                   <Select.Item
-                    className="outline-none cursor-default data-[highlighted]:bg-dark-gray-400"
+                    className="cursor-default px-3 py-2 outline-none data-selected:bg-dark-gray-600 data-[highlighted]:bg-dark-gray-400"
                     key={item}
                     value={item}
                   >
@@ -64,19 +60,19 @@ function Setting() {
       </Field.Root>
 
       {/* 从 border-image-source 中取出长度 */}
-      <Field.Root name="border-image-slice" className="grid grid-cols-subgrid col-span-full">
+      <Field.Root name="border-image-slice" className="col-span-full grid grid-cols-subgrid">
         <Field.Label>{'border-image-slice'}</Field.Label>
         <Field.Control />
       </Field.Root>
 
       {/* border image 来源 */}
-      <Field.Root name="border-image-source" className="grid grid-cols-subgrid col-span-full">
+      <Field.Root name="border-image-source" className="col-span-full grid grid-cols-subgrid">
         <Field.Label>{'border-image-source'}</Field.Label>
         <Field.Control />
       </Field.Root>
 
       {/* border-image 的显示宽度，最多 4 个值 top | right | bottom | left */}
-      <Field.Root name="border-image-width" className="grid grid-cols-subgrid col-span-full">
+      <Field.Root name="border-image-width" className="col-span-full grid grid-cols-subgrid">
         <Field.Label>{'border-image-width'}</Field.Label>
         <Field.Control />
       </Field.Root>

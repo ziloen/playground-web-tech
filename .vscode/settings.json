@@ -27,6 +27,7 @@
     ".vscode/emmet"
   ],
   "eslint.format.enable": false,
+  "tailwindCSS.experimental.configFile": "src/styles/main.css",
   "typescript.preferences.autoImportSpecifierExcludeRegexes": [
     "^mermaid/dist*",
     "^typescript$",
