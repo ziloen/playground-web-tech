@@ -1,4 +1,12 @@
-import { Field, Form, Select } from '@base-ui-components/react'
+import { Field, Form } from '@base-ui-components/react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemText,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/Select'
 
 export default function BorderImage() {
   return (
@@ -30,33 +38,19 @@ function Setting() {
       <Field.Root name="border-image-repeat" className="grid grid-cols-subgrid col-span-full">
         <Field.Label>{'border-image-repeat'}</Field.Label>
 
-        <Select.Root defaultValue={'stretch'} alignItemToTrigger={false}>
-          <Select.Trigger className="min-h-[1lh] px-3 py-2 border min-w-[200px] rounded-md border-solid border-dark-gray-200 bg-dark-gray-800 select-none focus-visible:outline-2 w-fit focus-visible:-outline-offset-1 focus-visible:outline-blue-500 hover:bg-dark-gray-700 shadow-xl">
-            <Select.Value placeholder="stretch" />
+        <Select defaultValue={'stretch'} alignItemToTrigger={false}>
+          <SelectTrigger>
+            <SelectValue placeholder="stretch" />
+          </SelectTrigger>
 
-            <div></div>
-          </Select.Trigger>
-
-          <Select.Portal>
-            <Select.Positioner
-              align="start"
-              sideOffset={8}
-              className="outline-none"
-            >
-              <Select.Popup className="max-h-(--available-height) min-w-[200px] overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 outline-none shadow-xl">
-                {['stretch', 'repeat', 'round', 'space'].map((item) => (
-                  <Select.Item
-                    className="cursor-default px-3 py-2 outline-none data-selected:bg-dark-gray-600 data-[highlighted]:bg-dark-gray-400"
-                    key={item}
-                    value={item}
-                  >
-                    <Select.ItemText>{item}</Select.ItemText>
-                  </Select.Item>
-                ))}
-              </Select.Popup>
-            </Select.Positioner>
-          </Select.Portal>
-        </Select.Root>
+          <SelectContent>
+            {['stretch', 'repeat', 'round', 'space'].map((item) => (
+              <SelectItem key={item} value={item}>
+                <SelectItemText>{item}</SelectItemText>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </Field.Root>
 
       {/* 从 border-image-source 中取出长度 */}

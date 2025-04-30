@@ -92,10 +92,6 @@ export default defineConfig(({ command, mode }) => {
         // https://lightningcss.dev/transpilation.html#feature-flags
         include: Features.Colors | Features.Nesting | Features.MediaRangeSyntax,
         exclude: Features.LogicalProperties,
-
-        cssModules: {
-          generateScopedName: '[hash:base64:8]',
-        },
       },
       devSourcemap: true,
       modules: {

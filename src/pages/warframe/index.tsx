@@ -16,6 +16,7 @@ import { getWorldStateApi } from '~/api/warframe'
 // 猎杀执刑官 archonHunt
 // 1999日历 calendar
 // 钢铁之路商品 steelPath.currentReward steelPath.rotation
+// 无尽回廊轮换 EndlessXpChoices
 export default function Warframe() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['warframe-world-state'],

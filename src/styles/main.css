@@ -33,6 +33,7 @@ body,
 #root {
   /* prevent margin collapsing */
   display: flow-root;
+  isolation: isolate;
 }
 
 *,
@@ -43,7 +44,7 @@ body,
 
 html {
   @apply font-sans;
-  background: light-dark(white, #121212);
+  background-color: light-dark(white, #121212);
   color: light-dark(black, --theme(--color-light-gray-200));
 }
 
@@ -51,6 +52,7 @@ html[data-theme="dark"] {
   color-scheme: dark;
 }
 
+html,
 html[data-theme="auto"] {
   color-scheme: dark light;
 }

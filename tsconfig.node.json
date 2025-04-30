@@ -5,6 +5,7 @@
     "moduleResolution": "bundler",
     "strictNullChecks": true,
     "allowJs": true,
+    "checkJs": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "erasableSyntaxOnly": true,
