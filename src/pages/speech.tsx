@@ -3,10 +3,18 @@ import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
 import { asNonNullable, asType } from '@wai-ri/core'
-import { Button, Input, Select } from 'antd'
+import { Button as AntdButton, Input as AntdInput, Select as AntdSelect } from 'antd'
 import type { DefaultOptionType } from 'antd/es/select'
 import { useMotionValue, useTransform, type MotionValue } from 'motion/react'
 import { memo } from 'react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemText,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/Select'
 import Slider from '~/components/Slider'
 import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
 import { LRUCache } from '~/utils'
@@ -200,7 +208,7 @@ export default function WebSpeechAPIPage() {
       >
         <div className="grid grid-cols-subgrid col-span-full">
           <span>voice</span>
-          <Select<string, VoiceOptionGroup>
+          <AntdSelect<string, VoiceOptionGroup>
             showSearch
             className="min-w-40"
             virtual={false}
@@ -231,17 +239,27 @@ export default function WebSpeechAPIPage() {
 
             <Select
               value={lang}
-              onChange={(lang) => {
+              onValueChange={(lang) => {
                 setLang(lang)
                 if (lang === 'en-US') {
                   setInputText(defaultEnText)
                 }
               }}
-              options={Object.keys(groupByLang).map((lang) => ({
-                value: lang,
-                label: lang,
-              }))}
-            />
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent>
+                {Object.keys(groupByLang).map((lang) => {
+                  return (
+                    <SelectItem key={lang} value={lang}>
+                      <SelectItemText>{lang}</SelectItemText>
+                    </SelectItem>
+                  )
+                })}
+              </SelectContent>
+            </Select>
           </div>
         )}
 
@@ -297,7 +315,7 @@ export default function WebSpeechAPIPage() {
         </div>
       </div>
 
-      <Input.TextArea
+      <AntdInput.TextArea
         style={{ maxWidth: '600px' }}
         autoSize={{ minRows: 3 }}
         value={inputText}
@@ -306,13 +324,13 @@ export default function WebSpeechAPIPage() {
 
       <br />
 
-      <Button
+      <AntdButton
         onClick={onSpeek}
       >
         Speak
-      </Button>
+      </AntdButton>
 
-      <Button
+      <AntdButton
         onClick={(e) => {
           pausedRef.current = false
           startedRef.current = true
@@ -321,11 +339,11 @@ export default function WebSpeechAPIPage() {
         }}
       >
         Cancel
-      </Button>
+      </AntdButton>
 
       <br />
 
-      <Button
+      <AntdButton
         onClick={(e) => {
           console.log('before pause')
           // pause before start will not work
@@ -343,9 +361,9 @@ export default function WebSpeechAPIPage() {
         }}
       >
         Pause
-      </Button>
+      </AntdButton>
 
-      <Button
+      <AntdButton
         onClick={() => {
           console.log('before resume')
           pausedRef.current = false
@@ -354,7 +372,7 @@ export default function WebSpeechAPIPage() {
         }}
       >
         Resume
-      </Button>
+      </AntdButton>
 
       <div className="grid">
         <div className="grid-cols-subgrid">
@@ -625,8 +643,8 @@ function AudioVisualization() {
 
       let sum = 0
 
-      for (let i = 0; i < frequencyData.length; i++) {
-        sum += frequencyData[i]
+      for (const frequency of frequencyData) {
+        sum += frequency
       }
 
       const level = sum / frequencyData.length

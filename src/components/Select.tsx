@@ -3,8 +3,8 @@ import { ChevronDownIcon } from '@primer/octicons-react'
 import type { ComponentProps } from 'react'
 import { cn } from '~/utils'
 
-export function Select({ ...props }: ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root alignItemToTrigger={false} {...props} />
+export function Select<T>({ ...props }: ComponentProps<typeof SelectPrimitive.Root<T>>) {
+  return <SelectPrimitive.Root<T> alignItemToTrigger={false} {...props} />
 }
 
 export function SelectTrigger(
