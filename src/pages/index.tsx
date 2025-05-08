@@ -1,5 +1,5 @@
-import type { RouteObject } from 'react-router-dom'
-import { Link } from 'react-router-dom'
+import type { RouteObject } from 'react-router'
+import { Link } from 'react-router'
 import routes from '~react-pages'
 
 export default function Index() {
