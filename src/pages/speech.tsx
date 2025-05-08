@@ -3,7 +3,7 @@ import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
 import { asNonNullable, asType } from '@wai-ri/core'
-import { Button as AntdButton, Input as AntdInput, Select as AntdSelect } from 'antd'
+import { Select as AntdSelect } from 'antd'
 import type { DefaultOptionType } from 'antd/es/select'
 import { useMotionValue, useTransform, type MotionValue } from 'motion/react'
 import { memo } from 'react'
@@ -213,8 +213,12 @@ export default function WebSpeechAPIPage() {
             className="min-w-40"
             virtual={false}
             value={selectedVoice}
-            dropdownStyle={{
-              maxHeight: '400px',
+            styles={{
+              popup: {
+                root: {
+                  maxHeight: '400px',
+                },
+              },
             }}
             onChange={setSelectedVoice}
             popupMatchSelectWidth={false}
@@ -315,22 +319,25 @@ export default function WebSpeechAPIPage() {
         </div>
       </div>
 
-      <AntdInput.TextArea
-        style={{ maxWidth: '600px' }}
-        autoSize={{ minRows: 3 }}
+      <textarea
+        className="max-w-[600px] w-[min(100%,600px)] min-h-[3lh] field-sizing-content m-0 p-0 box-content"
         value={inputText}
         onChange={(e) => setInputText(e.currentTarget.value)}
       />
+      {
+        /* <AntdInput.TextArea
+        style={{ maxWidth: '600px' }}
+        autoSize={{ minRows: 3 }}
+      /> */
+      }
 
       <br />
 
-      <AntdButton
-        onClick={onSpeek}
-      >
+      <button onClick={onSpeek}>
         Speak
-      </AntdButton>
+      </button>
 
-      <AntdButton
+      <button
         onClick={(e) => {
           pausedRef.current = false
           startedRef.current = true
@@ -339,11 +346,11 @@ export default function WebSpeechAPIPage() {
         }}
       >
         Cancel
-      </AntdButton>
+      </button>
 
       <br />
 
-      <AntdButton
+      <button
         onClick={(e) => {
           console.log('before pause')
           // pause before start will not work
@@ -361,9 +368,9 @@ export default function WebSpeechAPIPage() {
         }}
       >
         Pause
-      </AntdButton>
+      </button>
 
-      <AntdButton
+      <button
         onClick={() => {
           console.log('before resume')
           pausedRef.current = false
@@ -372,7 +379,7 @@ export default function WebSpeechAPIPage() {
         }}
       >
         Resume
-      </AntdButton>
+      </button>
 
       <div className="grid">
         <div className="grid-cols-subgrid">

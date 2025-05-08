@@ -51,7 +51,7 @@ export default function ColorGenerator() {
           onChange={(e) => {
             setInputVal(e.toRgbString())
           }}
-          destroyTooltipOnHide
+          destroyOnHidden
           placement="rightTop"
         />
       </div>
@@ -77,13 +77,12 @@ export default function ColorGenerator() {
         {Array.from({ length: 10 }, (_, index) => {
           return (
             <div
-              key={null}
+              key={index}
               className="size-[20px]"
               style={{
                 backgroundColor: `oklch(from var(--bg) ${index * 0.1 + 0.1} c h)`,
               }}
-            >
-            </div>
+            />
           )
         })}
       </div>

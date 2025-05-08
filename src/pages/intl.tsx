@@ -1,6 +1,11 @@
-import { Select } from 'antd'
 import { useMotionValue } from 'motion/react'
-import type { ArrayValues } from 'type-fest'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemText,
+  SelectTrigger,
+} from '~/components/Select'
 
 const Languages = [
   'en',
@@ -79,12 +84,6 @@ function LanguageSelect({
         const displayName = getLanguageDisplayName(language, lang)
 
         return {
-          label: (
-            <div className="flex justify-between items-center gap-[2em]">
-              <span>{displayName}</span>
-              <span>{nativeDisplayName}</span>
-            </div>
-          ),
           value: lang,
           nativeDisplayName,
           displayName,
@@ -93,17 +92,31 @@ function LanguageSelect({
     )
   }, [language])
 
+  const selectedOption = options.find((option) => option.value === language)
+
   return (
-    <Select<string, ArrayValues<typeof options>>
-      defaultValue={language}
-      options={options}
-      onChange={onChange}
-      popupClassName="[&_.rc-virtual-list-holder]:scrollbar-gutter-stable [&_.rc-virtual-list-holder]:scrollbar-thin"
-      popupMatchSelectWidth={false}
-      placement="bottomRight"
-      variant="borderless"
-      optionLabelProp="nativeDisplayName"
-    />
+    <Select value={language} onValueChange={onChange}>
+      <SelectTrigger>
+        <span>{selectedOption?.nativeDisplayName}</span>
+      </SelectTrigger>
+
+      <SelectContent className="max-h-[300px] w-fit scrollbar-thin scrollbar-gutter-stable">
+        {options.map((option) => {
+          return (
+            <SelectItem
+              value={option.value}
+              key={option.value}
+              className="flex justify-between items-center gap-[2em] min-w-max"
+            >
+              <SelectItemText>
+                {option.displayName}
+              </SelectItemText>
+              <span>{option.nativeDisplayName}</span>
+            </SelectItem>
+          )
+        })}
+      </SelectContent>
+    </Select>
   )
 }
 
@@ -143,9 +156,13 @@ function getLanguageDisplayName(
   displayLanguage: string,
   language: string,
 ) {
-  const displayNames = new Intl.DisplayNames([displayLanguage], {
-    type: 'language',
-    languageDisplay: 'dialect',
-  })
-  return displayNames.of(language)
+  try {
+    const displayNames = new Intl.DisplayNames([displayLanguage], {
+      type: 'language',
+      languageDisplay: 'dialect',
+    })
+    return displayNames.of(language)
+  } catch {
+    return language
+  }
 }

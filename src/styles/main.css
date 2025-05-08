@@ -22,13 +22,23 @@
     'monospace';
 }
 
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+@layer base {
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 }
+
 
 #root {
   /* prevent margin collapsing */
@@ -36,11 +46,6 @@ body,
   isolation: isolate;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
 
 html {
   @apply font-sans;
