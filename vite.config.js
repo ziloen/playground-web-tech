@@ -47,7 +47,9 @@ export default defineConfig(({ command, mode }) => {
       react(),
 
       // https://github.com/hannoeru/vite-plugin-pages
-      Pages({}),
+      Pages({
+        exclude: ['**/_*.{js,ts,jsx,tsx}'],
+      }),
 
       // https://github.com/antfu/unplugin-auto-import
       AutoImport({
