@@ -71,7 +71,7 @@ export async function resourceToDataURL(
 
   // ref: https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#Bypassing_the_cache
   if (options.cacheBust) {
-    resourceUrl += (/\?/.test(resourceUrl) ? '&' : '?') + String(new Date().getTime())
+    resourceUrl += (/\?/.test(resourceUrl) ? '&' : '?') + String(Date.now())
   }
 
   let dataURL: string

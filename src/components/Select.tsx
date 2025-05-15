@@ -48,12 +48,13 @@ export function SelectContent(
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
         align="start"
+        side="bottom"
         sideOffset={8}
         className="outline-none"
       >
         <SelectPrimitive.Popup
           className={cn(
-            'max-h-(--available-height) min-w-[200px] overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 shadow-lg outline-none',
+            'max-h-(--available-height) min-w-[200px] overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 shadow-lg outline-none data-starting-style:opacity-0 transition-all data-starting-style:scale-90 data-ending-style:opacity-0 data-ending-style:scale-90 origin-(--transform-origin)',
             className,
           )}
           {...props}
