@@ -1,4 +1,13 @@
+import { InfinityIcon } from '@primer/octicons-react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemText,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/Select'
 import { db } from './_db'
 
 export default function DexiePage() {
@@ -20,7 +29,7 @@ export default function DexiePage() {
             await db.todos.add({
               title: newTask.trim(),
               id: crypto.randomUUID(),
-              _v: 1,
+              _v: 0,
               completed: false,
               createdAt: Date.now(),
               updatedAt: Date.now(),
@@ -39,14 +48,47 @@ export default function DexiePage() {
         />
 
         <button type="submit">Add task</button>
+
+        <Select defaultValue={'none'}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+
+          <SelectContent>
+            {[
+              'none',
+              'everyday',
+              'monday',
+              'tuesday',
+              'wednesday',
+              'thursday',
+              'friday',
+              'saturday',
+              'sunday',
+            ]
+              .map((day) => (
+                <SelectItem key={day} value={day}>
+                  <SelectItemText className="capitalize">
+                    {day}
+                  </SelectItemText>
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
       </form>
 
-      <ul>
+      <ul className="ps-2 grid gap-2">
         {todos.map((todo, i) => (
-          <li key={todo.id} className={clsx(todo.completed && 'line-through opacity-75')}>
+          <li
+            key={todo.id}
+            className={clsx(
+              'relative bg-dark-gray-700 px-4 py-3',
+              todo.completed && 'line-through opacity-75',
+            )}
+          >
             <span
               onClick={() => {
-                db.todos.where('id').equals(todo.id).modify((todo) => {
+                db.todos.where({ id: todo.id }).modify((todo) => {
                   todo.completed = !todo.completed
                   todo.updatedAt = Date.now()
                   todo._v++
@@ -63,6 +105,8 @@ export default function DexiePage() {
             >
               Delete
             </button>
+
+            <InfinityIcon className="absolute start-1 top-1 opacity-50" size={14} />
           </li>
         ))}
       </ul>

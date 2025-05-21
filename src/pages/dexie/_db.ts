@@ -8,6 +8,21 @@ interface Todo {
   completed: boolean
   createdAt: number
   updatedAt: number
+  recurrence?: {
+    composite: 'replace' | 'add'
+    day:
+      | 'monday'
+      | 'tuesday'
+      | 'wednesday'
+      | 'thursday'
+      | 'friday'
+      | 'saturday'
+      | 'sunday'
+      | 'everyday'
+    count: number
+    lastDate: number
+    currentCount: number
+  }
 }
 
 interface Settings {
