@@ -3,6 +3,8 @@ import '@fontsource-variable/noto-sans-sc'
 
 import './markdown.css'
 
+import { Collapsible } from '@base-ui-components/react'
+import { ChevronDownIcon } from '@primer/octicons-react'
 import type { Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { Nodes as MdastNodes } from 'mdast'
 import type { Components as MarkdownComponents } from 'react-markdown'
@@ -51,11 +53,12 @@ type Components =
 
 const components: Components = {
   code({ node, className, children }) {
-    const inline = node.properties.inline as boolean
+    console.log('code', node)
+    const inline = node.properties.inline as 'true' | 'false' | undefined
     const rawText = node.properties.text as string
     const language = node.properties.language as string | null
 
-    if (inline) {
+    if (inline === 'true') {
       return <code className={className}>{children}</code>
     }
 
@@ -104,15 +107,34 @@ const components: Components = {
     )
   },
   think({ children }) {
-    return <div className="bg-red-400">{children}</div>
+    return (
+      <Collapsible.Root>
+        <Collapsible.Trigger
+          render={
+            <div className="flex items-center border-none bg-transparent gap-1 text-light-gray-900 hover:text-light-gray-300 data-panel-open:text-light-gray-300 cursor-pointer w-fit select-none">
+              <span className="text-sm">
+                Thought process
+              </span>
+              <ChevronDownIcon size={10} />
+            </div>
+          }
+        />
+
+        <Collapsible.Panel className="h-(--collapsible-panel-height) data-ending-style:h-0 data-starting-style:h-0 data-starting-style:opacity-0 data-ending-style:opacity-0 opacity-100 transition-all flex overflow-hidden">
+          <div className="border-s-2 border-0 border-solid border-s-dark-gray-200 ps-2 mt-2 text-light-gray-600 leading-relaxed text-sm ms-0.5">
+            {children}
+          </div>
+        </Collapsible.Panel>
+      </Collapsible.Root>
+    )
   },
 }
 
 const rehypePlugins = pluginList([
   [rehypeHighlight, {}],
   [rehypeKatex, { errorColor: '' }],
-  [rehypeRaw, { tagfilter: true, passThrough: ['think'] }],
   [rehypePlugin],
+  [rehypeRaw],
 ])
 
 const remarkPlugins = pluginList([
@@ -164,7 +186,9 @@ function remarkPlugin(this: Processor) {
       if (node.type === 'code' || node.type === 'inlineCode') {
         node.data ??= {}
         node.data.hProperties ??= {}
-        node.data.hProperties.inline = node.type === 'inlineCode'
+        // FIXME: this is a hack to make `rehypeRaw` work
+        // `rehypeRaw` will remove `inline` and `text` properties
+        node.data.hProperties.inline = node.type === 'inlineCode' ? 'true' : 'false'
         node.data.hProperties.text = node.value
         node.data.hProperties.language = node.type === 'code' ? node.lang : null
       }
