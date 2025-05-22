@@ -9,6 +9,7 @@ import type { Components as MarkdownComponents } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
+import rehypeRaw from 'rehype-raw'
 import remarkGfmNoAutoLink from 'remark-gfm-no-autolink'
 import remarkMath from 'remark-math'
 import type { PluggableList, Plugin, Processor } from 'unified'
@@ -38,11 +39,15 @@ export function Markdown({ children }: { children: string }) {
   )
 }
 
-type Components = {
-  [Key in keyof React.JSX.IntrinsicElements]?:
-    | React.ComponentType<React.JSX.IntrinsicElements[Key] & { node: HastElement }>
-    | keyof React.JSX.IntrinsicElements
-}
+type Components =
+  & {
+    [Key in keyof React.JSX.IntrinsicElements]?:
+      | React.ComponentType<React.JSX.IntrinsicElements[Key] & { node: HastElement }>
+      | keyof React.JSX.IntrinsicElements
+  }
+  & {
+    think?: React.ComponentType<React.ComponentProps<'div'> & { node: HastElement }>
+  }
 
 const components: Components = {
   code({ node, className, children }) {
@@ -98,11 +103,15 @@ const components: Components = {
       </a>
     )
   },
+  think({ children }) {
+    return <div className="bg-red-400">{children}</div>
+  },
 }
 
 const rehypePlugins = pluginList([
   [rehypeHighlight, {}],
   [rehypeKatex, { errorColor: '' }],
+  [rehypeRaw, { tagfilter: true, passThrough: ['think'] }],
   [rehypePlugin],
 ])
 
