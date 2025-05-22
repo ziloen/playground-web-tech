@@ -3,7 +3,6 @@ import '@fontsource-variable/noto-sans-sc'
 
 import './markdown.css'
 
-import { Collapsible } from '@base-ui-components/react'
 import { ChevronDownIcon } from '@primer/octicons-react'
 import type { Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { Nodes as MdastNodes } from 'mdast'
@@ -107,25 +106,41 @@ const components: Components = {
     )
   },
   think({ children }) {
-    return (
-      <Collapsible.Root>
-        <Collapsible.Trigger
-          render={
-            <div className="flex items-center border-none bg-transparent gap-1 text-light-gray-900 hover:text-light-gray-300 data-panel-open:text-light-gray-300 cursor-pointer w-fit select-none">
-              <span className="text-sm">
-                Thought process
-              </span>
-              <ChevronDownIcon size={10} />
-            </div>
-          }
-        />
+    const [isOpen, setIsOpen] = useState(false)
 
-        <Collapsible.Panel className="h-(--collapsible-panel-height) data-ending-style:h-0 data-starting-style:h-0 data-starting-style:opacity-0 data-ending-style:opacity-0 opacity-100 transition-all flex overflow-hidden">
+    return (
+      <div
+        className="grid transition-all duration-100"
+        style={{
+          gridTemplateRows: isOpen ? 'auto 1fr' : 'auto 0fr',
+        }}
+      >
+        <div
+          className={clsx(
+            'flex items-center gap-1 cursor-pointer w-fit select-none',
+            isOpen ? 'text-light-gray-300' : 'text-light-gray-900 hover:text-light-gray-300',
+          )}
+          onClick={() => {
+            setIsOpen((prev) => !prev)
+          }}
+        >
+          <span className="text-sm">
+            Thought process
+          </span>
+          <ChevronDownIcon size={10} />
+        </div>
+
+        <div
+          className={clsx(
+            'overflow-clip min-h-0 transition-opacity duration-100',
+            isOpen ? 'opacity-100' : 'opacity-0',
+          )}
+        >
           <div className="border-s-2 border-0 border-solid border-s-dark-gray-200 ps-2 mt-2 text-light-gray-600 leading-relaxed text-sm ms-0.5">
             {children}
           </div>
-        </Collapsible.Panel>
-      </Collapsible.Root>
+        </div>
+      </div>
     )
   },
 }
