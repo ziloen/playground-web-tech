@@ -20,7 +20,7 @@ export function SelectTrigger(
     >
       {children}
 
-      <ChevronDownIcon className="opacity-50" size={14} />
+      <ChevronDownIcon className="opacity-50 in-data-popup-open:rotate-180" size={14} />
     </SelectPrimitive.Trigger>
   )
 }
