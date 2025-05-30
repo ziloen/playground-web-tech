@@ -7,6 +7,8 @@ export { LRUCache } from './LRUCache'
 const twMerge = /* #__PURE__ */ extendTailwindMerge({
   override: {
     conflictingClassGroups: {
+      // In the default config the value is ['leading']
+      // https://github.com/dcastil/tailwind-merge/issues/446#issuecomment-2248766088
       'font-size': [],
     },
   },

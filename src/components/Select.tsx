@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react'
 import { cn } from '~/utils'
 
 export function Select<T>({ ...props }: ComponentProps<typeof SelectPrimitive.Root<T>>) {
-  return <SelectPrimitive.Root<T> alignItemToTrigger={false} {...props} />
+  return <SelectPrimitive.Root<T> {...props} />
 }
 
 export function SelectTrigger(
@@ -13,7 +13,7 @@ export function SelectTrigger(
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        'grid min-h-[1lh] w-fit min-w-[200px] grid-flow-col items-center justify-between rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 px-3 py-2 shadow-sm select-none hover:bg-dark-gray-700 focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-blue-500',
+        'grid min-h-[1lh] w-fit min-w-[200px] grid-flow-col items-center justify-between rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 px-3 py-2 shadow-sm select-none hover:bg-dark-gray-700 outline-none focus-visible:outline-solid outline-2 outline-offset-2 outline-blue-500',
         className,
       )}
       {...props}
@@ -51,6 +51,7 @@ export function SelectContent(
         side="bottom"
         sideOffset={8}
         className="outline-none"
+        alignItemWithTrigger={false}
       >
         <SelectPrimitive.Popup
           className={cn(

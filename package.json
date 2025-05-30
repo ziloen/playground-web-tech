@@ -13,7 +13,7 @@
   "dependencies": {
     "@ant-design/v5-patch-for-react-19": "1.0.3",
     "@atlaskit/pragmatic-drag-and-drop": "1.7.0",
-    "@base-ui-components/react": "1.0.0-alpha.8",
+    "@base-ui-components/react": "1.0.0-beta.0",
     "@ffmpeg/core-mt": "0.12.10",
     "@ffmpeg/ffmpeg": "0.12.15",
     "@ffmpeg/util": "0.12.2",
@@ -21,7 +21,7 @@
     "@fontsource-variable/noto-sans-sc": "5.2.5",
     "@lexical/react": "^0.31.2",
     "@primer/octicons-react": "19.15.2",
-    "@tanstack/react-query": "5.77.2",
+    "@tanstack/react-query": "5.79.0",
     "@wai-ri/core": "^0.0.105",
     "@wai-ri/react": "^0.0.105",
     "antd": "^5.25.3",
@@ -37,7 +37,6 @@
     "mermaid": "11.6.0",
     "micromark-extension-llm-math": "3.1.0",
     "motion": "12.15.0",
-    "radix-ui": "1.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-i18next": "^15.5.2",
@@ -55,7 +54,7 @@
     "use-context-selector": "2.0.0"
   },
   "devDependencies": {
-    "@iconify/json": "2.2.342",
+    "@iconify/json": "2.2.343",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@tailwindcss/vite": "4.1.8",
@@ -67,7 +66,7 @@
     "@vitejs/plugin-legacy": "6.1.1",
     "@vitejs/plugin-react": "4.5.0",
     "@ziloen/eslint-config": "0.1.63",
-    "@ziloen/tailwind-config": "2.0.3",
+    "@ziloen/tailwind-config": "2.0.4",
     "browserslist-to-esbuild": "2.1.1",
     "dprint": "0.50.0",
     "eslint": "^9.27.0",

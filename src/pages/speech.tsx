@@ -13,7 +13,6 @@ import {
   SelectItem,
   SelectItemText,
   SelectTrigger,
-  SelectValue,
 } from '~/components/Select'
 import Slider from '~/components/Slider'
 import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
@@ -251,7 +250,7 @@ export default function WebSpeechAPIPage() {
               }}
             >
               <SelectTrigger>
-                <SelectValue />
+                <div>{lang}</div>
               </SelectTrigger>
 
               <SelectContent>
@@ -324,12 +323,6 @@ export default function WebSpeechAPIPage() {
         value={inputText}
         onChange={(e) => setInputText(e.currentTarget.value)}
       />
-      {
-        /* <AntdInput.TextArea
-        style={{ maxWidth: '600px' }}
-        autoSize={{ minRows: 3 }}
-      /> */
-      }
 
       <br />
 

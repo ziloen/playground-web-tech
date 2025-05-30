@@ -38,7 +38,7 @@ function Setting() {
       <Field.Root name="border-image-repeat" className="grid grid-cols-subgrid col-span-full">
         <Field.Label>{'border-image-repeat'}</Field.Label>
 
-        <Select defaultValue={'stretch'} alignItemToTrigger={false}>
+        <Select defaultValue="stretch">
           <SelectTrigger>
             <SelectValue placeholder="stretch" />
           </SelectTrigger>

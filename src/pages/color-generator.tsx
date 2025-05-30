@@ -3,7 +3,8 @@
 // https://www.radix-ui.com/colors/custom
 // https://github.com/proteanstudio/contrast-tools
 
-import { ColorPicker, Input } from 'antd'
+import { Input } from '@base-ui-components/react'
+import { ColorPicker } from 'antd'
 import Color from 'colorjs.io'
 
 export default function ColorGenerator() {
@@ -45,7 +46,12 @@ export default function ColorGenerator() {
       }}
     >
       <div className="flex gap-2">
-        <Input value={inputVal} onChange={(e) => setInputVal(e.currentTarget.value)} />
+        <Input
+          className="px-3 py-2 rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 outline-none focus-visible:outline-solid outline-2 outline-offset-2 outline-blue-500"
+          value={inputVal}
+          spellCheck="false"
+          onChange={(e) => setInputVal(e.currentTarget.value)}
+        />
         <ColorPicker
           value={inputVal}
           onChange={(e) => {
