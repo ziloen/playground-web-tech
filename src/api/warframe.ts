@@ -6,6 +6,9 @@ type News = {
   link: string
   imageLink: string
   priority: boolean
+  /**
+   * @example "1970-01-01T00:00:00.000Z"
+   */
   date: string
   eta: string
   update: false
