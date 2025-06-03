@@ -51,7 +51,7 @@ export default defineConfig(({ command, mode }) => {
         exclude: ['**/_*.{js,ts,jsx,tsx}'],
       }),
 
-      // https://github.com/antfu/unplugin-auto-import
+      // https://github.com/unplugin/unplugin-auto-import
       AutoImport({
         imports: [
           {

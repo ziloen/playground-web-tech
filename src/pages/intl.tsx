@@ -6,6 +6,7 @@ import {
   SelectItemText,
   SelectTrigger,
 } from '~/components/Select'
+import { useMemoizedFn } from '~/hooks'
 
 const Languages = [
   'en',
@@ -77,6 +78,8 @@ function LanguageSelect({
   language: string
   onChange: (language: string) => void
 }) {
+  const [isOpen, setIsOpen] = useState(false)
+
   const options = useMemo(() => {
     return Intl.DisplayNames.supportedLocalesOf(Languages, { localeMatcher: 'best fit' }).map(
       (lang) => {
@@ -92,29 +95,50 @@ function LanguageSelect({
     )
   }, [language])
 
+  const items = useMemo(() => {
+    return options.map((option) => (
+      <SelectItem
+        value={option.value}
+        key={option.value}
+        className="flex justify-between items-center gap-[2em] min-w-max"
+      >
+        <SelectItemText>
+          {option.displayName}
+        </SelectItemText>
+        <span>{option.nativeDisplayName}</span>
+      </SelectItem>
+    ))
+  }, [options])
+
+  // 关闭时，使用选择前的渲染缓存，防止 items 导致内容闪烁
+  const [cachedItems, setCachedItems] = useState<React.JSX.Element[] | null>(null)
+
   const selectedOption = options.find((option) => option.value === language)
 
+  const onOpenChange = useMemoizedFn(
+    (open: boolean) => {
+      setIsOpen(open)
+      if (open) {
+        setCachedItems(null)
+      } else {
+        setCachedItems(items)
+      }
+    },
+  )
+
   return (
-    <Select value={language} onValueChange={onChange}>
+    <Select
+      value={language}
+      onValueChange={onChange}
+      open={isOpen}
+      onOpenChange={onOpenChange}
+    >
       <SelectTrigger>
         <span>{selectedOption?.nativeDisplayName}</span>
       </SelectTrigger>
 
       <SelectContent className="max-h-[300px] w-fit scrollbar-thin scrollbar-gutter-stable">
-        {options.map((option) => {
-          return (
-            <SelectItem
-              value={option.value}
-              key={option.value}
-              className="flex justify-between items-center gap-[2em] min-w-max"
-            >
-              <SelectItemText>
-                {option.displayName}
-              </SelectItemText>
-              <span>{option.nativeDisplayName}</span>
-            </SelectItem>
-          )
-        })}
+        {cachedItems ?? items}
       </SelectContent>
     </Select>
   )

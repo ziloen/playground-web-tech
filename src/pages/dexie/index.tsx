@@ -51,7 +51,7 @@ export default function DexiePage() {
 
         <Select defaultValue={'none'}>
           <SelectTrigger>
-            <SelectValue />
+            <SelectValue placeholder="Task recurrence" />
           </SelectTrigger>
 
           <SelectContent>
