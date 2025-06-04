@@ -59,6 +59,7 @@ export default defineConfig(({ command, mode }) => {
               'Suspense',
               'useCallback',
               'useEffect',
+              'useId',
               'useImperativeHandle',
               'useLayoutEffect',
               'useMemo',

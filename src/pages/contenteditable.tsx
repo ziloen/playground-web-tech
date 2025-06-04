@@ -2,7 +2,6 @@
 import styles from './contenteditable.module.css'
 
 import { asType } from '@wai-ri/core'
-import { useMotionValue } from 'motion/react'
 import type { RefCallback } from 'react'
 import type { InputEventInputType, KeyboardEventKey } from 'ts-lib-enhance'
 import { createContext, useContextSelector } from 'use-context-selector'

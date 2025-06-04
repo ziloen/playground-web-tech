@@ -5,7 +5,7 @@ import { fetchFile, toBlobURL } from '@ffmpeg/util'
 import { asNonNullable, asType } from '@wai-ri/core'
 import { Select as AntdSelect } from 'antd'
 import type { DefaultOptionType } from 'antd/es/select'
-import { useMotionValue, useTransform, type MotionValue } from 'motion/react'
+import { useTransform, type MotionValue } from 'motion/react'
 import { memo } from 'react'
 import {
   Select,

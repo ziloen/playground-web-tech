@@ -1,5 +1,4 @@
 import mermaid from 'mermaid'
-import { useId } from 'react'
 import { mergeRefs } from '~/hooks'
 import { toCanvas } from '~/lib/html-to-image'
 
