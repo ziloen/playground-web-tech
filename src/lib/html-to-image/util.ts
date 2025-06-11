@@ -89,23 +89,7 @@ export function getImageSize(targetNode: HTMLElement, options: Options = {}) {
 }
 
 export function getPixelRatio() {
-  let ratio
-
-  let FINAL_PROCESS
-  try {
-    FINAL_PROCESS = process
-  } catch {
-    // pass
-  }
-
-  const val = FINAL_PROCESS && FINAL_PROCESS.env ? FINAL_PROCESS.env.devicePixelRatio : null
-  if (val) {
-    ratio = parseInt(val, 10)
-    if (Number.isNaN(ratio)) {
-      ratio = 1
-    }
-  }
-  return ratio || window.devicePixelRatio || 1
+  return window.devicePixelRatio ?? 1
 }
 
 // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#maximum_canvas_size
