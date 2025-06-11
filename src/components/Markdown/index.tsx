@@ -25,6 +25,8 @@ import type { VFile } from 'vfile'
 
 // TODO: custom footnote style [^1](https://example.com)
 
+// TODO: stabilize render when streaming input
+
 export function Markdown({ children }: { children: string }) {
   return (
     <ReactMarkdown
@@ -52,7 +54,6 @@ type Components =
 
 const components: Components = {
   code({ node, className, children }) {
-    console.log('code', node)
     const inline = node.properties.inline as 'true' | 'false' | undefined
     const rawText = node.properties.text as string
     const language = node.properties.language as string | null
@@ -167,8 +168,6 @@ function pluginList<
 
 function rehypePlugin(this: Processor) {
   return (tree: HastNodes, file: VFile) => {
-    console.log('rehypePlugin', structuredClone(tree))
-
     visit(tree, (node, index, parent) => {
       // Add `codeBlock` to `pre` node
       if (
@@ -194,8 +193,6 @@ function remarkPlugin(this: Processor) {
   list.push({ disable: { null: ['codeIndented'] } })
 
   return (tree: MdastNodes, file: VFile) => {
-    console.log('remarkPlugin', structuredClone(tree))
-
     visit(tree, (node, index, parent) => {
       // Add `iniline` / `text` / `language` to code node
       if (node.type === 'code' || node.type === 'inlineCode') {

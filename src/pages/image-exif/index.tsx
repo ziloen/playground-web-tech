@@ -1,4 +1,4 @@
-import { load } from 'exifreader'
+// import { load } from 'exifreader'
 
 // https://github.com/mattiasw/ExifReader
 
@@ -9,10 +9,10 @@ export default function ImageEXIF() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    file.arrayBuffer().then((buffer) => {
-      const exifData = load(buffer)
-      setExifStr(JSON.stringify(exifData, null, 2))
-    })
+    // file.arrayBuffer().then((buffer) => {
+    //   const exifData = load(buffer)
+    //   setExifStr(JSON.stringify(exifData, null, 2))
+    // })
   }
 
   return (
