@@ -110,6 +110,11 @@ export default defineConfig(({ command, mode }) => {
     build: {
       cssMinify: 'lightningcss',
       target: browserslistToEsbuild(target),
+
+      // FIXME: workaround for https://github.com/vitejs/rolldown-vite/issues/165
+      rollupOptions: {
+        external: ['@emotion/is-prop-valid'],
+      },
     },
 
     server: {

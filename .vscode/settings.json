@@ -28,9 +28,9 @@
   ],
   "eslint.format.enable": false,
   "tailwindCSS.experimental.configFile": "src/styles/main.css",
+  "typescript.experimental.useTsgo": true,
   "typescript.preferences.autoImportSpecifierExcludeRegexes": [
     "^mermaid/dist*",
     "^typescript$",
-  ],
-  "typescript.tsdk": "node_modules\\typescript\\lib"
+  ]
 }
