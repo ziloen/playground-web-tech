@@ -342,7 +342,7 @@ function FlexAlignFirstLine() {
 
 function GridRepeat() {
   return (
-    <div className="resizable-x @container">
+    <div className="resizable-x">
       <div
         className={clsx(
           'grid gap-2',
@@ -350,11 +350,12 @@ function GridRepeat() {
           '[&>div]:bg-red-300',
           // titles
           '[&>span]:bg-blue-300 [&>span]:justify-self-start',
-          // default
-          'grid-cols-fit-[200px]',
-          // at least 2 items, when width <= item-min-width(200px) * 2 + gap(8px) * 1
-          '@[<=408px]:grid-cols-2',
         )}
+        style={{
+          '--item-size': 'minmax(min(200px, calc(50% - 4px)), 1fr)',
+          // at least 2 items
+          gridTemplateColumns: 'var(--item-size) repeat(auto-fit, var(--item-size))',
+        }}
       >
         <span className="col-span-full">Title1</span>
         <div className="">111</div>
