@@ -351,15 +351,10 @@ function GridRepeat() {
           // titles
           '[&>span]:bg-blue-300 [&>span]:justify-self-start',
           // default
-          'grid-cols-(--template-columns)',
-          // at least 2 items, when width <= item-min-width * 2 + gap * 1
-          '@[<=408px]:grid-cols-(--sm-template-columns)',
+          'grid-cols-fit-[200px]',
+          // at least 2 items, when width <= item-min-width(200px) * 2 + gap(8px) * 1
+          '@[<=408px]:grid-cols-2',
         )}
-        style={{
-          '--item-min-width': '200px',
-          '--template-columns': 'repeat(auto-fit, minmax(min(var(--item-min-width), 100%), 1fr))',
-          '--sm-template-columns': '1fr 1fr',
-        }}
       >
         <span className="col-span-full">Title1</span>
         <div className="">111</div>
