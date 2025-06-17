@@ -110,6 +110,7 @@ export default defineConfig(({ command, mode }) => {
     build: {
       cssMinify: 'lightningcss',
       target: browserslistToEsbuild(target),
+      reportCompressedSize: false,
     },
 
     server: {

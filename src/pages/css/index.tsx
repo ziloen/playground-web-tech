@@ -3,7 +3,7 @@ const testString =
 
 export default function CSSPage() {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-4 max-h-full overflow-y-auto scrollbar-gutter-stable grid-cols-1">
       <div className="w-[800px] max-w-full text-sm resizable-x">
         <EllipsisMiddle text={testString} />
       </div>
@@ -33,7 +33,9 @@ export default function CSSPage() {
 
       <GridRepeat />
 
-      <SizeConstraints />
+      <DynamicMultiLineClamp />
+
+      <div className="h-100"></div>
     </div>
   )
 }
@@ -378,39 +380,25 @@ function GridRepeat() {
   )
 }
 
-function SizeConstraints() {
-  const [left, setLeft] = useState(0)
-  const [top, setTop] = useState(0)
-  const [width, setWidth] = useState(100)
-
+function DynamicMultiLineClamp() {
   return (
     <div
-      className="size-[300px] bg-dark-gray-500 ms-4 relative"
-      onPointerMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect()
-        const relativeX = e.clientX - rect.left
-        const relativeY = e.clientY - rect.top
-        setLeft(relativeX)
-        setTop(relativeY)
-      }}
+      // TODO: fit initial height to content instead of fixed height
+      className="resizable-y w-[200px] h-[120px] bg-dark-gray-600"
+      style={{ containerType: 'size' }}
     >
       <div
-        className="absolute bg-red-400"
+        className="line-clamp-(--line-clamp) max-h-full"
         style={{
-          minWidth: '50px',
-          minHeight: '50px',
-          left: `${left}px`,
-          top: `${top}px`,
-          right: `max(100% - ${left + width}px, 0px)`,
-          bottom: `max(100% - ${top + width}px, 0px)`,
+          // TODO: Only works on Chrome now
+          '--line-clamp': 'round(down, tan(atan2(100cqb, 1lh)), 1)',
         }}
-      />
+      >
+        {testString}
+      </div>
     </div>
   )
 }
-
-// TODO: dynamic line-clamp
-// When container height change, line-clamp should be updated
 
 // TODO: multi dynamic sticky elments stack with dynamic height (or fixed height)
 // 可以点击按钮设置列表项是否 sticky，可以多个 sticky
