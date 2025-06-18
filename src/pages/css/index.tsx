@@ -342,7 +342,8 @@ function FlexAlignFirstLine() {
 
 function GridRepeat() {
   return (
-    <div className="resizable-x">
+    <div className="resizable-x @container">
+      {/* item min width: 200px, at least 2 columns */}
       <div
         className={clsx(
           'grid gap-2',
@@ -352,25 +353,59 @@ function GridRepeat() {
           '[&>span]:bg-blue-300 [&>span]:justify-self-start',
         )}
         style={{
-          '--item-size': 'minmax(min(200px, calc(50% - 4px)), 1fr)',
+          '--item-size': 'minmax(min(200px, 50% - 4px), 1fr)',
           // at least 2 items
           gridTemplateColumns: 'var(--item-size) repeat(auto-fit, var(--item-size))',
         }}
       >
         <span className="col-span-full">Title1</span>
-        <div className="">111</div>
+        <div>111</div>
         <span className="col-span-full">Title2</span>
-        <div className="">111</div>
-        <div className="">222</div>
+        <div>111</div>
+        <div>222</div>
         <span className="col-span-full">Title3</span>
-        <div className="">111</div>
-        <div className="">222</div>
-        <div className="">333</div>
+        <div>111</div>
+        <div>222</div>
+        <div>333</div>
         <span className="col-span-full">Title4</span>
-        <div className="">111</div>
-        <div className="">222</div>
-        <div className="">333</div>
-        <div className="">444</div>
+        <div>111</div>
+        <div>222</div>
+        <div>333</div>
+        <div>444</div>
+      </div>
+
+      {/* item max width: 200px, at least 2 columns */}
+      <div
+        className={clsx(
+          'grid gap-2 mt-4',
+          // items
+          '[&>div]:bg-red-300',
+          // titles
+          '[&>span]:bg-blue-300 [&>span]:justify-self-start',
+        )}
+        style={{
+          // columns = round(up, (width + gap) / (item-max-width + gap))
+          '--dividend': 'calc(100cqi + 8px)',
+          '--divisor': 'calc(200px + 8px)',
+          '--columns': 'round(up, tan(atan2(var(--dividend), var(--divisor))), 1)',
+          // Chrome 139+: round(up, calc((100cqi + 8px) / (200px + 8px)), 1)
+          gridTemplateColumns: 'repeat(max(var(--columns), 2), minmax(0, 1fr))',
+        }}
+      >
+        <span className="col-span-full">Title1</span>
+        <div>111</div>
+        <span className="col-span-full">Title2</span>
+        <div>111</div>
+        <div>222</div>
+        <span className="col-span-full">Title3</span>
+        <div>111</div>
+        <div>222</div>
+        <div>333</div>
+        <span className="col-span-full">Title4</span>
+        <div>111</div>
+        <div>222</div>
+        <div>333</div>
+        <div>444</div>
       </div>
     </div>
   )
@@ -386,8 +421,11 @@ function DynamicMultiLineClamp() {
       <div
         className="line-clamp-(--line-clamp) max-h-full"
         style={{
-          // TODO: Only works on Chrome now
-          '--line-clamp': 'round(down, tan(atan2(100cqb, 1lh)), 1)',
+          // line-clamp = round(height / line-height)
+          '--dividend': '100cqb',
+          '--divisor': '1lh',
+          '--line-clamp': 'round(down, tan(atan2(var(--dividend), var(--divisor))), 1)',
+          // Chrome 139+: round(down, calc(100cqb / 1lh), 1)
         }}
       >
         {testString}
