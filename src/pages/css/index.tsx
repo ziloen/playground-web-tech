@@ -419,7 +419,11 @@ function DynamicMultiLineClamp() {
       style={{ containerType: 'size' }}
     >
       <div
-        className="line-clamp-(--line-clamp) max-h-full"
+        className={clsx(
+          'line-clamp-(--line-clamp) max-h-full',
+          // debug text
+          'relative before:content-[counter(v)] before:[counter-reset:v_var(--line-clamp)] before:absolute before:top-0 before:left-0 before:text-red before:bg-white before:font-extrabold before:text-lg',
+        )}
         style={{
           // line-clamp = round(height / line-height)
           '--dividend': '100cqb',
