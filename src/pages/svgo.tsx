@@ -1,11 +1,16 @@
 import { forOwn } from 'lodash-es'
 import { builtinPlugins, optimize, VERSION } from 'svgo/browser'
+import type { CustomPlugin } from 'svgo/browser'
 import type { JsonObject, JsonValue } from 'type-fest'
 
 export default function SVGOPage() {
   // #region useState, useHookState
   const [svgStr, setSvgStr] = useState<string | null>(null)
   const [svgUri, setSvgUri] = useState<string | null>(null)
+  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
+    width: 0,
+    height: 0,
+  })
   // #endregion
 
   // #region useRef
@@ -55,6 +60,18 @@ export default function SVGOPage() {
                   console.error('Invalid JSON input:', error)
                 }
               }
+
+              if (value.startsWith('<svg')) {
+                // SVG input
+                try {
+                  const { data: optimizedSvg, dimensions } = optimizeSvg(value, true)
+                  setSvgStr(optimizedSvg)
+                  setDimensions(dimensions)
+                  setSvgUri(svgToDataUri(optimizedSvg))
+                } catch (error) {
+                  console.error('Invalid SVG input:', error)
+                }
+              }
             }}
           >
           </textarea>
@@ -68,6 +85,7 @@ export default function SVGOPage() {
             import('../assets/figma.svg?raw').then((v) => {
               setSvgStr(v.default)
               setSvgUri(svgToDataUri(v.default))
+              setDimensions({ width: 32, height: 32 })
             })
           }}
         >
@@ -76,27 +94,46 @@ export default function SVGOPage() {
       </div>
 
       {/* SVG preview */}
-      <div>
-        <div
+      <div
+        className="flex-1 grid place-items-center"
+        style={{
+          // make the iframe transparent
+          // https://fvsch.com/transparent-iframes
+          colorScheme: 'light',
+        }}
+      >
+        <iframe
+          src={svgUri || 'about:blank'}
+          frameBorder="0"
+          title="SVG preview"
+          scrolling="no"
+          className="bg-transparent border-none overflow-hidden"
           style={{
-            // make the iframe transparent
-            // https://fvsch.com/transparent-iframes
-            colorScheme: 'light',
+            width: dimensions.width ? `${dimensions.width}px` : '100%',
+            height: dimensions.height ? `${dimensions.height}px` : '100%',
           }}
-        >
-          <iframe
-            src={svgUri || 'about:blank'}
-            frameBorder="0"
-            title="SVG preview"
-            scrolling="no"
-            className="bg-transparent border-none overflow-hidden"
-          >
-          </iframe>
-        </div>
+        />
       </div>
 
       {/* Right side menus */}
-      <div>
+      <div className={clsx('relative', svgStr ? 'block' : 'hidden')}>
+        <div className="absolute right-0 bottom-0">
+          {/* Copy text */}
+          <button
+            onClick={() => {
+              if (!svgStr) {
+                return
+              }
+
+              navigator.clipboard.writeText(svgStr)
+            }}
+          >
+            Copy
+          </button>
+
+          {/* Download svg */}
+          {!!svgUri && <a href={svgUri} download="image.svg">Download</a>}
+        </div>
       </div>
     </div>
   )
@@ -126,12 +163,62 @@ function optimizeJsonObject(value: JsonValue): JsonValue {
 
   if (typeof value === 'string' && value.startsWith('<svg')) {
     // 如果是 SVG 字符串，执行优化
-    return optimizeSvg(value)
+    return optimizeSvg(value, false).data
   }
 
   return value
 }
 
-function optimizeSvg(value: string): string {
-  return optimize(value, { multipass: true }).data
+function createDimensionsExtractor() {
+  const dimensions = { width: 0, height: 0 }
+
+  const plugin: CustomPlugin = {
+    name: 'extract-dimensions',
+    fn() {
+      return {
+        element: {
+          // Node, parentNode
+          enter({ name, attributes }, { type }) {
+            if (!(name === 'svg' && type === 'root')) {
+              return
+            }
+
+            if (
+              attributes.width !== undefined
+              && attributes.height !== undefined
+            ) {
+              dimensions.width = Number.parseFloat(attributes.width)
+              dimensions.height = Number.parseFloat(attributes.height)
+            } else if (attributes.viewBox !== undefined) {
+              const viewBox = attributes.viewBox.split(/,\s*|\s+/)
+              dimensions.width = Number.parseFloat(viewBox[2])
+              dimensions.height = Number.parseFloat(viewBox[3])
+            }
+          },
+        },
+      }
+    },
+  }
+
+  return [dimensions, plugin] as const
+}
+
+function optimizeSvg(value: string, pretty = true) {
+  const [dimensions, dimensionsPlugin] = createDimensionsExtractor()
+
+  const data = optimize(value, {
+    multipass: true,
+    js2svg: {
+      pretty: pretty,
+      indent: 2,
+    },
+    plugins: [
+      'removeTitle',
+      'removeScripts',
+      'preset-default',
+      dimensionsPlugin,
+    ],
+  }).data
+
+  return { data, dimensions }
 }

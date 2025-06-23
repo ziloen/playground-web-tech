@@ -4,31 +4,51 @@
   "atDirectives": [
     {
       "name": "@apply",
-      "description": "@apply tailwindcss classes",
+      "description": "inline tailwindcss classes",
       "references": [
         {
           "name": "tailwind doc",
-          "url": "https://tailwindcss.com/docs/functions-and-directives#apply"
+          "url": "https://tailwindcss.com/docs/functions-and-directives#apply-directive"
         }
       ]
     },
     {
-      "name": "@tailwind",
-      "description": "tailwind directives",
+      "name": "@custom-variant",
+      "description": "add custom variant",
       "references": [
         {
           "name": "tailwind doc",
-          "url": "https://tailwindcss.com/docs/functions-and-directives#tailwind"
+          "url": "https://tailwindcss.com/docs/functions-and-directives#custom-variant-directive"
         }
       ]
     },
     {
-      "name": "@container",
-      "description": "Container query",
+      "name": "@reference",
+      "description": "make tailwindcss available in context",
       "references": [
         {
-          "name": "MDN",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@container"
+          "name": "tailwind doc",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#reference-directive"
+        }
+      ]
+    },
+    {
+      "name": "@theme",
+      "description": "define custom design tokens",
+      "references": [
+        {
+          "name": "tailwind doc",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#theme-directive"
+        }
+      ]
+    },
+    {
+      "name": "@utility",
+      "description": "add custom utilities",
+      "references": [
+        {
+          "name": "tailwind doc",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#utility-directive"
         }
       ]
     }
