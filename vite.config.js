@@ -103,7 +103,6 @@ export default defineConfig(({ command, mode }) => {
     },
 
     optimizeDeps: {
-      include: ['lodash-es'],
       exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util', '@ffmpeg/core'],
     },
 
