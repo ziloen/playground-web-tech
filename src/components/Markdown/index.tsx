@@ -2,7 +2,9 @@ import '@fontsource-variable/fira-code'
 import '@fontsource-variable/noto-sans-sc'
 
 import './markdown.css'
+import 'katex/dist/katex.css'
 
+import CarbonCopy from '~icons/carbon/copy'
 import { ChevronDownIcon } from '@primer/octicons-react'
 import type { Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { Nodes as MdastNodes } from 'mdast'
@@ -16,6 +18,7 @@ import remarkMath from 'remark-math'
 import type { PluggableList, Plugin, Processor } from 'unified'
 import { CONTINUE, EXIT, SKIP, visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
+import { cn } from '~/utils'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
 
@@ -63,22 +66,24 @@ const components: Components = {
     }
 
     return (
-      <code className={className}>
+      <code className={cn('overflow-clip', className)}>
         {/* Header */}
-        <div className="flex items-center bg-blue-800 px-4">
+        <div className="grid justify-items-end justify-end grid-flow-col items-center gap-2">
           <span>{language}</span>
 
           <button
-            className="ms-auto"
+            className="border-none flex p-1"
+            title="Copy code"
+            aria-label="Copy code"
             onClick={() => {
               navigator.clipboard.writeText(rawText)
             }}
           >
-            Copy
+            <CarbonCopy width={14} height={14} />
           </button>
         </div>
 
-        <div className="overflow-x-auto px-2 pb-2 pt-1 scrollbar-thin">
+        <div className="overflow-x-auto overflow-y-clip px-4 pb-5 scrollbar-thin">
           {children}
         </div>
       </code>
