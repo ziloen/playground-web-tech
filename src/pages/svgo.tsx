@@ -2,6 +2,9 @@ import { forOwn } from 'es-toolkit/compat'
 import type { CustomPlugin } from 'svgo/browser'
 import { builtinPlugins, optimize, VERSION } from 'svgo/browser'
 import type { JsonObject, JsonValue } from 'type-fest'
+import { useAutoResetState } from '~/hooks'
+import CarbonCheckmark from '~icons/carbon/checkmark'
+import CarbonCopy from '~icons/carbon/copy'
 
 export default function SVGOPage() {
   // #region useState, useHookState
@@ -11,6 +14,7 @@ export default function SVGOPage() {
     width: 0,
     height: 0,
   })
+  const [copied, setCopied] = useAutoResetState(false, 2_000)
   // #endregion
 
   // #region useRef
@@ -125,10 +129,14 @@ export default function SVGOPage() {
                 return
               }
 
-              navigator.clipboard.writeText(svgStr)
+              navigator.clipboard.writeText(svgStr).then(() => {
+                setCopied(true)
+              })
             }}
           >
-            Copy
+            {copied
+              ? <CarbonCheckmark width={14} height={14} />
+              : <CarbonCopy width={14} height={14} />}
           </button>
 
           {/* Download svg */}

@@ -54,6 +54,7 @@
     "use-context-selector": "2.0.0"
   },
   "devDependencies": {
+    "@dprint/typescript": "0.95.8",
     "@iconify/json": "2.2.352",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
@@ -63,8 +64,8 @@
     "@types/node": "24.0.4",
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
-    "@typescript/native-preview": "7.0.0-dev.20250624.1",
-    "@vitejs/plugin-legacy": "6.1.1",
+    "@typescript/native-preview": "7.0.0-dev.20250625.1",
+    "@vitejs/plugin-legacy": "7.0.0",
     "@vitejs/plugin-react-oxc": "0.2.3",
     "@ziloen/eslint-config": "0.1.64",
     "@ziloen/tailwind-config": "2.0.6",
@@ -79,8 +80,13 @@
     "typescript": "5.8.3",
     "unplugin-auto-import": "19.3.0",
     "unplugin-icons": "22.1.0",
-    "vite": "npm:rolldown-vite@6.3.21",
-    "vite-plugin-pages": "0.33.0",
+    "vite": "npm:rolldown-vite@7.0.0",
+    "vite-plugin-pages": "0.33.1",
     "vitest": "3.2.4"
+  },
+  "overrides": {
+    "@tailwindcss/vite": {
+      "vite": "^7"
+    }
   }
 }

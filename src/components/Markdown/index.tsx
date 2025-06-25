@@ -17,7 +17,9 @@ import remarkMath from 'remark-math'
 import type { PluggableList, Plugin, Processor } from 'unified'
 import { CONTINUE, EXIT, SKIP, visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
+import { useAutoResetState } from '~/hooks'
 import { cn } from '~/utils'
+import CarbonCheckmark from '~icons/carbon/checkmark'
 import CarbonCopy from '~icons/carbon/copy'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
@@ -60,6 +62,7 @@ const components: Components = {
     const inline = node.properties.inline as 'true' | 'false' | undefined
     const rawText = node.properties.text as string
     const language = node.properties.language as string | null
+    const [copied, setCopied] = useAutoResetState(false, 2_000)
 
     if (inline === 'true') {
       return <code className={className}>{children}</code>
@@ -76,10 +79,14 @@ const components: Components = {
             title="Copy code"
             aria-label="Copy code"
             onClick={() => {
-              navigator.clipboard.writeText(rawText)
+              navigator.clipboard.writeText(rawText).then(() => {
+                setCopied(true)
+              })
             }}
           >
-            <CarbonCopy width={14} height={14} />
+            {copied
+              ? <CarbonCheckmark width={14} height={14} />
+              : <CarbonCopy width={14} height={14} />}
           </button>
         </div>
 

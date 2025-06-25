@@ -29,7 +29,7 @@ supportedTypes.forEach(type => {
 
 export default function MarkdownPage() {
   return (
-    <div className="px-4">
+    <div className="px-4" dir="auto">
       <Markdown>{testText}</Markdown>
     </div>
   )
