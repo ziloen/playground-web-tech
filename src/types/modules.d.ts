@@ -25,5 +25,4 @@ declare module 'unified' {
   }
 }
 
-export { }
-
+export {}

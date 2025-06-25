@@ -1,6 +1,6 @@
 import { forOwn } from 'es-toolkit/compat'
-import { builtinPlugins, optimize, VERSION } from 'svgo/browser'
 import type { CustomPlugin } from 'svgo/browser'
+import { builtinPlugins, optimize, VERSION } from 'svgo/browser'
 import type { JsonObject, JsonValue } from 'type-fest'
 
 export default function SVGOPage() {
