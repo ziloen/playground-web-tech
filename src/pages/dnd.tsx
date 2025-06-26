@@ -78,7 +78,7 @@ export default function DND() {
       <div
         ref={targetRef}
         tabIndex={0}
-        className="size-[200px] focus:outline-blue-400 focus:outline focus:outline-1 rounded-[6px] bg-dark-gray-50"
+        className="size-[200px] focus:outline-blue-400 focus:outline rounded-[6px] bg-dark-gray-50"
       >
       </div>
 
