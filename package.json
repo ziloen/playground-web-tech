@@ -36,7 +36,7 @@
     "lexical": "0.32.1",
     "mermaid": "11.7.0",
     "micromark-extension-llm-math": "3.1.0",
-    "motion": "12.19.1",
+    "motion": "12.19.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-i18next": "15.5.3",
@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@dprint/typescript": "0.95.8",
-    "@iconify/json": "2.2.352",
+    "@iconify/json": "2.2.353",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@tailwindcss/vite": "4.1.11",
@@ -64,7 +64,7 @@
     "@types/node": "24.0.4",
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
-    "@typescript/native-preview": "7.0.0-dev.20250626.1",
+    "@typescript/native-preview": "7.0.0-dev.20250627.1",
     "@vitejs/plugin-legacy": "7.0.0",
     "@vitejs/plugin-react-oxc": "0.2.3",
     "@ziloen/eslint-config": "0.1.64",
@@ -80,7 +80,7 @@
     "typescript": "5.8.3",
     "unplugin-auto-import": "19.3.0",
     "unplugin-icons": "22.1.0",
-    "vite": "npm:rolldown-vite@7.0.2",
+    "vite": "npm:rolldown-vite@7.0.3",
     "vite-plugin-pages": "0.33.1",
     "vitest": "3.2.4"
   }
