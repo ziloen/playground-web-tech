@@ -1,4 +1,4 @@
-export { useAutoResetState } from "./useAutoResetState"
+export { useAutoResetState } from './useAutoResetState'
 export { useGetState } from './useGetState'
 export { useLatest } from './useLatest'
 export { useMemoizedFn } from './useMemoizedFn'
@@ -14,7 +14,7 @@ export { useNextEffect } from './useNextEffect'
  * <div ref={mergeRefs(ref1, ref2, ref3)} />
  * ```
  */
-export function mergeRefs<T>(...refs: React.Ref<T>[]): React.RefCallback<T> {
+export function mergeRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T> {
   return function(instance: T | null) {
     for (const ref of refs) {
       if (typeof ref === 'function') {

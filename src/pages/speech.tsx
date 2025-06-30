@@ -7,6 +7,7 @@ import { Select as AntdSelect } from 'antd'
 import type { DefaultOptionType } from 'antd/es/select'
 import { useTransform, type MotionValue } from 'motion/react'
 import { memo } from 'react'
+import { AutoSizeTextarea } from '~/components/AutoSizeTextarea'
 import {
   Select,
   SelectContent,
@@ -318,8 +319,8 @@ export default function WebSpeechAPIPage() {
         </div>
       </div>
 
-      <textarea
-        className="max-w-[600px] w-[min(100%,600px)] min-h-[3lh] field-sizing-content m-0 p-0 box-content"
+      <AutoSizeTextarea
+        className="max-w-[600px] w-[min(100%,600px)] min-h-[3lh] m-0 p-0 box-content resize-none"
         value={inputText}
         onChange={(e) => setInputText(e.currentTarget.value)}
       />

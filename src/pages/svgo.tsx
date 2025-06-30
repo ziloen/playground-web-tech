@@ -77,8 +77,7 @@ export default function SVGOPage() {
                 }
               }
             }}
-          >
-          </textarea>
+          />
           <span className="col-[1/1] row-[1/1] peer-focus:hidden">
             Paste markup
           </span>
