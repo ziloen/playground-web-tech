@@ -3,7 +3,11 @@
 
 import { mergeRefs, useMemoizedFn } from '~/hooks'
 
+
 type Props = React.ComponentProps<'textarea'>
+
+// FIXME: not working when window resized
+// TODO: animate height change
 
 export function AutoSizeTextarea({ ref, onChange, ...props }: Props) {
   // #region useState, useHookState
