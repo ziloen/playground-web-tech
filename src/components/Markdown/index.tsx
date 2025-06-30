@@ -149,8 +149,17 @@ const components: Components = {
             isOpen ? 'opacity-100' : 'opacity-0',
           )}
         >
-          <div className="border-s-2 border-0 border-solid border-s-dark-gray-200 ps-2 mt-2 text-light-gray-600 leading-relaxed text-sm ms-0.5">
-            {children}
+          <div className="mt-2 grid grid-flow-col">
+            <div
+              className="h-full box-content self-stretch w-0.5 bg-dark-gray-200 pe-2 ps-0.5 bg-clip-content cursor-pointer"
+              onClick={() => {
+                setIsOpen(false)
+              }}
+            />
+
+            <div className="text-light-gray-600 leading-relaxed text-sm">
+              {children}
+            </div>
           </div>
         </div>
       </div>
