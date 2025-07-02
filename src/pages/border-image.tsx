@@ -40,7 +40,7 @@ function Setting() {
 
         <Select defaultValue="stretch">
           <SelectTrigger>
-            <SelectValue placeholder="stretch" />
+            <SelectValue />
           </SelectTrigger>
 
           <SelectContent>

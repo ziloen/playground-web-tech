@@ -51,6 +51,7 @@ export function SelectContent(
         side="bottom"
         sideOffset={8}
         className="outline-none"
+        collisionPadding={0}
         alignItemWithTrigger={false}
       >
         <SelectPrimitive.Popup

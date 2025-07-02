@@ -16,6 +16,21 @@ export default function DexiePage() {
 
   if (!todos) return <div>Loading...</div>
 
+  const recurrenceItems = [
+    'none',
+    'everyday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ].map((value) => ({
+    value,
+    label: value.charAt(0).toUpperCase() + value.slice(1),
+  }))
+
   return (
     <div>
       <h1>Todo App</h1>
@@ -49,27 +64,17 @@ export default function DexiePage() {
 
         <button type="submit">Add task</button>
 
-        <Select defaultValue={'none'}>
+        <Select defaultValue="none" items={recurrenceItems}>
           <SelectTrigger>
-            <SelectValue placeholder="Task recurrence" />
+            <SelectValue />
           </SelectTrigger>
 
           <SelectContent>
-            {[
-              'none',
-              'everyday',
-              'monday',
-              'tuesday',
-              'wednesday',
-              'thursday',
-              'friday',
-              'saturday',
-              'sunday',
-            ]
-              .map((day) => (
-                <SelectItem key={day} value={day}>
-                  <SelectItemText className="capitalize">
-                    {day}
+            {recurrenceItems
+              .map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  <SelectItemText>
+                    {item.label}
                   </SelectItemText>
                 </SelectItem>
               ))}
