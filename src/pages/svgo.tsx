@@ -96,7 +96,10 @@ export default function SVGOPage() {
         </div>
       </div>
 
+      {/* TODO: configuration */}
+
       {/* SVG preview */}
+      {/* TODO: pan zoom pinch */}
       <div
         className="flex-1 grid place-items-center"
         style={{

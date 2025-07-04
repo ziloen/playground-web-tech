@@ -136,7 +136,10 @@ function LanguageSelect({
         <span>{selectedOption?.nativeDisplayName}</span>
       </SelectTrigger>
 
-      <SelectContent className="max-h-[300px] w-fit scrollbar-thin scrollbar-gutter-stable">
+      <SelectContent
+        className="max-h-[300px] w-fit scrollbar-thin scrollbar-gutter-stable"
+        align="end"
+      >
         {cachedItems ?? items}
       </SelectContent>
     </Select>

@@ -8,7 +8,7 @@ export function Select<T>({ ...props }: ComponentProps<typeof SelectPrimitive.Ro
 }
 
 export function SelectTrigger(
-  { children, className, ...props }: ComponentProps<typeof SelectPrimitive.Trigger>,
+  { children, className, ...props }: SelectPrimitive.Trigger.Props,
 ) {
   return (
     <SelectPrimitive.Trigger
@@ -28,7 +28,7 @@ export function SelectTrigger(
 export const SelectValue = SelectPrimitive.Value
 
 export function SelectItem(
-  { className, ...props }: ComponentProps<typeof SelectPrimitive.Item>,
+  { className, ...props }: SelectPrimitive.Item.Props,
 ) {
   return (
     <SelectPrimitive.Item
@@ -42,7 +42,9 @@ export function SelectItem(
 }
 
 export function SelectContent(
-  { className, ...props }: ComponentProps<typeof SelectPrimitive.Popup>,
+  { className, children, ...props }:
+    & Pick<SelectPrimitive.Popup.Props, 'className' | 'children'>
+    & Omit<SelectPrimitive.Positioner.Props, 'className' | 'children'>,
 ) {
   return (
     <SelectPrimitive.Portal>
@@ -53,14 +55,16 @@ export function SelectContent(
         className="outline-none"
         collisionPadding={0}
         alignItemWithTrigger={false}
+        {...props}
       >
         <SelectPrimitive.Popup
           className={cn(
             'max-h-(--available-height) min-w-[200px] overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 shadow-lg outline-none data-starting-style:opacity-0 transition-all data-starting-style:scale-90 data-ending-style:opacity-0 data-ending-style:scale-90 origin-(--transform-origin)',
             className,
           )}
-          {...props}
-        />
+        >
+          {children}
+        </SelectPrimitive.Popup>
       </SelectPrimitive.Positioner>
     </SelectPrimitive.Portal>
   )
