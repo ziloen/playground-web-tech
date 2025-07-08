@@ -15,6 +15,7 @@ import type { FileInfo } from 'ffprobe-wasm'
 import { FFprobeWorker } from 'ffprobe-wasm'
 import { builtinPlugins, optimize } from 'svgo/browser'
 import { useMemoizedFn } from '~/hooks'
+import { formatBytes } from '~/utils'
 
 const test_svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -186,19 +187,6 @@ function ConfigForm() {
       </div>
     </div>
   )
-}
-
-function formatBytes(bytes: number) {
-  const base = 1024
-  let n = 0
-  const labels = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB']
-
-  while (bytes > base && n < labels.length - 1) {
-    bytes /= base
-    n++
-  }
-
-  return `${bytes.toFixed(2)}${labels[n]}`
 }
 
 function formatDuration(durationString: string) {

@@ -15,6 +15,20 @@ const twMerge = /* #__PURE__ */ extendTailwindMerge({
 })
 
 /*#__NO_SIDE_EFFECTS__*/
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(...inputs))
+}
+
+/*#__NO_SIDE_EFFECTS__*/
+export function formatBytes(bytes: number): string {
+  const base = 1024
+  let n = 0
+  const labels = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB']
+
+  while (bytes > base && n < labels.length - 1) {
+    bytes /= base
+    n++
+  }
+
+  return `${bytes.toFixed(2)}${labels[n]}`
 }

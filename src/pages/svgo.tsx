@@ -1,14 +1,15 @@
-import { forOwn } from 'es-toolkit/compat'
 import type { CustomPlugin } from 'svgo/browser'
 import { builtinPlugins, optimize, VERSION } from 'svgo/browser'
 import type { JsonObject, JsonValue } from 'type-fest'
 import { useAutoResetState } from '~/hooks'
+import { formatBytes } from '~/utils'
 import CarbonCheckmark from '~icons/carbon/checkmark'
 import CarbonCopy from '~icons/carbon/copy'
 
 export default function SVGOPage() {
   // #region useState, useHookState
-  const [svgStr, setSvgStr] = useState<string | null>(null)
+  const [originalSvg, setOriginalSvg] = useState<string | null>(null)
+  const [optimizedSvg, setOptimizedSvg] = useState<string | null>(null)
   const [svgUri, setSvgUri] = useState<string | null>(null)
   const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
     width: 0,
@@ -39,7 +40,11 @@ export default function SVGOPage() {
     >
       {/* Left side menus */}
       <div className="w-60 bg-dark-gray-300 h-full">
-        <div className="px-4 py-1">Powered by SVGO {VERSION}</div>
+        <div className="px-4 py-1">
+          Powered by <a href="https://github.com/svg/svgo" target="_blank" rel="noreferrer">SVGO</a>
+          {' '}
+          {VERSION}
+        </div>
         <div className="cursor-pointer hover:bg-dark-gray-400 py-3 px-4">Open SVG</div>
         <label className="cursor-pointer hover:bg-dark-gray-400 py-3 px-4 grid">
           <textarea
@@ -69,7 +74,8 @@ export default function SVGOPage() {
                 // SVG input
                 try {
                   const { data: optimizedSvg, dimensions } = optimizeSvg(value, true)
-                  setSvgStr(optimizedSvg)
+                  setOriginalSvg(value)
+                  setOptimizedSvg(optimizedSvg)
                   setDimensions(dimensions)
                   setSvgUri(svgToDataUri(optimizedSvg))
                 } catch (error) {
@@ -86,9 +92,12 @@ export default function SVGOPage() {
           className="cursor-pointer hover:bg-dark-gray-400 py-3 px-4"
           onClick={() => {
             import('../assets/figma.svg?raw').then((v) => {
-              setSvgStr(v.default)
-              setSvgUri(svgToDataUri(v.default))
-              setDimensions({ width: 32, height: 32 })
+              const { data: optimizedSvg, dimensions } = optimizeSvg(v.default, true)
+
+              setOriginalSvg(v.default)
+              setOptimizedSvg(optimizedSvg)
+              setSvgUri(svgToDataUri(optimizedSvg))
+              setDimensions(dimensions)
             })
           }}
         >
@@ -122,16 +131,23 @@ export default function SVGOPage() {
       </div>
 
       {/* Right side menus */}
-      <div className={clsx('relative', svgStr ? 'block' : 'hidden')}>
-        <div className="absolute right-0 bottom-0">
+      <div className={clsx('relative', optimizedSvg ? 'block' : 'hidden')}>
+        <div className="absolute right-0 bottom-0 grid justify-items-end">
+          {!!originalSvg && !!optimizedSvg && (
+            <SizeCompare
+              originalSvg={originalSvg}
+              optimizedSvg={optimizedSvg}
+            />
+          )}
+
           {/* Copy text */}
           <button
             onClick={() => {
-              if (!svgStr) {
+              if (!optimizedSvg) {
                 return
               }
 
-              navigator.clipboard.writeText(svgStr).then(() => {
+              navigator.clipboard.writeText(optimizedSvg).then(() => {
                 setCopied(true)
               })
             }}
@@ -146,6 +162,29 @@ export default function SVGOPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function SizeCompare(
+  props: {
+    originalSvg: string
+    optimizedSvg: string
+  },
+) {
+  const originalSize = useMemo(() => new Blob([props.originalSvg]).size, [props.originalSvg])
+  const optimizedSize = useMemo(() => new Blob([props.optimizedSvg]).size, [props.optimizedSvg])
+
+  return (
+    <span className="w-max">
+      <span>{formatBytes(originalSize)}</span>
+      {' → '}
+      <span>{formatBytes(optimizedSize)}</span>{' '}
+      <span className="text-light-gray-800">
+        ({((optimizedSize / originalSize) * 100).toFixed(
+          2,
+        )}%)
+      </span>
+    </span>
   )
 }
 
