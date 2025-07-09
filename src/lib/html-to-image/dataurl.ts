@@ -5,7 +5,7 @@ function getContentFromDataUrl(dataURL: string) {
 }
 
 export function isDataUrl(url: string) {
-  return url.search(/^(data:)/) !== -1
+  return url.startsWith('data:')
 }
 
 export function makeDataUrl(content: string, mimeType: string) {

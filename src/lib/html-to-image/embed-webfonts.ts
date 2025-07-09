@@ -50,7 +50,7 @@ function parseCSS(source: string) {
   }
 
   const result: string[] = []
-  const commentsRegex = /(\/\*[\s\S]*?\*\/)/gi
+  const commentsRegex = /(?:\/\*[\s\S]*?\*\/)/gi
   // strip out comments
   let cssText = source.replace(commentsRegex, '')
 
