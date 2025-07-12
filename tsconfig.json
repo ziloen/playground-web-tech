@@ -4,6 +4,10 @@
     "baseUrl": ".",
     "module": "ESNext",
     "target": "ESNext",
+    "rootDirs": [
+      ".",
+      "./.react-router/types"
+    ],
     // type checking
     "strict": true,
     "noImplicitAny": true,
@@ -32,7 +36,6 @@
     "types": [
       "vite/client",
       "unplugin-icons/types/react",
-      "vite-plugin-pages/client-react",
       "ts-lib-enhance",
       "@types/dom-speech-recognition"
     ],
@@ -50,7 +53,8 @@
     "node_modules"
   ],
   "include": [
-    "src"
+    "src",
+    ".react-router/types/**/*"
   ],
   "references": [
     {

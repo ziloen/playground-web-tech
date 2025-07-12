@@ -1,6 +1,4 @@
 /* eslint-disable unicorn/prefer-dom-node-text-content */
-import styles from './contenteditable.module.css'
-
 import { asType } from '@wai-ri/core'
 import type { RefCallback } from 'react'
 import type { InputEventInputType, KeyboardEventKey } from 'ts-lib-enhance'
@@ -94,8 +92,7 @@ export default function ContentEditableText() {
           data-placeholder="Type something..."
           tabIndex={0}
           className={clsx(
-            'min-h-[54px] px-[8px] py-[10px] focus:outline-lightBlue-6 inline-block whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-[17px] text-[14px] outline-none max-w-full',
-            styles.contenteditable,
+            'min-h-[54px] px-[8px] py-[10px] focus:outline-lightBlue-6 inline-block whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-[17px] text-[14px] outline-none max-w-full empty:before:content-[attr(data-placeholder)] empty:before:text-light-gray-500',
           )}
         >
         </div>
