@@ -23,6 +23,8 @@ export default function CSSPage() {
 
       <SameWidthFlexWrap />
 
+      <SameWidthFlexWrap2 />
+
       <AutoShrinkButton />
 
       <AutoShrinkButton2 />
@@ -111,12 +113,13 @@ function HolyGrail() {
 }
 
 /**
- * Two item with same width, when any element reach max-content width, it will wrap to next line
+ * 一行两个按钮等宽且撑满容器宽度，任意一个按钮需要折行时，变为两行
  */
 function SameWidthFlexWrap() {
   return (
     <div className="flex w-[300px] flex-wrap gap-[12px] bg-dark-gray-700 resizable-x">
       <div
+        // FIXME: white-space: nowrap 导致一行时无法继续进行文字换行
         className="shrink-0 grow whitespace-nowrap bg-blue-400/20 text-center"
         style={{
           flexBasis: 'calc(50% - 6px)',
@@ -134,6 +137,33 @@ function SameWidthFlexWrap() {
         }}
       >
         dolor
+      </div>
+    </div>
+  )
+}
+
+// 另一种实现方式：把两个按钮里的文字在另一个里也放一份并隐藏
+function SameWidthFlexWrap2() {
+  return (
+    <div className="flex flex-wrap w-[300px] gap-[12px] bg-dark-gray-700 resizable-x">
+      <div className="grid shrink-0 grow bg-blue-400/20 text-center max-w-full">
+        <span className="[grid-area:1/1] text-wrap">
+          Lorem ipsum
+        </span>
+
+        <span aria-hidden className="[grid-area:1/1] invisible text-wrap h-0">
+          dolor
+        </span>
+      </div>
+
+      <div className="grid shrink-0 grow bg-green-400/20 text-center max-w-full">
+        <span className="[grid-area:1/1] text-wrap">
+          dolor
+        </span>
+
+        <span aria-hidden className="[grid-area:1/1] invisible text-wrap h-0">
+          Lorem ipsum
+        </span>
       </div>
     </div>
   )

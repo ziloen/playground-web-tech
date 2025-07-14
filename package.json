@@ -60,7 +60,7 @@
   },
   "devDependencies": {
     "@dprint/typescript": "0.95.8",
-    "@iconify/json": "2.2.357",
+    "@iconify/json": "2.2.358",
     "@react-router/dev": "7.6.3",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
