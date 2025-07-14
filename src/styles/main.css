@@ -39,7 +39,7 @@
   }
 }
 
-#root {
+body {
   /* prevent margin collapsing */
   display: flow-root;
   isolation: isolate;

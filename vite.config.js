@@ -106,6 +106,8 @@ export default defineConfig(({ command, mode }) => {
       cssMinify: 'lightningcss',
       target: browserslistToEsbuild(target),
       reportCompressedSize: false,
+      minify: 'oxc',
+      assetsInlineLimit: 0,
     },
 
     server: {
