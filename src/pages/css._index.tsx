@@ -147,21 +147,21 @@ function SameWidthFlexWrap2() {
   return (
     <div className="flex flex-wrap w-[300px] gap-[12px] bg-dark-gray-700 resizable-x">
       <div className="grid shrink-0 grow bg-blue-400/20 text-center max-w-full">
-        <span className="[grid-area:1/1] text-wrap">
+        <span className="area-[1/1]">
           Lorem ipsum
         </span>
 
-        <span aria-hidden className="[grid-area:1/1] invisible text-wrap h-0">
+        <span inert aria-hidden className="area-[1/1] invisible h-0">
           dolor
         </span>
       </div>
 
       <div className="grid shrink-0 grow bg-green-400/20 text-center max-w-full">
-        <span className="[grid-area:1/1] text-wrap">
+        <span className="area-[1/1]">
           dolor
         </span>
 
-        <span aria-hidden className="[grid-area:1/1] invisible text-wrap h-0">
+        <span inert aria-hidden className="area-[1/1] invisible h-0">
           Lorem ipsum
         </span>
       </div>
