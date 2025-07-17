@@ -7,8 +7,6 @@ const queryClient = new QueryClient()
 
 const modules = import.meta.glob('./pages/**/*.tsx', { eager: false })
 
-console.log(modules)
-
 export const routes = Object.entries(modules).map<RouteObject | null>(([path, request]) => {
   const fileName = path.match(/^\.\/pages\/(.*)\.tsx$/)?.[1]
 

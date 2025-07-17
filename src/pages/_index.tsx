@@ -4,8 +4,6 @@ import { routes } from '../App'
 
 export default function Index() {
   const flattenedRoutes = useMemo(() => {
-    console.log(routes)
-
     return flatRoutes(routes)
       .filter((route) => !['*', '/', ':'].includes(route))
       // eslint-disable-next-line @typescript-eslint/unbound-method
