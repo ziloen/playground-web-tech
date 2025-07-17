@@ -4,10 +4,6 @@
     "baseUrl": ".",
     "module": "ESNext",
     "target": "ESNext",
-    "rootDirs": [
-      ".",
-      "./.react-router/types"
-    ],
     // type checking
     "strict": true,
     "noImplicitAny": true,
@@ -54,7 +50,6 @@
   ],
   "include": [
     "src",
-    ".react-router/types/**/*"
   ],
   "references": [
     {

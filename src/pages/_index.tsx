@@ -1,23 +1,16 @@
-import { isNotNil } from 'es-toolkit'
-import { useContext } from 'react'
 import type { RouteObject } from 'react-router'
-import { Link, UNSAFE_FrameworkContext } from 'react-router'
+import { Link } from 'react-router'
+import { routes } from '../App'
 
 export default function Index() {
-  const framework = useContext(UNSAFE_FrameworkContext)
-
   const flattenedRoutes = useMemo(() => {
-    if (!framework) return []
-
-    console.log('routes:', framework.manifest.routes)
-
-    const routes = Object.values(framework.manifest.routes).filter(isNotNil)
+    console.log(routes)
 
     return flatRoutes(routes)
-      .filter((route) => !['*', '/', ':'].includes(route[0]))
+      .filter((route) => !['*', '/', ':'].includes(route))
       // eslint-disable-next-line @typescript-eslint/unbound-method
       .toSorted((new Intl.Collator('en')).compare)
-  }, [framework])
+  }, [])
 
   return (
     <div>
