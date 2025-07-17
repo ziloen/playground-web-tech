@@ -45,7 +45,7 @@ export default function Warframe() {
 function News({ data }: { data: WorldState }) {
   return (
     <div
-      className="grid gap-1 w-fit max-w-[500px] border border-solid border-white/60 backdrop-blur-sm"
+      className="grid gap-1 px-2 py-2 w-fit max-w-[500px] border border-solid border-white/60 backdrop-blur-sm"
       style={{
         gridTemplateColumns: 'max-content 1fr',
         gridAutoRows: 'max-content',
@@ -58,7 +58,7 @@ function News({ data }: { data: WorldState }) {
             key={news.id}
             target="_blank"
             rel="noreferrer"
-            className="grid relative px-2 py-0.5 gap-0.5 no-underline text-light-gray-200 visited:text-light-gray-900 grid-cols-subgrid col-span-full"
+            className="grid relative py-0.5 gap-0.5 no-underline text-light-gray-200 visited:text-light-gray-900 grid-cols-subgrid col-span-full"
           >
             {index === 0 && (
               <div className="col-span-full flex w-full contain-inline-size">

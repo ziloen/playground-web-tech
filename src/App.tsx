@@ -33,11 +33,13 @@ export const routes = Object.entries(modules).map<RouteObject | null>(([path, re
         default: React.ComponentType
         HydrateFallback?: React.ComponentType
         loader?: LoaderFunction
+        ErrorBoundary?: React.ComponentType
       }
       return {
         Component: value.default,
         HydrateFallback: value.HydrateFallback ?? null,
         loader: value.loader,
+        ErrorBoundary: value.ErrorBoundary ?? null,
       }
     },
   }
