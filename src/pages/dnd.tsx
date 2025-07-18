@@ -4,7 +4,9 @@ import {
   dropTargetForElements,
   monitorForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
-import type { SVGProps } from 'react'
+import { asType } from '@wai-ri/core'
+import { useMemoizedFn } from '~/hooks'
+import CarbonTrashCan from '~icons/carbon/trash-can'
 
 // Grid Drag and Drop
 // Swapping items when drag over another item
@@ -17,60 +19,81 @@ export default function DND() {
   const [dropFiles, setDropFiles] = useState<File[]>([])
   const [dropTypes, setDropTypes] = useState<string[]>([])
 
+  const onDrop = useMemoizedFn((data: DataTransfer | FileList) => {
+    if (data instanceof DataTransfer) {
+      const { items, files, types } = logDataTransfer(data)
+      setDropItems(items)
+      setDropFiles(files)
+      setDropTypes(types)
+    } else if (data instanceof FileList) {
+      const files = Array.from(data)
+      setDropFiles(files)
+      setDropItems([])
+      setDropTypes([])
+    }
+  })
+
+  const openFilePicker = useMemoizedFn(() => {
+    if (!inputRef.current) return
+    inputRef.current.click()
+  })
+
+  const inputRef = useRef<HTMLInputElement>(null)
   useEffect(() => {
     const ac = new AbortController()
+    const signal = ac.signal
     const target = targetRef.current
 
     target.addEventListener('dragenter', (e) => {
       e.preventDefault()
 
-      console.log(
-        'dragenter',
-        e,
-      )
+      console.log('dragenter', e)
 
-      const { items, files, types } = logDataTransfer(e.dataTransfer)
-
-      setDropItems(items)
-      setDropFiles(files)
-      setDropTypes(types)
-    }, { signal: ac.signal })
+      if (!e.dataTransfer) return
+      onDrop(e.dataTransfer)
+    }, { signal })
 
     target.addEventListener('dragover', (e) => {
       e.preventDefault()
-      // console.log('dragover', e)
-    }, { signal: ac.signal })
+    }, { signal })
 
     target.addEventListener('dragleave', (e) => {
       console.log('dragleave', e)
       setDropItems([])
-    }, { signal: ac.signal })
+    }, { signal })
 
     target.addEventListener('drop', (e) => {
       e.preventDefault()
 
-      console.log(
-        'drop',
-        e,
-      )
+      console.log('drop', e)
 
-      const { items, files, types } = logDataTransfer(e.dataTransfer)
+      if (!e.dataTransfer) return
+      onDrop(e.dataTransfer)
+    }, { signal })
 
-      setDropItems(items)
-      setDropFiles(files)
-      setDropTypes(types)
-    }, { signal: ac.signal })
-
-    target.addEventListener('paste', (e) => {
+    window.addEventListener('paste', (e) => {
       console.log('paste', e)
       const { items, files, types } = logDataTransfer(e.clipboardData)
 
       setDropItems(items)
       setDropFiles(files)
       setDropTypes(types)
-    }, { signal: ac.signal })
+    }, { signal })
 
-    return () => ac.abort()
+    const input = inputRef.current = document.createElement('input')
+
+    input.type = 'file'
+    input.accept = '*'
+    input.addEventListener('change', (e) => {
+      asType<HTMLInputElement>(e.currentTarget)
+      if (!e.currentTarget.files) return
+      onDrop(e.currentTarget.files)
+    }, { signal })
+
+    return () => {
+      ac.abort()
+      inputRef.current = null
+    }
   }, [])
 
   return (
@@ -78,7 +101,8 @@ export default function DND() {
       <div
         ref={targetRef}
         tabIndex={0}
-        className="size-[200px] focus:outline-blue-400 focus:outline rounded-[6px] bg-dark-gray-50"
+        className="size-[200px] cursor-pointer focus:outline-blue-400 focus:outline rounded-[6px] bg-dark-gray-50"
+        onClick={openFilePicker}
       >
       </div>
 
@@ -128,18 +152,6 @@ export default function DND() {
   )
 }
 
-function MaterialSymbolsDeleteOutlineRounded(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>
-      <path
-        fill="currentColor"
-        d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5q0-.425.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5q0 .425-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8q-.425 0-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8q-.425 0-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"
-      >
-      </path>
-    </svg>
-  )
-}
-
 function DeleteDropZone() {
   const [isDragging, setIsDragging] = useState(false)
 
@@ -169,7 +181,7 @@ function DeleteDropZone() {
               }}
               transition={{ type: 'tween' }}
             >
-              <MaterialSymbolsDeleteOutlineRounded className="text-[28px]" />
+              <CarbonTrashCan className="text-[28px]" />
             </motion.div>
           )}
       </AnimatePresence>

@@ -8,37 +8,34 @@ const queryClient = new QueryClient()
 const modules = import.meta.glob('./pages/**/*.tsx', { eager: false })
 
 export const routes = Object.entries(modules).map<RouteObject | null>(([path, request]) => {
-  const fileName = path.match(/^\.\/pages\/(.*)\.tsx$/)?.[1]
+  const filePath = path.slice(8, -4)
 
-  if (!fileName) {
+  if (!filePath) {
     return null
   }
 
-  const index = fileName.endsWith('_index')
+  const index = filePath.endsWith('_index')
 
-  const normalizedFileName = fileName.replaceAll('_index', '').replaceAll('$', ':').replaceAll(
-    '.',
-    '/',
-  )
+  const normalizedPath = filePath
+    .replaceAll('_index', '')
+    .replaceAll(/\$$/g, '*')
+    .replaceAll('$', ':')
+    .replaceAll('.', '/')
 
   return {
     index: index,
-    path: index
-      ? '/' + normalizedFileName
-      : fileName === '$'
-      ? '*'
-      : '/' + normalizedFileName,
+    path: normalizedPath,
     lazy: async () => {
       const value = (await request()) as {
         default: React.ComponentType
-        HydrateFallback?: React.ComponentType
         loader?: LoaderFunction
+        HydrateFallback?: React.ComponentType
         ErrorBoundary?: React.ComponentType
       }
       return {
         Component: value.default,
-        HydrateFallback: value.HydrateFallback ?? null,
         loader: value.loader,
+        HydrateFallback: value.HydrateFallback ?? null,
         ErrorBoundary: value.ErrorBoundary ?? null,
       }
     },
