@@ -781,7 +781,7 @@ export default function Editor() {
         <LexicalComposer initialConfig={initialConfig}>
           <PlainTextPlugin
             contentEditable={
-              <ContentEditable className="outline-none z-1 focus:outline-green-600 cursor-text text-[14px] leading-[21px] px-[16px] py-[6px] resize-none transition-all" />
+              <ContentEditable className="outline outline-transparent z-1 focus:outline-green-600 cursor-text text-[14px] leading-[21px] px-[16px] py-[6px] resize-none transition-[outline-color]" />
             }
             ErrorBoundary={LexicalErrorBoundary}
             placeholder={

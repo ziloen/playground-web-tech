@@ -702,7 +702,7 @@ function AudioVisualization() {
       </button>
 
       <div
-        className="h-8 w-[600px] flex items-center gap-0.5 overflow-visible relative transition-all duration-200"
+        className="h-8 w-[600px] flex items-center gap-0.5 overflow-visible relative transition-[mask-position] duration-200"
         style={{
           maskPosition: recording ? '0% 0%, 0% 0%' : '-32px 0%, 32px 0%',
           maskImage:

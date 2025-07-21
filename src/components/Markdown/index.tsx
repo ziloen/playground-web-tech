@@ -123,7 +123,7 @@ const components: Components = {
 
     return (
       <div
-        className="grid transition-all duration-100"
+        className="grid transition-[grid-template-rows] duration-100"
         style={{
           gridTemplateRows: isOpen ? 'auto 1fr' : 'auto 0fr',
         }}
