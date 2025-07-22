@@ -86,8 +86,14 @@ export default function DND() {
     input.accept = '*'
     input.addEventListener('change', (e) => {
       asType<HTMLInputElement>(e.currentTarget)
-      if (!e.currentTarget.files) return
-      onDrop(e.currentTarget.files)
+      const files = e.currentTarget.files
+
+      if (files) {
+        onDrop(files)
+      }
+
+      // Reset input value to allow re-uploading the same file
+      e.currentTarget.value = ''
     }, { signal })
 
     return () => {

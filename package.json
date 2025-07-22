@@ -20,7 +20,7 @@
     "@fontsource-variable/fira-code": "5.2.6",
     "@fontsource-variable/noto-sans-sc": "5.2.6",
     "@lexical/react": "0.33.1",
-    "@primer/octicons-react": "19.15.3",
+    "@primer/octicons-react": "19.15.4",
     "@tanstack/react-query": "5.83.0",
     "@wai-ri/core": "0.0.105",
     "antd": "5.26.6",
@@ -80,7 +80,7 @@
     "typescript": "5.8.3",
     "unplugin-auto-import": "19.3.0",
     "unplugin-icons": "22.1.0",
-    "vite": "npm:rolldown-vite@7.0.9",
+    "vite": "npm:rolldown-vite@7.0.10",
     "vitest": "3.2.4"
   }
 }
