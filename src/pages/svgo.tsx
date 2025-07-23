@@ -260,6 +260,7 @@ function optimizeSvg(value: string, pretty = true) {
     js2svg: {
       pretty: pretty,
       indent: 2,
+      eol: 'lf',
     },
     plugins: [
       'removeTitle',
