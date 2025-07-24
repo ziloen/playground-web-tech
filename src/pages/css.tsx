@@ -11,13 +11,9 @@ export default function CSSPage() {
         <ShowMore text={testString} />
       </div>
 
-      <div>
-        <Subgrid />
-      </div>
+      <Subgrid />
 
-      <div>
-        <HolyGrail />
-      </div>
+      <HolyGrail />
 
       <AspectRatio />
 
@@ -36,6 +32,8 @@ export default function CSSPage() {
       <GridRepeat />
 
       <DynamicMultiLineClamp />
+
+      <ImageNewLine />
 
       <div className="h-100"></div>
     </div>
@@ -464,6 +462,61 @@ function DynamicMultiLineClamp() {
       >
         {testString}
       </div>
+    </div>
+  )
+}
+
+/**
+ * TODO:图片和文字(包括 text node)之间换行（包括前后），连续的图片之间不换行
+ * - 如果图片在最前面，则图片前面不需要换行（多余的换行）
+ * - 如果图片在最后面，则图片后面不需要换行（多余的换行）
+ * - 如果图片在中间，则图片前后都需要换行
+ * - 连续的图片之间不需要换行
+ * 已知问题：text node 无法选中 https://github.com/w3c/csswg-drafts/issues/2208
+ */
+function ImageNewLine() {
+  const [isTextNode, setIsTextNode] = useState(false)
+
+  return (
+    <div>
+      <button onClick={() => setIsTextNode(!isTextNode)}>toggle text node</button>
+
+      <div>
+        {isTextNode ? '#text 1' : <span>#text 1</span>}
+
+        <ImageItem />
+
+        {isTextNode ? '#text 2' : <span>#text 2</span>}
+
+        {[0, 1, 2].map((v) => <ImageItem key={v} />)}
+
+        {isTextNode ? '#text 3' : <span>#text 3</span>}
+
+        <ImageItem />
+
+        {isTextNode ? '#text 4' : <span>#text 4</span>}
+      </div>
+    </div>
+  )
+}
+
+function ImageItem() {
+  return (
+    <div
+      className={clsx(
+        'inline align-top',
+        // 仅第一个连续的图片且前面有元素，前 换行
+        '[--s-br:inline] [&_+_div]:[--s-br:none] first:[--s-br:none]',
+        // 仅最后一个连续的图片且后面有元素 后 换行
+        '[--e-br:inline] has-[+_div]:[--e-br:none] last:[--e-br:none]',
+      )}
+    >
+      <br className="[display:var(--s-br)]" />
+
+      <div className="inline-block size-20 bg-linear-to-r/oklch from-blue-300 via-green-500 via-35% to-yellow-400">
+      </div>
+
+      <br className="[display:var(--e-br)]" />
     </div>
   )
 }

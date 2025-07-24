@@ -93,7 +93,7 @@ export default defineConfig(({ command, mode }) => {
       },
       devSourcemap: true,
       modules: {
-        generateScopedName: '[hash:base64:8]',
+        generateScopedName: '[hash:hex:8]',
       },
     },
 
@@ -107,6 +107,11 @@ export default defineConfig(({ command, mode }) => {
       reportCompressedSize: false,
       minify: 'oxc',
       assetsInlineLimit: 0,
+      rollupOptions: {
+        output: {
+          hashCharacters: 'hex',
+        },
+      },
     },
 
     server: {
