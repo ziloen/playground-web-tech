@@ -1,3 +1,4 @@
+import JSON5 from 'json5'
 import type { CustomPlugin } from 'svgo/browser'
 import { builtinPlugins, optimize, VERSION } from 'svgo/browser'
 import type { JsonObject, JsonValue } from 'type-fest'
@@ -61,7 +62,7 @@ export default function SVGOPage() {
               if (value.startsWith('{') || value.startsWith('[')) {
                 // JSON input
                 try {
-                  const json = JSON.parse(value) as JsonValue
+                  const json = JSON5.parse<JsonValue>(value)
 
                   const optimizedJson = optimizeJsonObject(json)
                   console.info('Optimized JSON:', optimizedJson)
@@ -258,7 +259,7 @@ function optimizeSvg(value: string, pretty = true) {
   const data = optimize(value, {
     multipass: true,
     js2svg: {
-      pretty: pretty,
+      pretty,
       indent: 2,
       eol: 'lf',
     },
