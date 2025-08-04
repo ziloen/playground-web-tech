@@ -69,7 +69,7 @@ export default defineConfig(({ command, mode }) => {
           {
             type: true,
             from: 'react',
-            imports: ['ComponentProps'],
+            imports: ['ComponentProps', 'ComponentRef'],
           },
         ],
         dts: 'src/types/auto-imports.d.ts',

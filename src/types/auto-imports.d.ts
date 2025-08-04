@@ -27,6 +27,6 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
-  export type { ComponentProps } from 'react'
+  export type { ComponentProps, ComponentRef } from 'react'
   import('react')
 }

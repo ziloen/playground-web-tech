@@ -1,4 +1,5 @@
 import JSON5 from 'json5'
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import type { CustomPlugin } from 'svgo/browser'
 import { builtinPlugins, optimize, VERSION } from 'svgo/browser'
 import type { JsonObject, JsonValue } from 'type-fest'
@@ -20,6 +21,7 @@ export default function SVGOPage() {
   // #endregion
 
   // #region useRef
+  const transformWrapperRef = useRef<ComponentRef<typeof TransformWrapper>>(null)
   // #endregion
 
   // #region useMemo
@@ -79,6 +81,7 @@ export default function SVGOPage() {
                   setOptimizedSvg(optimizedSvg)
                   setDimensions(dimensions)
                   setSvgUri(svgToDataUri(optimizedSvg))
+                  transformWrapperRef.current?.resetTransform()
                 } catch (error) {
                   console.error('Invalid SVG input:', error)
                 }
@@ -98,6 +101,7 @@ export default function SVGOPage() {
               setOriginalSvg(v.default)
               setOptimizedSvg(optimizedSvg)
               setSvgUri(svgToDataUri(optimizedSvg))
+              transformWrapperRef.current?.resetTransform()
               setDimensions(dimensions)
             })
           }}
@@ -109,27 +113,42 @@ export default function SVGOPage() {
       {/* TODO: configuration */}
 
       {/* SVG preview */}
-      {/* TODO: pan zoom pinch */}
-      <div
-        className="flex-1 grid place-items-center"
-        style={{
-          // make the iframe transparent
-          // https://fvsch.com/transparent-iframes
-          colorScheme: 'light',
+      <TransformWrapper
+        ref={transformWrapperRef}
+        maxScale={10}
+        panning={{
+          velocityDisabled: true,
         }}
+        limitToBounds={false}
       >
-        <iframe
-          src={svgUri || 'about:blank'}
-          frameBorder="0"
-          title="SVG preview"
-          scrolling="no"
-          className="bg-transparent border-none overflow-hidden"
-          style={{
-            width: dimensions.width ? `${dimensions.width}px` : '100%',
-            height: dimensions.height ? `${dimensions.height}px` : '100%',
+        <TransformComponent
+          wrapperStyle={{
+            // make the iframe transparent
+            // https://fvsch.com/transparent-iframes
+            colorScheme: 'light',
+            height: '100%',
+            flex: '1',
           }}
-        />
-      </div>
+          contentStyle={{
+            height: '100%',
+            width: '100%',
+            display: 'grid',
+            placeItems: 'center',
+          }}
+        >
+          <iframe
+            src={svgUri || 'about:blank'}
+            frameBorder="0"
+            title="SVG preview"
+            scrolling="no"
+            className="bg-transparent border-none overflow-hidden pointer-events-none"
+            style={{
+              width: dimensions.width ? `${dimensions.width}px` : '100%',
+              height: dimensions.height ? `${dimensions.height}px` : '100%',
+            }}
+          />
+        </TransformComponent>
+      </TransformWrapper>
 
       {/* Right side menus */}
       <div className={clsx('relative', optimizedSvg ? 'block' : 'hidden')}>
