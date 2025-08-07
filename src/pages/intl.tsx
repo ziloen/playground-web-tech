@@ -83,7 +83,7 @@ function LanguageSelect({
     return Intl.DisplayNames.supportedLocalesOf(Languages, { localeMatcher: 'best fit' }).map(
       (lang) => {
         const nativeDisplayName = getLanguageDisplayName(lang, lang)
-        const displayName = getLanguageDisplayName(language, lang)
+        const displayName = getLanguageDisplayName(lang, language)
 
         return {
           value: lang,
@@ -178,16 +178,25 @@ function TimeNow({ language }: { language: string }) {
   return <motion.div>{nowStr}</motion.div>
 }
 
+/**
+ * @example
+ * ```ts
+ * const displayName = getLanguageDisplayName('zh-Hans', 'en-US')
+ * //    ^ "Chinese (Simplified)"
+ * ```
+ */
 function getLanguageDisplayName(
-  displayLanguage: string,
   language: string,
+  toLanguage: string,
+  options: Omit<Intl.DisplayNamesOptions, 'type'> = {
+    fallback: 'code',
+  },
 ) {
   try {
-    const displayNames = new Intl.DisplayNames([displayLanguage], {
+    return new Intl.DisplayNames([toLanguage], {
       type: 'language',
-      languageDisplay: 'dialect',
-    })
-    return displayNames.of(language)
+      ...options,
+    }).of(language)
   } catch {
     return language
   }

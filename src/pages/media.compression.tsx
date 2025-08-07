@@ -90,7 +90,7 @@ export default function Compression() {
       '18',
       'output.mp4',
     ])
-    const data = await ffmpeg.readFile('output.mp4') as Uint8Array
+    const data = await ffmpeg.readFile('output.mp4') as Uint8Array<ArrayBuffer>
     console.log(data)
     setOutputBlob(new Blob([data], { type: 'video/mp4' }))
   })

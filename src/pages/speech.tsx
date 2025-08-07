@@ -807,7 +807,7 @@ async function webmToMp3(blob: Blob): Promise<Blob> {
     'output.mp3',
   ])
 
-  const data = await ffmpeg.readFile('output.mp3')
+  const data = await ffmpeg.readFile('output.mp3') as Uint8Array<ArrayBuffer>
 
   return new Blob([data], { type: 'audio/mpeg' })
 }
