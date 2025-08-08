@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 
 import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react-oxc'
+import react from '@vitejs/plugin-react'
 import browserslistToEsbuild from 'browserslist-to-esbuild'
 import { Features } from 'lightningcss'
 import { resolve as r } from 'node:path'
