@@ -272,7 +272,7 @@ export default function WebSpeechAPIPage() {
           <Slider
             value={pitch}
             onChange={(e) => {
-              setPitch(+e.currentTarget.valueAsNumber)
+              setPitch(e.currentTarget.valueAsNumber)
 
               if (speechSynthesis.speaking) {
                 onSpeek()
