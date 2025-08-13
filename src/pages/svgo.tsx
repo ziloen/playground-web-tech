@@ -1,6 +1,6 @@
 import JSON5 from 'json5'
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
-import type { CustomPlugin } from 'svgo/browser'
+import type { CustomPlugin, DataUri } from 'svgo/browser'
 import { builtinPlugins, optimize, VERSION } from 'svgo/browser'
 import type { JsonObject, JsonValue } from 'type-fest'
 import { useAutoResetState } from '~/hooks'
@@ -31,6 +31,9 @@ export default function SVGOPage() {
   // #endregion
 
   // #region useHookEffect, useEffect
+  useEffect(() => {
+    Reflect.set(window, 'optimizeSvg', optimizeSvg)
+  }, [])
   // #endregion
 
   return (
@@ -41,6 +44,7 @@ export default function SVGOPage() {
         backgroundSize: '20px 20px',
       }}
     >
+      {/* TODO: support drop svg file */}
       {/* Left side menus */}
       <div className="w-60 bg-dark-gray-300 h-full">
         <div className="px-4 py-1">
@@ -76,14 +80,29 @@ export default function SVGOPage() {
               if (value.startsWith('<svg')) {
                 // SVG input
                 try {
-                  const { data: optimizedSvg, dimensions } = optimizeSvg(value, true)
+                  const { data: optimizedSvg, dimensions } = optimizeSvg(value, { pretty: true })
                   setOriginalSvg(value)
                   setOptimizedSvg(optimizedSvg)
                   setDimensions(dimensions)
-                  setSvgUri(svgToDataUri(optimizedSvg))
+                  setSvgUri(svgToDataUrl(optimizedSvg))
                   transformWrapperRef.current?.resetTransform()
                 } catch (error) {
                   console.error('Invalid SVG input:', error)
+                }
+              } else if (value.startsWith('data:image/svg+xml,')) {
+                // Data URL input
+                try {
+                  const svgString = decodeURIComponent(value.slice('data:image/svg+xml,'.length))
+                  const { data: optimizedSvg, dimensions } = optimizeSvg(svgString, {
+                    pretty: true,
+                  })
+                  setOriginalSvg(svgString)
+                  setOptimizedSvg(optimizedSvg)
+                  setDimensions(dimensions)
+                  setSvgUri(svgToDataUrl(optimizedSvg))
+                  transformWrapperRef.current?.resetTransform()
+                } catch (error) {
+                  console.error('Invalid SVG data URL input:', error)
                 }
               }
             }}
@@ -96,11 +115,11 @@ export default function SVGOPage() {
           className="cursor-pointer hover:bg-dark-gray-400 py-3 px-4"
           onClick={() => {
             import('../assets/figma.svg?raw').then((v) => {
-              const { data: optimizedSvg, dimensions } = optimizeSvg(v.default, true)
+              const { data: optimizedSvg, dimensions } = optimizeSvg(v.default, { pretty: true })
 
               setOriginalSvg(v.default)
               setOptimizedSvg(optimizedSvg)
-              setSvgUri(svgToDataUri(optimizedSvg))
+              setSvgUri(svgToDataUrl(optimizedSvg))
               transformWrapperRef.current?.resetTransform()
               setDimensions(dimensions)
             })
@@ -136,6 +155,7 @@ export default function SVGOPage() {
             placeItems: 'center',
           }}
         >
+          {/* TODO: Add text color: white to iframe */}
           <iframe
             src={svgUri || 'about:blank'}
             frameBorder="0"
@@ -161,27 +181,48 @@ export default function SVGOPage() {
           )}
 
           {/* Copy text */}
-          <button
-            onClick={() => {
-              if (!optimizedSvg) {
-                return
-              }
-
-              navigator.clipboard.writeText(optimizedSvg).then(() => {
-                setCopied(true)
-              })
-            }}
-          >
-            {copied
-              ? <CarbonCheckmark width={14} height={14} />
-              : <CarbonCopy width={14} height={14} />}
-          </button>
+          {!!optimizedSvg && (
+            <CopyButton text={optimizedSvg}>
+            </CopyButton>
+          )}
 
           {/* Download svg */}
-          {!!svgUri && <a href={svgUri} download="image.svg">Download</a>}
+          {!!svgUri && (
+            <>
+              {/* Copy as data url */}
+              <CopyButton text={svgUri}>
+                data URL
+              </CopyButton>
+
+              <a href={svgUri} download="image.svg">Download</a>
+            </>
+          )}
         </div>
       </div>
     </div>
+  )
+}
+
+function CopyButton({ children, text }: { children?: React.ReactNode; text: string }) {
+  const [copied, setCopied] = useAutoResetState(false, 2_000)
+
+  return (
+    <button
+      onClick={() => {
+        if (!text) {
+          return
+        }
+
+        navigator.clipboard.writeText(text).then(() => {
+          setCopied(true)
+        })
+      }}
+    >
+      {copied
+        ? <CarbonCheckmark width={14} height={14} />
+        : <CarbonCopy width={14} height={14} />}
+      {children}
+    </button>
   )
 }
 
@@ -208,8 +249,13 @@ function SizeCompare(
   )
 }
 
-function svgToDataUri(svg: string) {
+// TODO: 使用单引号，不转义空格，减少字符数
+function svgToDataUrl(svg: string): string {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
+}
+
+function dataUrlToSvg(dataUrl: string): string {
+  return decodeURIComponent(dataUrl.slice('data:image/svg+xml,'.length))
 }
 
 /**
@@ -230,9 +276,14 @@ function optimizeJsonObject(value: JsonValue): JsonValue {
     return optimizedObject
   }
 
-  if (typeof value === 'string' && value.startsWith('<svg')) {
-    // 如果是 SVG 字符串，执行优化
-    return optimizeSvg(value, false).data
+  if (typeof value === 'string') {
+    if (value.startsWith('<svg')) {
+      // 如果是 SVG 字符串，执行优化
+      return optimizeSvg(value, { pretty: false }).data
+    } else if (value.startsWith('data:image/svg+xml,')) {
+      // 如果是 data url，提取出 SVG 字符串后执行优化
+      return svgToDataUrl(optimizeSvg(dataUrlToSvg(value), { pretty: false }).data)
+    }
   }
 
   return value
@@ -272,8 +323,13 @@ function createDimensionsExtractor() {
   return [dimensions, plugin] as const
 }
 
-function optimizeSvg(value: string, pretty = true) {
+function optimizeSvg(
+  value: string,
+  options: { pretty?: boolean; datauri?: DataUri } = {},
+) {
   const [dimensions, dimensionsPlugin] = createDimensionsExtractor()
+
+  const { pretty = true, datauri = undefined } = options
 
   const data = optimize(value, {
     multipass: true,
@@ -288,6 +344,7 @@ function optimizeSvg(value: string, pretty = true) {
       'preset-default',
       dimensionsPlugin,
     ],
+    datauri,
   }).data
 
   return { data, dimensions }
