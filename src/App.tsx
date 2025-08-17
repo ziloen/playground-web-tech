@@ -3,7 +3,16 @@ import { isNotNil } from 'es-toolkit'
 import type { LoaderFunction, RouteObject } from 'react-router'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+})
 
 function DefaultHydrateFallback() {
   return null
