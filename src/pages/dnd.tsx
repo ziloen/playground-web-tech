@@ -386,7 +386,7 @@ function parseDL(
   const title = dl.querySelector(':scope > dt')?.textContent?.trim() ?? ''
   const children: (Folder | Bookmark | Separator)[] = []
 
-  for (const el of dl.querySelectorAll(':scope > dd > *')) {
+  for (const el of dl.querySelectorAll(':scope > dd > :where(hr, dl, a)')) {
     if (el instanceof HTMLHRElement) {
       children.push({ type: 'separator' })
     } else if (el instanceof HTMLDListElement) {
