@@ -29,6 +29,8 @@ export default function KeyCode() {
     const ac = new AbortController()
 
     el.addEventListener('keydown', (e) => {
+      console.log(e)
+
       if (getPreventDefault()) e.preventDefault()
       if (getStopPropagation()) e.stopPropagation()
 

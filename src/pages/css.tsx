@@ -35,6 +35,8 @@ export default function CSSPage() {
 
       <ImageNewLine />
 
+      <BleedLayout />
+
       <div className="h-100"></div>
     </div>
   )
@@ -517,6 +519,35 @@ function ImageItem() {
       </div>
 
       <br className="[display:var(--e-br)]" />
+    </div>
+  )
+}
+
+function BleedLayout() {
+  const [state, setState] = useState(false)
+
+  return (
+    <div
+      className="grid [:where(&>*)]:col-start-2 gap-y-2 text-center resizable-x"
+      style={{
+        gridTemplateColumns: state
+          ? '24px 1fr 24px' // 左右固定宽度，中间自适应
+          : '1fr min(600px, 100%) 1fr', // 左右自适应，中间固定最大宽度
+      }}
+    >
+      <div className="bg-green-800">
+        Normal element
+      </div>
+      <button onClick={() => setState((v) => !v)}>
+        Toggle Layout (current: {state ? 'fixed sides' : 'fixed center'})
+      </button>
+
+      <div className="col-span-full bg-blue-700">
+        Full width element
+      </div>
+
+      <div className="bg-green-800">Normal element</div>
+      <div className="bg-green-800">Normal element</div>
     </div>
   )
 }
