@@ -348,12 +348,12 @@ type Separator = {
 
 function parseFirefoxBookmarkHtml(
   /**
-   * ```
+   * ```html
    * <DL>
    *   <DT>Folder Name</DT>
    *
    *   <DD>
-   *     <A HREF="https://example.com" >Example</A>
+   *     <A HREF="https://example.com">Example</A>
    *   </DD>
    *
    *   <DD>
@@ -365,15 +365,16 @@ function parseFirefoxBookmarkHtml(
    *       <DT>Sub Folder</DT>
    *
    *       <DD>
-   *         <A HREF="https://example2.com" >Example 2</A>
+   *         <A HREF="https://example2.com">Example 2</A>
    *       </DD>
    *     </DL>
    *   </DD>
    * </DL>
+   * ```
    */
   html: string,
 ): Folder | null {
-  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const doc = Document.parseHTMLUnsafe(html)
   const dl = doc.querySelector('dl')
   if (!dl) return null
 
