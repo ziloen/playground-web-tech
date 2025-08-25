@@ -207,23 +207,30 @@ function logDataTransfer(dataTransfer: DataTransfer | null) {
   const files = Array.from(dataTransfer.files)
   const items = Array.from(dataTransfer.items).map(({ kind, type }) => ({ kind, type }))
   const types = Array.from(dataTransfer.types)
+
   const values = items.reduce<Record<string, string>>((previousValue, currentValue) => {
-    const value = dataTransfer.getData(currentValue.type)
-    previousValue[currentValue.type] = value
+    const type = currentValue.type
+    const value = dataTransfer.getData(type)
+    previousValue[type] = value
     // Firefox bookmarks
-    if (currentValue.type === 'text/x-moz-place' && value) {
+    // https://github.com/mozilla-firefox/firefox/blob/main/toolkit/components/places/PlacesUtils.sys.mjs
+    if (type === 'text/x-moz-place' && value) {
       const json = JSON.parse(value) as Record<string, unknown>
-      console.log(json)
+      console.log(json.type, json)
+    } else if (type === 'text/html' && value && types.includes('text/x-moz-place')) {
+      const folder = parseFirefoxBookmarkHtml(value)
+      console.log('bookmark folder:', folder)
     }
+
     return previousValue
   }, {})
 
-  console.log({
+  console.log(structuredClone({
     files,
     items,
     types,
     values,
-  })
+  }))
 
   return { files, items, types }
 }
@@ -321,4 +328,77 @@ function Item({ value, items }: { value: string; items: string[] }) {
       {value}
     </motion.div>
   )
+}
+
+type Folder = {
+  type: 'folder'
+  title: string
+  children: (Folder | Bookmark | Separator)[]
+}
+
+type Bookmark = {
+  type: 'bookmark'
+  title: string
+  url: string
+}
+
+type Separator = {
+  type: 'separator'
+}
+
+function parseFirefoxBookmarkHtml(
+  /**
+   * ```
+   * <DL>
+   *   <DT>Folder Name</DT>
+   *
+   *   <DD>
+   *     <A HREF="https://example.com" >Example</A>
+   *   </DD>
+   *
+   *   <DD>
+   *     <HR>
+   *   </DD>
+   *
+   *   <DD>
+   *     <DL>
+   *       <DT>Sub Folder</DT>
+   *
+   *       <DD>
+   *         <A HREF="https://example2.com" >Example 2</A>
+   *       </DD>
+   *     </DL>
+   *   </DD>
+   * </DL>
+   */
+  html: string,
+): Folder | null {
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const dl = doc.querySelector('dl')
+  if (!dl) return null
+
+  return parseDL(dl)
+}
+
+function parseDL(
+  dl: HTMLDListElement,
+): Folder {
+  const title = dl.querySelector(':scope > dt')?.textContent?.trim() ?? ''
+  const children: (Folder | Bookmark | Separator)[] = []
+
+  for (const el of dl.querySelectorAll(':scope > dd > *')) {
+    if (el instanceof HTMLHRElement) {
+      children.push({ type: 'separator' })
+    } else if (el instanceof HTMLDListElement) {
+      children.push(parseDL(el))
+    } else if (el instanceof HTMLAnchorElement) {
+      children.push({
+        type: 'bookmark',
+        title: el.textContent?.trim() ?? '',
+        url: el.getAttribute('href')?.trim() ?? '',
+      })
+    }
+  }
+
+  return { type: 'folder', title, children }
 }
