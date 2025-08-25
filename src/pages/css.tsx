@@ -37,6 +37,8 @@ export default function CSSPage() {
 
       <BleedLayout />
 
+      <GridItemFlexGrow />
+
       <div className="h-100"></div>
     </div>
   )
@@ -551,6 +553,63 @@ function BleedLayout() {
     </div>
   )
 }
+
+/**
+ * Grid 布局，不确定行数，某一项撑满剩余空间，类似 flex-grow: 1
+ */
+function GridItemFlexGrow() {
+  const [state, setState] = useState(false)
+
+  return (
+    <div className="grid grid-flow-row h-70 gap-2 bg-purple-400/15 max-w-36 relative pe-6 auto-rows-[minmax(0,min-content)]">
+      {/* 这几项应当为 min-content 高度，且数量不确定 */}
+      <button onClick={() => setState((v) => !v)}>Toggle</button>
+      <div className="bg-green-800">1</div>
+      <div className="bg-green-800">2</div>
+
+      {/* 这一项应当始终撑满容器但不溢出 */}
+      <div
+        className="bg-blue-700 overflow-auto"
+        style={{
+          containerType: 'size',
+          // 非常大的内在高度，确保撑满容器哦
+          containIntrinsicBlockSize: '99999px',
+        }}
+      >
+        <div>Flex item</div>
+
+        {state && <div className="h-[300px] min-h-0">999</div>}
+      </div>
+
+      <div className="bg-green-800">3</div>
+    </div>
+  )
+}
+
+// TODO: grid 布局，不确定列数，最后一项撑满剩余空间
+// +---+---+---+
+// | 1 | 2 | 3 |
+// +---+---+---+
+// | 4 | 5 | 6 |
+// +-----------+
+
+// +---+---+---+
+// | 1 | 2 | 3 |
+// +---+---+---+
+// |     4     |
+// +-----------+
+//
+// +---+---+---+
+// | 1 | 2 | 3 |
+// +---+---+---+
+// | 4 |   5   |
+// +-----------+
+//
+// +---+---+---+---+
+// | 1 | 2 | 3 | 4 |
+// +---+---+---+---+
+// | 5 | 6 |   7   |
+// +---------------+
 
 // TODO: multi dynamic sticky elments stack with dynamic height (or fixed height)
 // 可以点击按钮设置列表项是否 sticky，可以多个 sticky
