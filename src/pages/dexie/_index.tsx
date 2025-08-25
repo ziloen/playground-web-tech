@@ -1,5 +1,6 @@
 import { InfinityIcon } from '@primer/octicons-react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { v7 } from 'uuid'
 import {
   Select,
   SelectContent,
@@ -43,7 +44,7 @@ export default function DexiePage() {
           try {
             await db.todos.add({
               title: newTask.trim(),
-              id: crypto.randomUUID(),
+              id: v7(),
               _v: 0,
               completed: false,
               createdAt: Date.now(),

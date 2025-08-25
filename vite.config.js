@@ -125,9 +125,5 @@ export default defineConfig(({ command, mode }) => {
     test: {
       environment: 'jsdom',
     },
-
-    experimental: {
-      enableNativePlugin: false,
-    },
   }
 })
