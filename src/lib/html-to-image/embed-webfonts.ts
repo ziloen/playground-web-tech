@@ -35,9 +35,9 @@ async function embedFonts(data: Metadata, options: Options): Promise<string> {
       url = new URL(url, data.url).href
     }
 
-    return fetchAsDataURL<[string, string]>(url, options.fetchRequestInit, ({ result }) => {
+    return fetchAsDataURL(url, options.fetchRequestInit, ({ result }) => {
       cssText = cssText.replace(loc, `url(${result})`)
-      return [loc, result]
+      return [loc, result] as const
     })
   })
 
@@ -150,22 +150,22 @@ async function getCSSRules(
     }
   })
 
-  return Promise.all(deferreds).then(() => {
-    // Second loop parses rules
-    styleSheets.forEach((sheet) => {
-      if ('cssRules' in sheet) {
-        try {
-          toArray<CSSStyleRule>(sheet.cssRules || []).forEach((item) => {
-            ret.push(item)
-          })
-        } catch (e) {
-          console.error(`Error while reading CSS rules from ${sheet.href ?? ''}`, e)
-        }
-      }
-    })
+  await Promise.all(deferreds)
 
-    return ret
+  // Second loop parses rules
+  styleSheets.forEach((sheet) => {
+    if ('cssRules' in sheet) {
+      try {
+        toArray<CSSStyleRule>(sheet.cssRules || []).forEach((item) => {
+          ret.push(item)
+        })
+      } catch (e) {
+        console.error(`Error while reading CSS rules from ${sheet.href ?? ''}`, e)
+      }
+    }
   })
+
+  return ret
 }
 
 function getWebFontRules(cssRules: CSSStyleRule[]): CSSStyleRule[] {
