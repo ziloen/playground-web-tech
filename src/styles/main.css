@@ -79,3 +79,10 @@ html {
   initial-value: 1px;
   inherits: false;
 }
+
+/* 用于给百分比数值做动画 */
+@property --percent {
+  syntax: "<percentage>";
+  initial-value: 100%;
+  inherits: false;
+}
