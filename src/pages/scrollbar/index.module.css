@@ -1,6 +1,5 @@
 /* https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar */
 
-/* FIXME: @property not working when style in shadowdom */
 @property --scrollbar-thumb-color {
   syntax: "<color>";
   inherits: true;
@@ -10,6 +9,18 @@
 @property --scrollbar-thumb-border {
   syntax: "<length>";
   inherits: true;
+  initial-value: 0px;
+}
+
+@property --scrollbar-margin-block {
+  syntax: "<length>+";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --scrollbar-margin-inline {
+  syntax: "<length>+";
+  inherits: false;
   initial-value: 0px;
 }
 
@@ -24,6 +35,9 @@
   .scrollbar {
     --scrollbar-thumb-color: transparent;
     --scrollbar-thumb-border: 3px;
+    /* --scrollbar-margin-block inherits: false，需要转发一下，不然 -webkit-scrollbar-track 读不到 */
+    --_scrollbar-margin-block: var(--scrollbar-margin-block);
+    --_scrollbar-margin-inline: var(--scrollbar-margin-inline);
 
     transition: --scrollbar-thumb-color .2s ease,
       --scrollbar-thumb-border .2s ease;
@@ -66,8 +80,8 @@
 
 
     &::-webkit-scrollbar-track {
-      /* border-radius - scrollbar-size / 2 */
-      margin: calc(24px - var(--scrollbar-size) / 2);
+      margin-block: var(--_scrollbar-margin-block);
+      margin-inline: var(--_scrollbar-margin-inline);
       border-radius: 9999px;
       background-color: var(--track-bg);
     }
