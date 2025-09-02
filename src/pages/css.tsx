@@ -1,3 +1,5 @@
+import styles from './scrollbar/index.module.css'
+
 const testString =
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vel rhoncus nisl. Nunc accumsan ornare augue, et efficitur orci. Ut. `
 
@@ -38,6 +40,8 @@ export default function CSSPage() {
       <BleedLayout />
 
       <GridItemFlexGrow />
+
+      <ScrollClipMargin />
 
       <div className="h-100"></div>
     </div>
@@ -443,6 +447,9 @@ function GridRepeat() {
   )
 }
 
+/**
+ * 动态多行文本省略
+ */
 function DynamicMultiLineClamp() {
   return (
     <div
@@ -586,7 +593,49 @@ function GridItemFlexGrow() {
   )
 }
 
+// TODO: 显示区域大于实际可滚动区域
+//
+// +- - - - - - - -+- - - - - - - - - - - - - - - -
+// |               |                      ↑
+// |---------------|---                   |
+// |               | ↑                    |
+// |               |容器和滚动条区域    实际显示内容范围
+// |               | ↓                    |
+// |---------------|---                   |
+// |               |                      ↓
+// +- - - - - - - -+- - - - - - - - - - - - - - - -
+//
+// 以下为使用 scrollbar margin block 模拟的行为
+function ScrollClipMargin() {
+  return (
+    <div className="w-[300px] h-[300px] overflow-visible relative ms-10">
+      <div className="absolute inset-0 border bg-white/10 z-1 pointer-events-none"></div>
+      <div
+        className={clsx(
+          styles.scrollbar,
+          'h-[400px] overflow-y-auto relative -top-[50px] overscroll-contain scroll-py-[50px]',
+        )}
+        style={{
+          '--scrollbar-margin-block': '50px',
+        }}
+      >
+        <div className="bg-green/20 flex flex-col py-[50px]">
+          {/* <div className="h-[50px] bg-green-700"></div> */}
+          <div
+            contentEditable
+            className="min-h-[300px] basis-max grow bg-dark-gray-500 outline-none"
+          >
+          </div>
+          {/* <textarea className="grow basis-max min-h-[300px] field-sizing-content"></textarea> */}
+          {/* <div className="h-[50px] bg-green-700 mt-auto"></div> */}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // TODO: grid 布局，不确定列数，最后一项撑满剩余空间
+// 可能的实现：grid-auto-columns: repeat(auto-fit, 100px) minmax(0, 1fr));
 // +---+---+---+---+
 // | 1 | 2 | 3 | 4 |
 // +---+---+---+---+
