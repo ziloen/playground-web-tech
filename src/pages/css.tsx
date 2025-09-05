@@ -607,9 +607,12 @@ function GridItemFlexGrow() {
 //
 // 以下为使用 scrollbar margin block 模拟的行为
 function ScrollClipMargin() {
+  const editorRef = useRef<HTMLDivElement>(null)
+
   return (
     <div className="w-[300px] h-[300px] overflow-visible relative ms-10">
-      <div className="absolute inset-0 border bg-white/10 z-1 pointer-events-none"></div>
+      <div className="absolute inset-y-0 -inset-x-2 border bg-white/10 z-1 pointer-events-none" />
+
       <div
         className={clsx(
           styles.scrollbar,
@@ -622,8 +625,33 @@ function ScrollClipMargin() {
         <div className="bg-green/20 flex flex-col py-[50px]">
           {/* <div className="h-[50px] bg-green-700"></div> */}
           <div
+            ref={editorRef}
             contentEditable
             className="min-h-[300px] basis-max grow bg-dark-gray-500 outline-none"
+            // FIXME: 使用 scroll-padding 来添加输入内边距时，手动添加的内容无效
+            // 例如手动添加换行时
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                e.stopPropagation()
+
+                const sel = window.getSelection()
+                if (!sel || !sel.rangeCount) return
+                const range = sel.getRangeAt(0)
+
+                const p = document.createElement('p')
+                const br = document.createElement('br')
+                p.append(br)
+                editorRef.current?.append(p)
+                range.setStartAfter(br)
+                range.setEndAfter(br)
+                sel.removeAllRanges()
+
+                sel.addRange(range)
+
+                p.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' })
+              }
+            }}
           >
           </div>
           {/* <textarea className="grow basis-max min-h-[300px] field-sizing-content"></textarea> */}

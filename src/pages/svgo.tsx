@@ -8,6 +8,7 @@ import { formatBytes } from '~/utils'
 import CarbonCheckmark from '~icons/carbon/checkmark'
 import CarbonCopy from '~icons/carbon/copy'
 
+// FIXME: Some svg are broken after optimized by svgo
 export default function SVGOPage() {
   // #region useState, useHookState
   const [originalSvg, setOriginalSvg] = useState<string | null>(null)
