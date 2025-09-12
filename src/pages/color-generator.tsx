@@ -4,7 +4,6 @@
 // https://github.com/proteanstudio/contrast-tools
 
 import { Input } from '@base-ui-components/react'
-import { ColorPicker } from 'antd'
 import Color from 'colorjs.io'
 
 export default function ColorGenerator() {
@@ -15,7 +14,12 @@ export default function ColorGenerator() {
   }, [])
 
   const { bgColor, activeColor, hoverColor, textColor } = useMemo(() => {
-    const color = new Color(inputVal)
+    let color: Color
+    try {
+      color = new Color(inputVal)
+    } catch {
+      color = new Color('#000')
+    }
 
     const hoverColor = color.clone()
     hoverColor.oklch.l += 0.04
@@ -52,13 +56,12 @@ export default function ColorGenerator() {
           spellCheck="false"
           onChange={(e) => setInputVal(e.currentTarget.value)}
         />
-        <ColorPicker
+        <input
+          type="color"
           value={inputVal}
           onChange={(e) => {
-            setInputVal(e.toRgbString())
+            setInputVal(e.currentTarget.value)
           }}
-          destroyOnHidden
-          placement="rightTop"
         />
       </div>
 

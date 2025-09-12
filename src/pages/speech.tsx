@@ -1,3 +1,4 @@
+import { Combobox } from '@base-ui-components/react/combobox'
 import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
 import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
@@ -11,6 +12,7 @@ import TextareaAutosize from 'react-textarea-autosize'
 import {
   Select,
   SelectContent,
+  SelectIndicator,
   SelectItem,
   SelectItemText,
   SelectTrigger,
@@ -19,6 +21,7 @@ import Slider from '~/components/Slider'
 import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
 import { LRUCache } from '~/utils'
 import CarbonCloud from '~icons/carbon/cloud'
+import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
 
 const defaultZhText =
   `从零开始学习 Web 开发极具挑战性，该教程将为你提供详细的资料，手把手帮助你轻松愉快地学习。无论你是正在学习 Web 开发的学生（自学或参与课程）、寻找材料的老师、编程爱好者，亦或是仅仅想了解一点点 Web 技术，我们都希望你能感到宾至如归。`
@@ -208,6 +211,61 @@ export default function WebSpeechAPIPage() {
       >
         <div className="grid grid-cols-subgrid col-span-full">
           <span>voice</span>
+
+          <Combobox.Root
+            value={selectedVoice}
+            onValueChange={setSelectedVoice}
+            items={options.flatMap((group) => group.options)}
+            multiple={false}
+          >
+            <div className="relative">
+              <Combobox.Input className="grid min-h-[1lh] w-fit min-w-[200px] grid-flow-col items-center justify-between rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 px-3 py-2 shadow-sm outline-2 outline-offset-2 outline-blue-500 outline-none select-none hover:bg-dark-gray-700 focus-visible:outline-solid" />
+
+              <Combobox.Trigger className="absolute end-2 inset-y-0 my-auto border-none bg-transparent ">
+                <OcticonChevronDown12
+                  className="opacity-50 in-data-popup-open:rotate-180"
+                  width={14}
+                  height={14}
+                />
+              </Combobox.Trigger>
+            </div>
+
+            <Combobox.Portal>
+              <Combobox.Positioner align="start" side="bottom" sideOffset={8}>
+                <Combobox.Popup
+                  className={'max-h-(--available-height) min-w-[200px] overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 shadow-lg outline-none data-starting-style:opacity-0 transition-[scale,opacity] data-starting-style:scale-90 data-ending-style:opacity-0 data-ending-style:scale-90 origin-(--transform-origin)'}
+                >
+                  <Combobox.Empty>
+                    <div className="px-3 py-2">
+                      Nothing found
+                    </div>
+                  </Combobox.Empty>
+
+                  <Combobox.List>
+                    {(item: VoiceOption) => {
+                      return (
+                        <Combobox.Item
+                          key={item.value}
+                          className="relative cursor-default px-3 py-2 outline-none data-selected:bg-dark-gray-600 data-[highlighted]:bg-dark-gray-400"
+                          value={item.value}
+                        >
+                          <span>{item.voice.name}</span>
+                          {!item.voice.localService && (
+                            <CarbonCloud className="text-lg shrink-0 text-blue-600" />
+                          )}
+                        </Combobox.Item>
+                      )
+                    }}
+                  </Combobox.List>
+                </Combobox.Popup>
+              </Combobox.Positioner>
+            </Combobox.Portal>
+          </Combobox.Root>
+        </div>
+
+        <div className="grid grid-cols-subgrid col-span-full">
+          <span>voice</span>
+
           <AntdSelect<string, VoiceOptionGroup>
             showSearch
             className="min-w-40"
@@ -258,6 +316,7 @@ export default function WebSpeechAPIPage() {
                 {Object.keys(groupByLang).map((lang) => {
                   return (
                     <SelectItem key={lang} value={lang}>
+                      <SelectIndicator />
                       <SelectItemText>{lang}</SelectItemText>
                     </SelectItem>
                   )

@@ -37,11 +37,19 @@ export function SelectItem(
   return (
     <SelectPrimitive.Item
       className={cn(
-        'cursor-default px-3 py-2 outline-none data-selected:bg-dark-gray-600 data-[highlighted]:bg-dark-gray-400',
+        'relative cursor-default px-3 py-2 outline-none data-selected:bg-dark-gray-600 data-[highlighted]:bg-dark-gray-400',
         className,
       )}
       {...props}
     />
+  )
+}
+
+export function SelectIndicator() {
+  return (
+    <SelectPrimitive.ItemIndicator className="absolute inset-y-0 left-0.5 my-auto h-3 w-[2px] rounded-full bg-light-gray-800">
+      {null}
+    </SelectPrimitive.ItemIndicator>
   )
 }
 
