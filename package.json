@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@ant-design/v5-patch-for-react-19": "1.0.3",
-    "@atlaskit/pragmatic-drag-and-drop": "1.7.6",
+    "@atlaskit/pragmatic-drag-and-drop": "1.7.7",
     "@base-ui-components/react": "1.0.0-beta.3",
     "@ffmpeg/core-mt": "0.12.10",
     "@ffmpeg/ffmpeg": "0.12.15",
@@ -20,8 +20,7 @@
     "@fontsource-variable/fira-code": "5.2.6",
     "@fontsource-variable/noto-sans-sc": "5.2.6",
     "@lexical/react": "0.35.0",
-    "@primer/octicons-react": "19.16.0",
-    "@tanstack/react-query": "5.86.0",
+    "@tanstack/react-query": "5.87.4",
     "@wai-ri/core": "0.0.105",
     "antd": "5.27.3",
     "clsx": "2.1.1",
@@ -31,7 +30,7 @@
     "es-toolkit": "1.39.10",
     "exifreader": "4.31.2",
     "ffprobe-wasm": "0.3.1",
-    "i18next": "25.5.1",
+    "i18next": "25.5.2",
     "json5": "2.2.3",
     "katex": "0.16.22",
     "lexical": "0.35.0",
@@ -55,11 +54,11 @@
     "tailwind-merge": "3.3.1",
     "temporal-polyfill": "0.3.0",
     "use-context-selector": "2.0.0",
-    "uuid": "11.1.0"
+    "uuid": "13.0.0"
   },
   "devDependencies": {
     "@dprint/typescript": "0.95.11",
-    "@iconify/json": "2.2.381",
+    "@iconify/json": "2.2.383",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@tailwindcss/vite": "4.1.13",
@@ -74,7 +73,7 @@
     "@ziloen/tailwind-config": "2.0.8",
     "browserslist-to-esbuild": "2.1.1",
     "dprint": "0.50.1",
-    "eslint": "9.34.0",
+    "eslint": "9.35.0",
     "jsdom": "26.1.0",
     "lightningcss": "1.30.1",
     "tailwindcss": "4.1.13",
@@ -82,8 +81,8 @@
     "type-fest": "4.41.0",
     "typescript": "5.9.2",
     "unplugin-auto-import": "20.1.0",
-    "unplugin-icons": "22.2.0",
-    "vite": "npm:rolldown-vite@7.1.5",
+    "unplugin-icons": "22.3.0",
+    "vite": "npm:rolldown-vite@7.1.9",
     "vitest": "3.2.4"
   }
 }

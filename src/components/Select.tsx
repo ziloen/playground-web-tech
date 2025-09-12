@@ -1,7 +1,7 @@
 import { Select as SelectPrimitive } from '@base-ui-components/react'
-import { ChevronDownIcon } from '@primer/octicons-react'
 import type { ComponentProps } from 'react'
 import { cn } from '~/utils'
+import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
 
 export function Select<T>({ ...props }: ComponentProps<typeof SelectPrimitive.Root<T>>) {
   return <SelectPrimitive.Root<T> {...props} />
@@ -20,7 +20,11 @@ export function SelectTrigger(
     >
       {children}
 
-      <ChevronDownIcon className="opacity-50 in-data-popup-open:rotate-180" size={14} />
+      <OcticonChevronDown12
+        className="opacity-50 in-data-popup-open:rotate-180"
+        width={14}
+        height={14}
+      />
     </SelectPrimitive.Trigger>
   )
 }

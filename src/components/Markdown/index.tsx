@@ -4,7 +4,6 @@ import '@fontsource-variable/noto-sans-sc'
 import 'katex/dist/katex.css'
 import './markdown.css'
 
-import { ChevronDownIcon } from '@primer/octicons-react'
 import type { Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { Nodes as MdastNodes } from 'mdast'
 import type { Components as MarkdownComponents } from 'react-markdown'
@@ -15,12 +14,13 @@ import rehypeRaw from 'rehype-raw'
 import remarkGfmNoAutoLink from 'remark-gfm-no-autolink'
 import remarkMath from 'remark-math'
 import type { PluggableList, Plugin, Processor } from 'unified'
-import { CONTINUE, EXIT, SKIP, visit } from 'unist-util-visit'
+import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 import { useAutoResetState } from '~/hooks'
 import { cn } from '~/utils'
 import CarbonCheckmark from '~icons/carbon/checkmark'
 import CarbonCopy from '~icons/carbon/copy'
+import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
 
@@ -140,7 +140,7 @@ const components: Components = {
           <span className="text-sm">
             Thought process
           </span>
-          <ChevronDownIcon size={10} />
+          <OcticonChevronDown12 width={10} height={10} />
         </div>
 
         <div
