@@ -8,10 +8,39 @@ import {
   SelectValue,
 } from '~/components/Select'
 
+// 参考交互：https://developer.mozilla.org/docs/Web/CSS/CSS_backgrounds_and_borders/Border-image_generator
+// TODO: 实现双色/多色 stroke-dasharray
+// TODO: 实现斜向 stroke-dasharray，▰▱▰▱ 而不是 ■□■□
+// TODO: 同时支持 border-radius
+
 export default function BorderImage() {
   return (
     <div className="size-full">
       <Setting />
+
+      <svg xmlns="http://www.w3.org/2000/svg" width={100} height={100} viewBox="0 0 100 100">
+        <defs>
+          <pattern
+            id="pattern-border-image"
+            width="16"
+            height="10"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(45)"
+          >
+            <rect width="8" height="10" fill="#333" />
+            <rect x="8" width="8" height="10" fill="#ff0" />
+          </pattern>
+        </defs>
+
+        <line
+          x1="0"
+          y1="50"
+          x2="100"
+          y2="50"
+          stroke="url(#pattern-border-image)"
+          strokeWidth="10"
+        />
+      </svg>
     </div>
   )
 }
