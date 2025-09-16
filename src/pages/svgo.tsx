@@ -85,7 +85,7 @@ export default function SVGOPage() {
                   setOriginalSvg(value)
                   setOptimizedSvg(optimizedSvg)
                   setDimensions(dimensions)
-                  setSvgUri(svgToDataUrl(optimizedSvg))
+                  setSvgUri(optimizeSvgToDataUri(value))
                   transformWrapperRef.current?.resetTransform()
                 } catch (error) {
                   console.error('Invalid SVG input:', error)
@@ -100,7 +100,7 @@ export default function SVGOPage() {
                   setOriginalSvg(svgString)
                   setOptimizedSvg(optimizedSvg)
                   setDimensions(dimensions)
-                  setSvgUri(svgToDataUrl(optimizedSvg))
+                  setSvgUri(optimizeSvgToDataUri(svgString))
                   transformWrapperRef.current?.resetTransform()
                 } catch (error) {
                   console.error('Invalid SVG data URL input:', error)
@@ -120,7 +120,7 @@ export default function SVGOPage() {
 
               setOriginalSvg(v.default)
               setOptimizedSvg(optimizedSvg)
-              setSvgUri(svgToDataUrl(optimizedSvg))
+              setSvgUri(optimizeSvgToDataUri(v.default))
               transformWrapperRef.current?.resetTransform()
               setDimensions(dimensions)
             })
@@ -250,7 +250,8 @@ function SizeCompare(
   )
 }
 
-// TODO: 使用单引号，不转义空格，减少字符数
+// TODO: use single quotes and do not encode unreserved characters e.g. whitespace
+// https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding
 function svgToDataUrl(svg: string): string {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }
@@ -259,9 +260,6 @@ function dataUrlToSvg(dataUrl: string): string {
   return decodeURIComponent(dataUrl.slice('data:image/svg+xml,'.length))
 }
 
-/**
- * 深度递归将所有 value 为 svg 字符串的属性执行 svgo
- */
 function optimizeJsonObject(value: JsonValue): JsonValue {
   if (Array.isArray(value)) {
     return value.map(optimizeJsonObject)
@@ -283,7 +281,7 @@ function optimizeJsonObject(value: JsonValue): JsonValue {
       return optimizeSvg(value, { pretty: false }).data
     } else if (value.startsWith('data:image/svg+xml,')) {
       // 如果是 data url，提取出 SVG 字符串后执行优化
-      return svgToDataUrl(optimizeSvg(dataUrlToSvg(value), { pretty: false }).data)
+      return optimizeSvgToDataUri(dataUrlToSvg(value))
     }
   }
 
@@ -338,6 +336,12 @@ function optimizeSvg(
       pretty,
       indent: 2,
       eol: 'lf',
+      // Use single quotes to reduce size
+      // https://github.com/svg/svgo/issues/617
+      ...(datauri === 'enc' && {
+        attrStart: "='",
+        attrEnd: "'",
+      }),
     },
     plugins: [
       'removeTitle',
@@ -349,4 +353,8 @@ function optimizeSvg(
   }).data
 
   return { data, dimensions }
+}
+
+function optimizeSvgToDataUri(value: string): string {
+  return optimizeSvg(value, { pretty: false, datauri: 'enc' }).data
 }
