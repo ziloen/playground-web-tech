@@ -35,17 +35,16 @@
   .scrollbar {
     --scrollbar-thumb-color: transparent;
     --scrollbar-thumb-border: 3px;
-    /* --scrollbar-margin-block inherits: false，需要转发一下，不然 -webkit-scrollbar-track 读不到 */
+    /* --scrollbar-margin-block inherits: false，需要转发一下，否则 ::-webkit-scrollbar-track 无法继承 */
     --_scrollbar-margin-block: var(--scrollbar-margin-block);
     --_scrollbar-margin-inline: var(--scrollbar-margin-inline);
 
+    /* FIXME: 定义在 .scrollbar 上容易和外部的 .transition-colors 冲突导致失效 */
+    /* transition 属性在 ::-webkit-scrollbar-thumb 上无效 */
     transition: --scrollbar-thumb-color .2s ease,
       --scrollbar-thumb-border .2s ease;
 
-    &:hover,
-    &:active,
-    &:focus,
-    &:focus-within {
+    &:is(:hover, :active, :focus, :focus-within) {
       --scrollbar-thumb-color: var(--thumb-bg);
     }
 
@@ -77,7 +76,6 @@
       --scrollbar-thumb-border: 1px;
       --scrollbar-thumb-color: var(--thumb-bg-active);
     }
-
 
     &::-webkit-scrollbar-track {
       margin-block: var(--_scrollbar-margin-block);

@@ -3,9 +3,7 @@ import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
 import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
-import { asNonNullable, asType } from '@wai-ri/core'
-import { Select as AntdSelect } from 'antd'
-import type { DefaultOptionType } from 'antd/es/select'
+import { asNonNullable } from '@wai-ri/core'
 import { useTransform, type MotionValue } from 'motion/react'
 import { memo } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
@@ -28,14 +26,6 @@ const defaultZhText =
 
 const defaultEnText =
   `If you are a complete beginner, web development can be challenging — we will hold your hand and provide enough detail for you to feel comfortable and learn the topics properly. You should feel at home whether you are a student learning web development (on your own or as part of a class), a teacher looking for class materials, a hobbyist, or someone who just wants to understand more about how web technologies work.`
-
-interface VoiceOption extends DefaultOptionType {
-  voice: SpeechSynthesisVoice
-}
-
-interface VoiceOptionGroup extends DefaultOptionType {
-  options: VoiceOption[]
-}
 
 // @ts-expect-error navigator has no type
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -69,19 +59,18 @@ export default function WebSpeechAPIPage() {
     return Object.groupBy(voiceList, (voice) => voice.lang)
   }, [voiceList])
 
-  const options = useMemo<VoiceOptionGroup[]>(() => {
+  const options = useMemo(() => {
     if (!groupByLang) return []
 
     return Object.entries(groupByLang).map(([lang, voices]) => {
       asNonNullable(voices)
 
       return {
-        label: <span>{lang}</span>,
-        title: lang,
-        options: voices.map((voice) => ({
+        value: lang,
+        label: lang,
+        items: voices.map((voice) => ({
           value: voice.name,
           label: voice.name,
-
           voice,
         })),
       }
@@ -215,11 +204,18 @@ export default function WebSpeechAPIPage() {
           <Combobox.Root
             value={selectedVoice}
             onValueChange={setSelectedVoice}
-            items={options.flatMap((group) => group.options)}
+            items={options}
             multiple={false}
           >
             <div className="relative">
-              <Combobox.Input className="grid min-h-[1lh] w-fit min-w-[200px] grid-flow-col items-center justify-between rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 px-3 py-2 shadow-sm outline-2 outline-offset-2 outline-blue-500 outline-none select-none hover:bg-dark-gray-700 focus-visible:outline-solid" />
+              <Combobox.Input
+                className="grid min-h-[1lh] w-stretch min-w-[200px] grid-flow-col items-center justify-between rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 px-3 py-2 shadow-sm outline-2 outline-offset-2 outline-blue-500 outline-none select-none hover:bg-dark-gray-700 focus-visible:outline-solid field-sizing-content"
+                style={{
+                  fontFamily: 'inherit',
+                  fontSize: 'inherit',
+                  fontStyle: 'inherit',
+                }}
+              />
 
               <Combobox.Trigger className="absolute end-2 inset-y-0 my-auto border-none bg-transparent ">
                 <OcticonChevronDown12
@@ -232,9 +228,7 @@ export default function WebSpeechAPIPage() {
 
             <Combobox.Portal>
               <Combobox.Positioner align="start" side="bottom" sideOffset={8}>
-                <Combobox.Popup
-                  className={'max-h-(--available-height) min-w-[200px] overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 shadow-lg outline-none data-starting-style:opacity-0 transition-[scale,opacity] data-starting-style:scale-90 data-ending-style:opacity-0 data-ending-style:scale-90 origin-(--transform-origin)'}
-                >
+                <Combobox.Popup className="max-h-[min(var(--available-height),500px)] min-w-[200px] origin-(--transform-origin) overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 shadow-lg transition-[scale,opacity] outline-none data-ending-style:scale-90 data-ending-style:opacity-0 data-starting-style:scale-90 data-starting-style:opacity-0">
                   <Combobox.Empty>
                     <div className="px-3 py-2">
                       Nothing found
@@ -242,57 +236,31 @@ export default function WebSpeechAPIPage() {
                   </Combobox.Empty>
 
                   <Combobox.List>
-                    {(item: VoiceOption) => {
-                      return (
-                        <Combobox.Item
-                          key={item.value}
-                          className="relative cursor-default px-3 py-2 outline-none data-selected:bg-dark-gray-600 data-[highlighted]:bg-dark-gray-400"
-                          value={item.value}
-                        >
-                          <span>{item.voice.name}</span>
-                          {!item.voice.localService && (
-                            <CarbonCloud className="text-lg shrink-0 text-blue-600" />
-                          )}
-                        </Combobox.Item>
-                      )
-                    }}
+                    {(group: (typeof options)[number]) => (
+                      <Combobox.Group key={group.value}>
+                        <Combobox.GroupLabel className="text-light-gray-800 py-2 ps-3">
+                          {group.label}
+                        </Combobox.GroupLabel>
+
+                        {group.items.map((item) => (
+                          <Combobox.Item
+                            key={item.value}
+                            className="relative flex cursor-default items-center gap-2 py-2 outline-none data-selected:bg-dark-gray-600 data-[highlighted]:bg-dark-gray-400 ps-5 pe-3"
+                            value={item.value}
+                          >
+                            <span>{item.voice.name}</span>
+                            {!item.voice.localService && (
+                              <CarbonCloud className="text-lg shrink-0 text-blue-600" />
+                            )}
+                          </Combobox.Item>
+                        ))}
+                      </Combobox.Group>
+                    )}
                   </Combobox.List>
                 </Combobox.Popup>
               </Combobox.Positioner>
             </Combobox.Portal>
           </Combobox.Root>
-        </div>
-
-        <div className="grid grid-cols-subgrid col-span-full">
-          <span>voice</span>
-
-          <AntdSelect<string, VoiceOptionGroup>
-            showSearch
-            className="min-w-40"
-            virtual={false}
-            value={selectedVoice}
-            styles={{
-              popup: {
-                root: {
-                  maxHeight: '400px',
-                },
-              },
-            }}
-            onChange={setSelectedVoice}
-            popupMatchSelectWidth={false}
-            optionRender={({ data }) => {
-              asType<VoiceOption>(data)
-              return (
-                <div className="flex items-center gap-2 min-w-max shrink-0">
-                  <span>{data.voice.name}</span>
-                  {!data.voice.localService && (
-                    <CarbonCloud className="text-lg shrink-0 text-blue-600" />
-                  )}
-                </div>
-              )
-            }}
-            options={options}
-          />
         </div>
 
         {groupByLang && (

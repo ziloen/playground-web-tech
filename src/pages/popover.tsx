@@ -19,16 +19,10 @@ export default function PopoverPage() {
               sideOffset={8}
               side="top"
               align="start"
-              sticky
-              collisionAvoidance={{
-                side: 'flip',
-                // align: 'shift',
-                // align: '',
-                // fallbackAxisSide: 'start',
-              }}
-              trackAnchor={false}
+              collisionAvoidance={{ fallbackAxisSide: 'none' }}
+              trackAnchor={true}
             >
-              <Popover.Popup className="bg-[canvas] rounded-lg outline outline-dark-gray-100 px-4 py-2 h-[500px] max-h-[calc(100vh-10px)]">
+              <Popover.Popup className="bg-[canvas] rounded-lg outline outline-dark-gray-100 px-4 py-2 h-[500px] max-h-[calc(var(--available-height)-10px)]">
                 <div className="">popover content</div>
               </Popover.Popup>
             </Popover.Positioner>
