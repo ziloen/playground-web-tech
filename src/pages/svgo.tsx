@@ -288,12 +288,13 @@ function optimizeJsonObject(value: JsonValue): JsonValue {
   return value
 }
 
-function createDimensionsExtractor() {
-  const dimensions = { width: 0, height: 0 }
-
+function createDimensionsExtractor(dimensions: {
+  width: number
+  height: number
+}) {
   const plugin: CustomPlugin = {
     name: 'extract-dimensions',
-    fn() {
+    fn(root, params, info) {
       return {
         element: {
           // Node, parentNode
@@ -319,18 +320,19 @@ function createDimensionsExtractor() {
     },
   }
 
-  return [dimensions, plugin] as const
+  return plugin
 }
 
 function optimizeSvg(
   value: string,
   options: { pretty?: boolean; datauri?: DataUri } = {},
 ) {
-  const [dimensions, dimensionsPlugin] = createDimensionsExtractor()
+  const dimensions = { width: 0, height: 0 }
+  const dimensionsPlugin = createDimensionsExtractor(dimensions)
 
   const { pretty = true, datauri = undefined } = options
 
-  const data = optimize(value, {
+  const { data } = optimize(value, {
     multipass: true,
     js2svg: {
       pretty,
@@ -350,7 +352,7 @@ function optimizeSvg(
       dimensionsPlugin,
     ],
     datauri,
-  }).data
+  })
 
   return { data, dimensions }
 }
