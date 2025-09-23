@@ -81,7 +81,7 @@ html {
 }
 
 /* 用于给百分比数值做动画 */
-@property --percent {
+@property --animatable-percent {
   syntax: "<percentage>";
   initial-value: 100%;
   inherits: false;
