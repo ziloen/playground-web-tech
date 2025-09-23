@@ -295,6 +295,10 @@ function createDimensionsExtractor(dimensions: {
   const plugin: CustomPlugin = {
     name: 'extract-dimensions',
     fn(root, params, info) {
+      if (info.multipassCount > 0) {
+        return null
+      }
+
       return {
         element: {
           // Node, parentNode
@@ -327,6 +331,15 @@ function optimizeSvg(
   value: string,
   options: { pretty?: boolean; datauri?: DataUri } = {},
 ) {
+  // https://github.com/svg/svgo/issues?q=is%3Aissue%20state%3Aopen%20foreignObject
+  if (value.includes('<foreignObject')) {
+    console.warn('SVG contains <foreignObject>, which may not be supported by SVGO properly.')
+    return {
+      data: options.datauri === 'enc' ? svgToDataUrl(value) : value,
+      dimensions: { width: 0, height: 0 },
+    }
+  }
+
   const dimensions = { width: 0, height: 0 }
   const dimensionsPlugin = createDimensionsExtractor(dimensions)
 
@@ -338,6 +351,7 @@ function optimizeSvg(
       pretty,
       indent: 2,
       eol: 'lf',
+      finalNewline: pretty,
       // Use single quotes to reduce size
       // https://github.com/svg/svgo/issues/617
       ...(datauri === 'enc' && {
@@ -346,6 +360,14 @@ function optimizeSvg(
       }),
     },
     plugins: [
+      {
+        name: 'removeAttrs',
+        params: {
+          // data-figma-skip-parse
+          // data-figma-gradient-fill
+          attrs: 'data-figma-.*',
+        },
+      },
       'removeTitle',
       'removeScripts',
       'preset-default',
