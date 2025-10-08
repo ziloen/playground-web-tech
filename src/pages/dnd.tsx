@@ -5,6 +5,7 @@ import {
   monitorForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { asType } from '@wai-ri/core'
+import type { RefCallback } from 'react'
 import { useMemoizedFn } from '~/hooks'
 import CarbonTrashCan from '~icons/carbon/trash-can'
 
@@ -13,11 +14,11 @@ import CarbonTrashCan from '~icons/carbon/trash-can'
 // Change order when drag over between items
 
 export default function DND() {
-  const targetRef = useRef<HTMLDivElement>(null!)
-
   const [dropItems, setDropItems] = useState<{ kind: string; type: string }[]>([])
   const [dropFiles, setDropFiles] = useState<File[]>([])
   const [dropTypes, setDropTypes] = useState<string[]>([])
+
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const onDrop = useMemoizedFn((data: DataTransfer | FileList) => {
     if (data instanceof DataTransfer) {
@@ -38,13 +39,13 @@ export default function DND() {
     inputRef.current.click()
   })
 
-  const inputRef = useRef<HTMLInputElement>(null)
-  useEffect(() => {
+  const dropZoneRef = useMemoizedFn<RefCallback<HTMLDivElement>>((el) => {
+    if (!el) return
+
     const ac = new AbortController()
     const signal = ac.signal
-    const target = targetRef.current
 
-    target.addEventListener('dragenter', (e) => {
+    el.addEventListener('dragenter', (e) => {
       e.preventDefault()
 
       console.log('dragenter', e)
@@ -53,16 +54,16 @@ export default function DND() {
       onDrop(e.dataTransfer)
     }, { signal })
 
-    target.addEventListener('dragover', (e) => {
+    el.addEventListener('dragover', (e) => {
       e.preventDefault()
     }, { signal })
 
-    target.addEventListener('dragleave', (e) => {
+    el.addEventListener('dragleave', (e) => {
       console.log('dragleave', e)
       setDropItems([])
     }, { signal })
 
-    target.addEventListener('drop', (e) => {
+    el.addEventListener('drop', (e) => {
       e.preventDefault()
 
       console.log('drop', e)
@@ -100,12 +101,12 @@ export default function DND() {
       ac.abort()
       inputRef.current = null
     }
-  }, [])
+  })
 
   return (
     <div className="relative size-full overflow-clip">
       <div
-        ref={targetRef}
+        ref={dropZoneRef}
         tabIndex={0}
         className="size-[200px] cursor-pointer focus:outline-blue-400 focus:outline rounded-[6px] bg-dark-gray-50"
         onClick={openFilePicker}

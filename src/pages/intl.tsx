@@ -161,11 +161,14 @@ function TimeNow({ language }: { language: string }) {
     }), [language])
 
   const nowStr = useMotionValue('')
+  const [dateTime, setDateTime] = useState('')
 
   useEffect(() => {
     let animationFrameId: number
 
     function updateNow() {
+      const now = new Date()
+      setDateTime(now.toISOString())
       nowStr.set(formatter.format(new Date()))
       animationFrameId = requestAnimationFrame(updateNow)
     }
@@ -175,7 +178,7 @@ function TimeNow({ language }: { language: string }) {
     return () => cancelAnimationFrame(animationFrameId)
   }, [formatter])
 
-  return <motion.div>{nowStr}</motion.div>
+  return <motion.time dateTime={dateTime}>{nowStr}</motion.time>
 }
 
 /**

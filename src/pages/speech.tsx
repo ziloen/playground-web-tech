@@ -206,6 +206,7 @@ export default function WebSpeechAPIPage() {
             onValueChange={setSelectedVoice}
             items={options}
             multiple={false}
+            autoHighlight
           >
             <div className="relative">
               <Combobox.Input
