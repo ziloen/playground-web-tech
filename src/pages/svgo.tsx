@@ -19,6 +19,7 @@ export default function SVGOPage() {
     height: 0,
   })
   const [copied, setCopied] = useAutoResetState(false, 2_000)
+  const [showGridLines, setShowGridLines] = useState(false)
   // #endregion
 
   // #region useRef
@@ -128,6 +129,13 @@ export default function SVGOPage() {
         >
           Demo
         </div>
+
+        <div
+          className="cursor-pointer hover:bg-dark-gray-400 py-3 px-4"
+          onClick={() => setShowGridLines(!showGridLines)}
+        >
+          Toggle Grid Lines
+        </div>
       </div>
 
       {/* TODO: configuration */}
@@ -154,6 +162,8 @@ export default function SVGOPage() {
             width: '100%',
             display: 'grid',
             placeItems: 'center',
+            gridTemplateColumns: '1fr auto 1fr',
+            gridTemplateRows: '1fr auto 1fr',
           }}
         >
           {/* TODO: Add text color: white to iframe */}
@@ -166,8 +176,47 @@ export default function SVGOPage() {
             style={{
               width: dimensions.width ? `${dimensions.width}px` : '100%',
               height: dimensions.height ? `${dimensions.height}px` : '100%',
+              gridColumn: '2 / 3',
+              gridRow: '2 / 3',
             }}
           />
+
+          {showGridLines && (
+            <>
+              {/* top */}
+              <div
+                className="bg-blue-200/40 w-full h-px place-self-end"
+                style={{
+                  gridColumn: '1 / -1',
+                  gridRow: '1 / 2',
+                }}
+              />
+              {/* bottom */}
+              <div
+                className="bg-blue-200/40 w-full h-px place-self-start"
+                style={{
+                  gridColumn: '1 / -1',
+                  gridRow: '3 / 4',
+                }}
+              />
+              {/* left */}
+              <div
+                className="bg-blue-200/40 w-px h-full place-self-end"
+                style={{
+                  gridColumn: '1 / 2',
+                  gridRow: '1 / -1',
+                }}
+              />
+              {/* right */}
+              <div
+                className="bg-blue-200/40 w-px h-full place-self-start"
+                style={{
+                  gridColumn: '3 / 4',
+                  gridRow: '1 / -1',
+                }}
+              />
+            </>
+          )}
         </TransformComponent>
       </TransformWrapper>
 
