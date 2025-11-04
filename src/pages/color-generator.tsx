@@ -5,13 +5,11 @@
 
 import { Input } from '@base-ui-components/react'
 import Color from 'colorjs.io'
+import { randomInt } from 'es-toolkit'
+import { generateColorRamp } from 'rampensau'
 
 export default function ColorGenerator() {
   const [inputVal, setInputVal] = useState('#8519F1')
-
-  useEffect(() => {
-    console.log(Color.spaces)
-  }, [])
 
   const { bgColor, activeColor, hoverColor, textColor } = useMemo(() => {
     let color: Color
@@ -117,30 +115,43 @@ const colorSpaces = [
   'oklab',
   'lch',
   'hsl',
-]
+].map((space) => Color.spaces[space])
 
 function ColorCompare() {
-  const [[startColor, endColor], setGradient] = useState(['#ffffff', '#000000'])
-
-  const gradients = useMemo(() => {
-    return colorSpaces.map((space) => ({
-      name: Color.spaces[space].name,
-    }))
-  }, [])
+  const [gradients, setGradients] = useState(['#fff', '#000'])
 
   function generateRandomColor() {
-    const r1 = Math.floor(Math.random() * 256)
-    const g1 = Math.floor(Math.random() * 256)
-    const b1 = Math.floor(Math.random() * 256)
+    const hslColorValues = generateColorRamp({
+      // hue generation options
+      total: randomInt(3, 6), // number of colors in the ramp
+      hStart: Math.random() * 360, // hue at the start of the ramp
+      hCycles: 1, // number of full hue cycles
+      // (.5 = 180°, 1 = 360°, 2 = 720°, etc.)
+      hStartCenter: 0.5, // where in the ramp the hue should be centered
+      hEasing: (x, fr) => x, // hue easing function x is a value between 0 and 1
+      // fr is the size of each fraction of the ramp: (1 / total)
 
-    const r2 = Math.floor(Math.random() * 256)
-    const g2 = Math.floor(Math.random() * 256)
-    const b2 = Math.floor(Math.random() * 256)
+      // if you want to use a specific list of hues, you can pass an array of hues to the hueList option
+      // all other hue options will be ignored
 
-    setGradient([
-      `rgb(${r1}, ${g1}, ${b1})`,
-      `rgb(${r2}, ${g2}, ${b2})`,
-    ])
+      // hueList: [...],                      // list of hues to use
+
+      // saturation
+      sRange: [Math.random() * 0.5, 1], // saturation range
+      // sEasing: (x, fr) => x ** 2, // saturation easing function
+
+      // lightness
+      lRange: [Math.random() * 0.4, 0.95], // lightness range
+      // lEasing: (x, fr) => x ** 1.5, // lightness easing function
+
+      transformFn: (color, i) => color,
+    })
+
+    setGradients(
+      hslColorValues.map(([h, s, l]) =>
+        `hsl(${h.toFixed(2)}deg ${(s * 100).toFixed(2)}% ${(l * 100).toFixed(2)}%)`
+      ),
+    )
   }
 
   return (
@@ -149,8 +160,9 @@ function ColorCompare() {
         <button onClick={generateRandomColor}>
           <span>Random</span>
           <div className="flex">
-            <div className="size-[16px]" style={{ background: startColor }} />
-            <div className="size-[16px]" style={{ background: endColor }} />
+            {gradients.map((color, i) => (
+              <div key={color} className="size-[16px]" style={{ background: color }} />
+            ))}
           </div>
         </button>
 
@@ -158,7 +170,7 @@ function ColorCompare() {
           <div
             key={i}
             className="flex border cursor-pointer"
-            onClick={() => setGradient([start, end])}
+            onClick={() => setGradients([start, end])}
           >
             <div
               className="size-[16px]"
@@ -172,20 +184,21 @@ function ColorCompare() {
         ))}
       </div>
 
-      <div className="flex flex-col gap-2">
-        {gradients.map(({ name }) => (
+      <div
+        className="flex flex-col gap-2"
+        style={{
+          '--gradients': gradients.join(', '),
+        }}
+      >
+        {colorSpaces.map(({ name }) => (
           <div key={name} className="flex justify-between items-center w-[300px]">
             <div>{name}</div>
             <div
               className="w-[250px] h-[32px] rounded-4px"
               style={{
-                '--start': startColor,
-                '--end': endColor,
-                background:
-                  `linear-gradient(90deg in ${name.toLowerCase()}, var(--start), var(--end)`,
+                background: `linear-gradient(90deg in ${name.toLowerCase()}, var(--gradients))`,
               }}
-            >
-            </div>
+            />
           </div>
         ))}
       </div>

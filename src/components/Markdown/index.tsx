@@ -125,7 +125,7 @@ const components: Components = {
       <div
         className="grid transition-[grid-template-rows] duration-100"
         style={{
-          gridTemplateRows: isOpen ? 'auto 1fr' : 'auto 0fr',
+          gridTemplateRows: isOpen ? 'max-content 1fr' : 'max-content 0fr',
         }}
       >
         <div
@@ -145,7 +145,7 @@ const components: Components = {
 
         <div
           className={clsx(
-            'overflow-clip min-h-0 transition-opacity duration-100',
+            'overflow-hidden transition-opacity duration-100',
             isOpen ? 'opacity-100' : 'opacity-0',
           )}
         >
