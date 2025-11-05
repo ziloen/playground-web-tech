@@ -86,3 +86,9 @@ html {
   initial-value: 100%;
   inherits: false;
 }
+
+@property --animatable-number {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: false;
+}

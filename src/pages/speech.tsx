@@ -730,11 +730,17 @@ function AudioVisualization() {
       </button>
 
       <div
-        className="h-8 w-[600px] flex items-center gap-0.5 overflow-visible relative transition-[--animatable-percent] duration-200"
+        className="h-8 w-[600px] flex items-center gap-0.5 overflow-visible relative transition-[--animatable-number] duration-200"
         style={{
-          '--animatable-percent': recording ? '100%' : '0%',
-          maskImage:
-            'linear-gradient(to right, transparent, #000 calc(0.11 * var(--animatable-percent)), black 89%, transparent 89%), linear-gradient(to left, transparent, #000 calc(0.11 * var(--animatable-percent)), #000 89%, transparent 89%)',
+          '--animatable-number': recording ? '1' : '0',
+          '--fade-length': '11%',
+          maskImage: `linear-gradient(
+              to right,
+              transparent 0px,
+              #000 calc(var(--fade-length) * var(--animatable-number)),
+              #000 calc(100% - (var(--fade-length) * var(--animatable-number))),
+              transparent 100%
+            )`,
           maskRepeat: 'no-repeat',
         }}
       >
