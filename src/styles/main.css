@@ -81,13 +81,13 @@ html {
 }
 
 /* 用于给百分比数值做动画 */
-@property --animatable-percent {
+@property --animatable-percent-1 {
   syntax: "<percentage>";
   initial-value: 100%;
   inherits: false;
 }
 
-@property --animatable-number {
+@property --animatable-number-1 {
   syntax: "<number>";
   initial-value: 0;
   inherits: false;
