@@ -2,13 +2,13 @@
 
 @property --scrollbar-thumb-color {
   syntax: "<color>";
-  inherits: true;
+  inherits: false;
   initial-value: white;
 }
 
 @property --scrollbar-thumb-border {
   syntax: "<length>";
-  inherits: true;
+  inherits: false;
   initial-value: 0px;
 }
 
@@ -35,9 +35,6 @@
   .scrollbar {
     --scrollbar-thumb-color: transparent;
     --scrollbar-thumb-border: 3px;
-    /* --scrollbar-margin-block inherits: false，需要转发一下，否则 ::-webkit-scrollbar-track 无法继承 */
-    --_scrollbar-margin-block: var(--scrollbar-margin-block);
-    --_scrollbar-margin-inline: var(--scrollbar-margin-inline);
 
     /* FIXME: 定义在 .scrollbar 上容易和外部的 .transition-colors 冲突导致失效 */
     /* transition 属性在 ::-webkit-scrollbar-thumb 上无效 */
@@ -55,6 +52,8 @@
     }
 
     &::-webkit-scrollbar-thumb {
+      --scrollbar-thumb-color: inherit;
+      --scrollbar-thumb-border: inherit;
       background-color: var(--scrollbar-thumb-color);
       background-clip: padding-box;
       border-radius: var(--scrollbar-size) / calc(var(--scrollbar-size) - (var(--scrollbar-thumb-border) * 2));
@@ -78,8 +77,11 @@
     }
 
     &::-webkit-scrollbar-track {
-      margin-block: var(--_scrollbar-margin-block);
-      margin-inline: var(--_scrollbar-margin-inline);
+      /* 手动 inherit 继承父级变量 */
+      --scrollbar-margin-block: inherit;
+      --scrollbar-margin-inline: inherit;
+      margin-block: var(--scrollbar-margin-block);
+      margin-inline: var(--scrollbar-margin-inline);
       border-radius: 9999px;
       background-color: var(--track-bg);
     }

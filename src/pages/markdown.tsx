@@ -25,6 +25,9 @@ supportedTypes.forEach(type => {
   '<think>\n好的，用户问“你好吗”，我需要用中文回应。根据指南，回答要简洁自然，符合对话风格。首先，我应该礼貌回应，然后提供进一步帮助。还要注意避免重复和生硬用语。可以回答：“你好！我是一个AI助手，没有情绪感受，但随时准备好为你提供帮助。今天有什么需要我为你处理的吗？” 这样既友好又符合要求，同时保持口语化。检查是否符合所有指南，确保没有使用复杂结构或冗长句子。确认无误后，发送回复。\n</think>',
   '    test ~~indented code~~ *abc* `are you ok` [some link](https://example.com)',
   'https://test/auto/link1234   www.abc.com/abc  abc@abc.abc',
+
+  // FIXME: `**"` 和 `"**` 被视为整体导致没有加粗
+  '**"色即是空，空即是色"**的佛学思想贯穿全书。',
 ].join('\n\n')
 
 export default function MarkdownPage() {
