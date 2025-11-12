@@ -43,6 +43,8 @@ export default function CSSPage() {
 
       <ScrollClipMargin />
 
+      <ScrollDefaultCenter />
+
       <div className="h-100"></div>
     </div>
   )
@@ -610,7 +612,7 @@ function ScrollClipMargin() {
   const editorRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className="w-[300px] h-[300px] overflow-visible relative ms-10">
+    <div className="w-[300px] h-[300px] overflow-visible relative ms-10 my-20">
       <div className="absolute inset-y-0 -inset-x-2 border bg-white/10 z-1 pointer-events-none" />
 
       <div
@@ -627,7 +629,7 @@ function ScrollClipMargin() {
           <div
             ref={editorRef}
             contentEditable
-            className="min-h-[300px] basis-max grow bg-dark-gray-500 outline-none"
+            className="min-h-[200px] basis-max grow bg-dark-gray-500 outline-none"
             // FIXME: 使用 scroll-padding 来添加输入内边距时，手动添加的内容无效
             // 例如手动添加换行时
             onKeyDown={(e) => {
@@ -657,6 +659,33 @@ function ScrollClipMargin() {
           {/* <textarea className="grow basis-max min-h-[300px] field-sizing-content"></textarea> */}
           {/* <div className="h-[50px] bg-green-700 mt-auto"></div> */}
         </div>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * 将滚动容器默认滚动到中间位置
+ */
+function ScrollDefaultCenter() {
+  const [snapCenter, setSnapCenter] = useState(true)
+
+  return (
+    <div className="overflow-x-auto snap-x w-100 h-10 snap-mandatory">
+      <div className="w-200 relative h-full bg-linear-to-r/oklch from-blue-400 to-green-400">
+        {snapCenter && (
+          <div
+            className="absolute inset-0 m-auto size-1 bg-red snap-center"
+            ref={(el) => {
+              // 初始渲染后移除 snap 元素，避免影响后续滚动行为
+              if (el) {
+                requestAnimationFrame(() => {
+                  setSnapCenter(false)
+                })
+              }
+            }}
+          />
+        )}
       </div>
     </div>
   )
