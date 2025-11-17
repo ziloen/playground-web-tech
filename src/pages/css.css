@@ -1,0 +1,13 @@
+@property --captured-length {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: true;
+}
+
+
+/* 
+support test for division of mixed units
+
+https://github.com/web-platform-tests/interop/issues/513
+*/
+@supports (-webkit-line-clamp: calc(100px / 1lh)) {}

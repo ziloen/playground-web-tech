@@ -1,3 +1,6 @@
+import './css.css'
+
+import type { RefCallback } from 'react'
 import styles from './scrollbar/index.module.css'
 
 const testString =
@@ -44,6 +47,8 @@ export default function CSSPage() {
       <ScrollClipMargin />
 
       <ScrollDefaultCenter />
+
+      <TextFitToWidth />
 
       <div className="h-100"></div>
     </div>
@@ -668,24 +673,59 @@ function ScrollClipMargin() {
  * 将滚动容器默认滚动到中间位置
  */
 function ScrollDefaultCenter() {
-  const [snapCenter, setSnapCenter] = useState(true)
+  const hideOnLoad = useCallback<RefCallback<HTMLElement>>((el) => {
+    if (!el) return
+
+    requestAnimationFrame(() => {
+      el.style.display = 'none'
+    })
+  }, [])
 
   return (
     <div className="overflow-x-auto snap-x w-100 h-10 snap-mandatory">
       <div className="w-200 relative h-full bg-linear-to-r/oklch from-blue-400 to-green-400">
-        {snapCenter && (
-          <div
-            className="absolute inset-0 m-auto size-1 bg-red snap-center"
-            ref={(el) => {
-              // 初始渲染后移除 snap 元素，避免影响后续滚动行为
-              if (el) {
-                requestAnimationFrame(() => {
-                  setSnapCenter(false)
-                })
-              }
-            }}
-          />
-        )}
+        <div
+          aria-hidden
+          className="absolute inset-0 size-0 m-auto pointer-events-none snap-center invisible"
+          ref={hideOnLoad}
+        />
+      </div>
+    </div>
+  )
+}
+
+/**
+ * 将字体大小设置为占满容器宽度
+ *
+ * https://kizu.dev/fit-to-width/
+ */
+function TextFitToWidth() {
+  return (
+    <div className="resizable-x w-[400px] bg-dark-gray-200 flex @container">
+      <div
+        className="outline flex-1 @container"
+        style={{
+          '--captured-length': '100cqi',
+          '--available-space': 'var(--captured-length)',
+        }}
+      >
+        <div
+          style={{
+            inlineSize: 'var(--available-space)',
+            '--captured-length': '100cqi',
+            '--ratio':
+              'tan(atan2(var(--available-space), var(--available-space) - var(--captured-length)))',
+            // 在 Firefox 上 ratio 计算可能不精确导致 1em * ratio 后略大于 available-space，从而导致换行
+            '--dynamic-font-size': 'calc(0.999em * var(--ratio))',
+            fontSize: 'clamp(1em, var(--dynamic-font-size), 120px)',
+          }}
+        >
+          Are you OK?
+        </div>
+      </div>
+
+      <div className="outline whitespace-nowrap">
+        Are you OK?
       </div>
     </div>
   )
