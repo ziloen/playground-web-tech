@@ -203,7 +203,7 @@ export default function WebSpeechAPIPage() {
 
           <Combobox.Root
             value={selectedVoice}
-            onValueChange={setSelectedVoice}
+            onValueChange={(v) => v && setSelectedVoice(v)}
             items={options}
             multiple={false}
             autoHighlight
@@ -271,6 +271,7 @@ export default function WebSpeechAPIPage() {
             <Select
               value={lang}
               onValueChange={(lang) => {
+                if (!lang) return
                 setLang(lang)
                 if (lang === 'en-US') {
                   setInputText(defaultEnText)

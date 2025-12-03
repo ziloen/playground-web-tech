@@ -128,7 +128,7 @@ function LanguageSelect({
   return (
     <Select
       value={language}
-      onValueChange={onChange}
+      onValueChange={(v) => v && onChange(v)}
       open={isOpen}
       onOpenChange={onOpenChange}
     >
