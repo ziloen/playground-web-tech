@@ -6,12 +6,6 @@
   initial-value: white;
 }
 
-@property --scrollbar-thumb-border {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
 @property --scrollbar-margin-block {
   syntax: "<length>+";
   inherits: false;
@@ -25,55 +19,57 @@
 }
 
 .scrollbar {
-  --scrollbar-size: 10px;
-  --track-bg: oklab(100% 0 0 / 0.05);
-  --thumb-bg: oklch(100% 0 0 / 0.2);
-  --thumb-bg-active: oklch(100% 0 0 / 0.5);
+  --scrollbar-width: 10px;
+  --scrollbar-thumb-width: 4px;
+
+  --scrollbar-track-bg: oklab(100% 0 0 / 0.05);
+  --scrollbar-thumb-bg: oklch(100% 0 0 / 0.2);
+  --scrollbar-thumb-bg-active: oklch(100% 0 0 / 0.5);
 }
 
 @supports selector(::-webkit-scrollbar-thumb) {
   .scrollbar {
     --scrollbar-thumb-color: transparent;
-    --scrollbar-thumb-border: 3px;
 
     /* FIXME: 定义在 .scrollbar 上容易和外部的 .transition-colors 冲突导致失效 */
     /* transition 属性在 ::-webkit-scrollbar-thumb 上无效 */
-    transition: --scrollbar-thumb-color .2s ease,
-      --scrollbar-thumb-border .2s ease;
+    transition: --scrollbar-thumb-color .2s ease;
 
     &:is(:hover, :active, :focus, :focus-within) {
-      --scrollbar-thumb-color: var(--thumb-bg);
+      --scrollbar-thumb-color: var(--scrollbar-thumb-bg);
     }
 
     &::-webkit-scrollbar {
-      width: var(--scrollbar-size);
-      height: var(--scrollbar-size);
+      width: var(--scrollbar-width);
+      height: var(--scrollbar-width);
       background-color: transparent;
     }
 
     &::-webkit-scrollbar-thumb {
       --scrollbar-thumb-color: inherit;
-      --scrollbar-thumb-border: inherit;
       background-color: var(--scrollbar-thumb-color);
       background-clip: padding-box;
-      border-radius: var(--scrollbar-size) / calc(var(--scrollbar-size) - (var(--scrollbar-thumb-border) * 2));
-
-      border-block-width: 0px;
-      border-inline-width: var(--scrollbar-thumb-border);
       border-style: solid;
       border-color: transparent;
+
+      /* border-radius: <x-radius>/<y-radius> */
+      /* x-radius: scrollbar-width / 2 */
+      /* y-radius: thumb-width / 2 */
+      border-radius: calc(var(--scrollbar-width) / 2) / calc(var(--scrollbar-thumb-width) / 2);
+      border-block-width: 0px;
+      border-inline-width: calc((var(--scrollbar-width) - var(--scrollbar-thumb-width)) / 2);
     }
 
     &::-webkit-scrollbar-thumb:horizontal {
-      border-block-width: var(--scrollbar-thumb-border);
+      border-radius: calc(var(--scrollbar-thumb-width) / 2) / calc(var(--scrollbar-width) / 2);
+      border-block-width: calc((var(--scrollbar-width) - var(--scrollbar-thumb-width)) / 2);
       border-inline-width: 0px;
-      border-radius: calc(var(--scrollbar-size) - (var(--scrollbar-thumb-border) * 2)) / var(--scrollbar-size);
     }
 
     &::-webkit-scrollbar-thumb:hover,
     &::-webkit-scrollbar-thumb:active {
-      --scrollbar-thumb-border: 1px;
-      --scrollbar-thumb-color: var(--thumb-bg-active);
+      --scrollbar-thumb-width: 8px;
+      --scrollbar-thumb-color: var(--scrollbar-thumb-bg-active);
     }
 
     &::-webkit-scrollbar-track {
@@ -83,7 +79,7 @@
       margin-block: var(--scrollbar-margin-block);
       margin-inline: var(--scrollbar-margin-inline);
       border-radius: 9999px;
-      background-color: var(--track-bg);
+      background-color: var(--scrollbar-track-bg);
     }
 
     &::-webkit-scrollbar-button,
@@ -96,7 +92,7 @@
 @supports not selector(::-webkit-scrollbar-thumb) {
   .scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: transparent var(--track-bg);
+    scrollbar-color: transparent var(--scrollbar-track-bg);
     scrollbar-arrow-color: red;
 
     transition-property: scrollbar-color;
@@ -107,7 +103,7 @@
     &:active,
     &:focus,
     &:focus-within {
-      scrollbar-color: var(--thumb-bg) var(--track-bg);
+      scrollbar-color: var(--scrollbar-thumb-bg) var(--scrollbar-track-bg);
     }
   }
 }

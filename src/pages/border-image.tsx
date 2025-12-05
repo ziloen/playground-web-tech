@@ -8,7 +8,10 @@ import {
   SelectValue,
 } from '~/components/Select'
 
-// 参考交互：https://developer.mozilla.org/docs/Web/CSS/CSS_backgrounds_and_borders/Border-image_generator
+// 参考交互：
+// https://developer.mozilla.org/docs/Web/CSS/Guides/Backgrounds_and_borders/Border-image_generator
+// https://developer.mozilla.org/docs/Web/CSS/Guides/Backgrounds_and_borders/Border-radius_generator
+
 // TODO: 实现双色/多色 stroke-dasharray
 // TODO: 实现斜向 stroke-dasharray，▰▱▰▱ 而不是 ■□■□
 // TODO: 同时支持 border-radius
