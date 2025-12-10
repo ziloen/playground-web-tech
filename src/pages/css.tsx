@@ -710,13 +710,14 @@ function TextFitToWidth() {
         }}
       >
         <div
+          // 在 Firefox 上 ratio 计算可能不精确导致 1em * ratio 后略大于 available-space，从而导致换行，手动不换行
+          className="@[>0px]:whitespace-nowrap"
           style={{
             inlineSize: 'var(--available-space)',
             '--captured-length': '100cqi',
             '--ratio':
               'tan(atan2(var(--available-space), var(--available-space) - var(--captured-length)))',
-            // 在 Firefox 上 ratio 计算可能不精确导致 1em * ratio 后略大于 available-space，从而导致换行
-            '--dynamic-font-size': 'calc(0.999em * var(--ratio))',
+            '--dynamic-font-size': 'calc(1em * (var(--ratio)))',
             fontSize: 'clamp(1em, var(--dynamic-font-size), 120px)',
           }}
         >
