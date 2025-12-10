@@ -710,6 +710,8 @@ function TextFitToWidth() {
         }}
       >
         <div
+          // https://github.com/w3c/csswg-drafts/issues/2528
+          // Chrome 145+ 可以使用 text-grow
           // 在 Firefox 上 ratio 计算可能不精确导致 1em * ratio 后略大于 available-space，从而导致换行，手动不换行
           className="@[>0px]:whitespace-nowrap"
           style={{
