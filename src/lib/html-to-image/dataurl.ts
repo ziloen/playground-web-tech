@@ -22,19 +22,16 @@ export async function fetchAsDataURL<T>(
     throw new Error(`Resource "${res.url}" not found`)
   }
   const blob = await res.blob()
-  return new Promise<T>((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onerror = reject
-    reader.onloadend = () => {
-      try {
-        resolve(process({ res, result: reader.result as string }))
-      } catch (error) {
-        reject(error as Error)
-      }
-    }
+  let bytes: Uint8Array
+  if (blob.bytes) {
+    bytes = await blob.bytes()
+  } else {
+    const arrayBuffer = await blob.arrayBuffer()
+    bytes = new Uint8Array(arrayBuffer)
+  }
+  const base64 = bytes.toBase64()
 
-    reader.readAsDataURL(blob)
-  })
+  return process({ res, result: `data:${blob.type};base64,${base64}` })
 }
 
 const cache: { [url: string]: string } = {}
