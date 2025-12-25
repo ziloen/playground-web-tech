@@ -20,10 +20,10 @@ export default function ColorGenerator() {
     }
 
     const hoverColor = color.clone()
-    hoverColor.oklch.l += 0.04
+    hoverColor.oklch.l = (hoverColor.oklch.l ?? 0) + 0.04
 
     const activeColor = color.clone()
-    activeColor.oklch.l += 0.08
+    activeColor.oklch.l = (activeColor.oklch.l ?? 0) + 0.08
 
     const whiteContrast = Math.abs(Color.contrast(color, 'white', 'APCA'))
     const blackContrast = Math.abs(Color.contrast(color, 'black', 'APCA'))

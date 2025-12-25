@@ -1,7 +1,7 @@
 import { react } from '@ziloen/eslint-config'
+import { defineConfig } from 'eslint/config'
 
-/** @type {import("@ziloen/eslint-config").ConfigArray} */
-export default [
-  ...react({ project: ['./tsconfig.json', './tsconfig.node.json'] }),
+export default defineConfig(
+  react({ project: true }),
   { ignores: ['public'] },
-]
+)
