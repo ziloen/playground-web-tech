@@ -392,7 +392,7 @@ function optimizeSvg(
   const dimensions = { width: 0, height: 0 }
   const dimensionsPlugin = createDimensionsExtractor(dimensions)
 
-  const { pretty = true, datauri = undefined } = options
+  const { pretty = true, datauri } = options
 
   const { data } = optimize(value, {
     multipass: true,
