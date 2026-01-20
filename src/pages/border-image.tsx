@@ -1,4 +1,4 @@
-import { Field, Form } from '@base-ui-components/react'
+import { Field, Form } from '@base-ui/react'
 import {
   Select,
   SelectContent,

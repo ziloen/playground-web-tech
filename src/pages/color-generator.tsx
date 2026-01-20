@@ -3,7 +3,7 @@
 // https://www.radix-ui.com/colors/custom
 // https://github.com/proteanstudio/contrast-tools
 
-import { Input } from '@base-ui-components/react'
+import { Input } from '@base-ui/react'
 import Color from 'colorjs.io'
 import { randomInt } from 'es-toolkit'
 import { generateColorRamp } from 'rampensau'

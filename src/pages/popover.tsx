@@ -1,4 +1,4 @@
-import { Popover } from '@base-ui-components/react/popover'
+import { Popover } from '@base-ui/react'
 
 // Popover 组件的使用示例
 // 最大宽度为当前视口宽度

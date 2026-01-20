@@ -1,4 +1,4 @@
-import { Combobox } from '@base-ui-components/react/combobox'
+import { Combobox } from '@base-ui/react'
 import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
 import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
