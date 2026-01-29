@@ -50,6 +50,8 @@ export default function CSSPage() {
 
       <TextFitToWidth />
 
+      <AnchorPositionInScroll />
+
       <div className="h-100"></div>
     </div>
   )
@@ -700,6 +702,8 @@ function ScrollDefaultCenter() {
  * https://kizu.dev/fit-to-width/
  */
 function TextFitToWidth() {
+  const text = 'Resize me'
+
   return (
     <div className="resizable-x w-[400px] bg-dark-gray-200 flex @container">
       <div
@@ -723,12 +727,170 @@ function TextFitToWidth() {
             fontSize: 'clamp(1em, var(--dynamic-font-size), 120px)',
           }}
         >
-          Are you OK?
+          {text}
         </div>
       </div>
 
       <div className="outline whitespace-nowrap">
-        Are you OK?
+        {text}
+      </div>
+    </div>
+  )
+}
+
+function AnchorPositionInScroll() {
+  return (
+    <div
+      className="h-100 relative flex w-auto gap-12"
+      style={{
+        anchorScope: '--anchor-a, --anchor-b, --proxy-a, --proxy-b',
+      }}
+    >
+      <div className="overflow-y-auto h-full">
+        <p
+          style={{
+            anchorName: '--anchor-a',
+          }}
+        >
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+      </div>
+      <div className="overflow-y-auto h-full">
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p
+          style={{
+            anchorName: '--anchor-b',
+          }}
+        >
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
+          est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
+          dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
+        </p>
+      </div>
+
+      <div
+        className="absolute bg-blue/40 size-stretch"
+        style={{
+          positionAnchor: '--anchor-a',
+          top: 'anchor(top)',
+          right: 'anchor(right)',
+          bottom: 'anchor(bottom)',
+          left: 'anchor(left)',
+          positionVisibility: 'always',
+          anchorName: '--proxy-a',
+        }}
+      >
+      </div>
+
+      <div
+        className="absolute bg-green/40 size-stretch"
+        style={{
+          positionAnchor: '--anchor-b',
+          top: 'anchor(top)',
+          right: 'anchor(right)',
+          bottom: 'anchor(bottom)',
+          left: 'anchor(left)',
+          positionVisibility: 'always',
+          anchorName: '--proxy-b',
+        }}
+      >
+      </div>
+
+      {/* FIXME: 现仅 Firefox 有效，且必须要 proxy 和 positionAnchor */}
+      <div
+        className="absolute bg-red/40 size-stretch"
+        style={{
+          positionAnchor: '--proxy-a',
+          top: 'min(anchor(--proxy-a top), anchor(--proxy-b top))',
+          right: 'anchor(--proxy-b left)',
+          bottom: 'min(anchor(--proxy-a bottom), anchor(--proxy-b bottom))',
+          left: 'anchor(--proxy-a right)',
+          positionVisibility: 'always',
+        }}
+      >
       </div>
     </div>
   )
