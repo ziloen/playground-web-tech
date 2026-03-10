@@ -5,11 +5,10 @@
   border-radius: var(--track-radius);
   block-size: max(var(--track-height), var(--thumb-height));
   overflow: clip;
-  container-type: inline-size;
+  cursor: pointer;
 
   &::-moz-range-track {
     appearance: none;
-    cursor: pointer;
     overflow: clip;
     block-size: var(--track-height);
     border-radius: var(--track-radius, 0px);
@@ -27,7 +26,7 @@
 
   &::-moz-range-thumb {
     appearance: none;
-    cursor: pointer;
+    cursor: grab;
     border: none;
     box-sizing: border-box;
     block-size: var(--thumb-height);
@@ -48,6 +47,14 @@
       background-color: var(--thumb-hover-background);
     }
   }
+
+  &:active {
+    cursor: grabbing;
+
+    &::-moz-range-thumb {
+      cursor: grabbing;
+    }
+  }
 }
 
 
@@ -56,9 +63,9 @@
     position: relative;
     isolation: isolate;
     user-select: none;
+    cursor: pointer;
 
     &::-webkit-slider-runnable-track {
-      cursor: pointer;
       border-radius: var(--track-radius, 0px);
       block-size: var(--track-height);
       background-color: var(--track-background);
@@ -102,6 +109,14 @@
 
       &::-webkit-slider-thumb {
         background-color: var(--thumb-hover-background);
+      }
+    }
+
+    &:active {
+      cursor: grabbing;
+
+      &::-webkit-slider-thumb {
+        cursor: grabbing;
       }
     }
   }
