@@ -1,4 +1,4 @@
-const gifVideoProps = {
+const gifVideoProps: React.ComponentProps<'video'> = {
   autoPlay: true,
   controls: false,
   disablePictureInPicture: true,
@@ -6,6 +6,7 @@ const gifVideoProps = {
   loop: true,
   muted: true,
   playsInline: true,
+  // loading="lazy",
 }
 
 export default function VideoComp() {

@@ -120,10 +120,5 @@ export default defineConfig(({ command, mode }) => {
         'Cross-Origin-Embedder-Policy': 'require-corp',
       },
     },
-
-    // https://github.com/vitest-dev/vitest
-    test: {
-      environment: 'jsdom',
-    },
   }
 })

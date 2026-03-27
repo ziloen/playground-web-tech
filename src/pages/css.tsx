@@ -52,6 +52,8 @@ export default function CSSPage() {
 
       <AnchorPositionInScroll />
 
+      <GridMinMaxColumns />
+
       <div className="h-100"></div>
     </div>
   )
@@ -852,7 +854,7 @@ function AnchorPositionInScroll() {
       </div>
 
       <div
-        className="absolute bg-blue/40 size-stretch"
+        className="absolute bg-blue/40 size-stretch pointer-events-none"
         style={{
           positionAnchor: '--anchor-a',
           top: 'anchor(top)',
@@ -866,7 +868,7 @@ function AnchorPositionInScroll() {
       </div>
 
       <div
-        className="absolute bg-green/40 size-stretch"
+        className="absolute bg-green/40 size-stretch pointer-events-none"
         style={{
           positionAnchor: '--anchor-b',
           top: 'anchor(top)',
@@ -881,7 +883,7 @@ function AnchorPositionInScroll() {
 
       {/* FIXME: 现仅 Firefox 有效，且必须要 proxy 和 positionAnchor */}
       <div
-        className="absolute bg-red/40 size-stretch"
+        className="absolute bg-red/40 size-stretch pointer-events-none"
         style={{
           positionAnchor: '--proxy-a',
           top: 'min(anchor(--proxy-a top), anchor(--proxy-b top))',
@@ -896,8 +898,39 @@ function AnchorPositionInScroll() {
   )
 }
 
+/**
+ * Grid 布局，自动列数，但是有2-4列的限制
+ */
+function GridMinMaxColumns() {
+  return (
+    <div
+      className="resizable-x grid w-[min(100%,400px)]"
+      style={{
+        '--col-gap': '8px',
+        '--col-size': '100px',
+        '--min-cols': 2,
+        '--max-cols': 4,
+
+        '--min-col-size': '(100% + var(--col-gap)) / var(--max-cols) - var(--col-gap)',
+        '--max-col-size': '(100% + var(--col-gap)) / var(--min-cols) - var(--col-gap)',
+        '--col-size-calc': 'min(max(var(--col-size), var(--min-col-size)), var(--max-col-size))',
+
+        gap: 'var(--col-gap)',
+        gridTemplateColumns: `repeat(auto-fit, minmax(var(--col-size-calc), 1fr))`,
+      }}
+    >
+      {Array.from({ length: 10 }).map((_, i) => (
+        <div key={i} className="bg-red-300 h-10 flex items-center justify-center">
+          {i + 1}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // TODO: grid 布局，不确定列数，最后一项撑满剩余空间
 // 可能的实现：grid-auto-columns: repeat(auto-fit, 100px) minmax(0, 1fr));
+// 可能的实现2：使用 anchor 元素，将最后一项和一个 absolute 的 column -1 的元素之间链接起来，视觉上达到效果
 // +---+---+---+---+
 // | 1 | 2 | 3 | 4 |
 // +---+---+---+---+
