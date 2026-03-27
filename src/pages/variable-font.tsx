@@ -1,5 +1,5 @@
-import '@fontsource-variable/fira-code'
-import '@fontsource-variable/noto-sans-sc'
+import '@fontsource-variable/fira-code/index.css'
+import '@fontsource-variable/noto-sans-sc/index.css'
 
 export default function VariableFont() {
   const wght = useMotionValue(400)
