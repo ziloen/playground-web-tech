@@ -1,5 +1,6 @@
 import './css.css'
 
+import { range } from 'es-toolkit'
 import type { RefCallback } from 'react'
 import styles from './scrollbar/index.module.css'
 
@@ -53,6 +54,8 @@ export default function CSSPage() {
       <AnchorPositionInScroll />
 
       <GridMinMaxColumns />
+
+      <GridLastItemFlexGrow />
 
       <div className="h-100"></div>
     </div>
@@ -881,7 +884,7 @@ function AnchorPositionInScroll() {
       >
       </div>
 
-      {/* FIXME: 现仅 Firefox 有效，且必须要 proxy 和 positionAnchor */}
+      {/* FIXME: 现仅 Firefox 有效（不稳定），且必须要 proxy 和 positionAnchor */}
       <div
         className="absolute bg-red/40 size-stretch pointer-events-none"
         style={{
@@ -919,7 +922,7 @@ function GridMinMaxColumns() {
         gridTemplateColumns: `repeat(auto-fit, minmax(var(--col-size-calc), 1fr))`,
       }}
     >
-      {Array.from({ length: 10 }).map((_, i) => (
+      {range(10).map((i) => (
         <div key={i} className="bg-red-300 h-10 flex items-center justify-center">
           {i + 1}
         </div>
@@ -928,9 +931,10 @@ function GridMinMaxColumns() {
   )
 }
 
-// TODO: grid 布局，不确定列数，最后一项撑满剩余空间
-// 可能的实现：grid-auto-columns: repeat(auto-fit, 100px) minmax(0, 1fr));
+// TODO: grid 布局，不确定列数，不确定数量，最后一项撑满剩余空间
+// 可能的实现1：grid-auto-columns: repeat(auto-fit, 100px) minmax(0, 1fr));
 // 可能的实现2：使用 anchor 元素，将最后一项和一个 absolute 的 column -1 的元素之间链接起来，视觉上达到效果
+// 可能的实现3：选择器选择 last-row，设置 colmn-start，last-child 设置 colmn-end: -1
 // +---+---+---+---+
 // | 1 | 2 | 3 | 4 |
 // +---+---+---+---+
@@ -954,7 +958,39 @@ function GridMinMaxColumns() {
 // +---+---+---+---+
 // | 5 | 6 | 7 | 8 |
 // +---------------+
+function GridLastItemFlexGrow() {
+  const [itemCount, setItemCount] = useState(5)
+
+  return (
+    <div className="w-[min(100%,400px)] resizable-x">
+      <div>
+        <button onClick={() => setItemCount((v) => v > 0 ? v - 1 : 0)}>
+          -1
+        </button>
+
+        {itemCount}
+
+        <button onClick={() => setItemCount((v) => v + 1)}>
+          +1
+        </button>
+      </div>
+
+      <div className="grid  gap-2 grid-cols-fit-[100px] @container">
+        {range(itemCount).map((i) => (
+          <div
+            key={i}
+            className="bg-red-300 h-10 flex-center last:col-end-[span_2] last:col-start-auto"
+          >
+            {i + 1}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 // TODO: multi dynamic sticky elments stack with dynamic height (or fixed height)
 // 可以点击按钮设置列表项是否 sticky，可以多个 sticky
 // sticky 时，滚动出范围时，会自动堆叠到下一个 sticky 元素的下面
+function StickyStack() {
+}
