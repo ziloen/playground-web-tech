@@ -17,7 +17,7 @@
   ],
   "editor.codeActionsOnSave": [
     // only sort imports
-    "source.sortImports",
+    // "source.sortImports",
     // remove unused imports & sort imports
     // "source.organizeImports",
     // "source.fixAll.eslint",

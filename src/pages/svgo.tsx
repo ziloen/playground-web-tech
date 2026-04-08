@@ -14,7 +14,7 @@ export default function SVGOPage() {
   const [originalSvg, setOriginalSvg] = useState<string | null>(null)
   const [optimizedSvg, setOptimizedSvg] = useState<string | null>(null)
   const [svgUri, setSvgUri] = useState<string | null>(null)
-  const [dimensions, setDimensions] = useState<{ width: number; height: number }>({
+  const [dimensions, setDimensions] = useState({
     width: 0,
     height: 0,
   })
@@ -42,7 +42,7 @@ export default function SVGOPage() {
     <div
       className="flex h-full"
       style={{
-        backgroundImage: 'repeating-conic-gradient(#3b3b3b 0% 25%, #333333 0% 50%)',
+        backgroundImage: 'repeating-conic-gradient(#3b3b3b 0 25%, #333333 25% 50%)',
         backgroundSize: '20px 20px',
       }}
     >

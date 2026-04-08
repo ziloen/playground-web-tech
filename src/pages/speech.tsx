@@ -36,7 +36,7 @@ const isChrome = navigator.userAgentData
 
 export default function WebSpeechAPIPage() {
   const [inputText, setInputText, getInputText] = useGetState(defaultZhText)
-  const [selectedVoice, setSelectedVoice] = useState<string>('')
+  const [selectedVoice, setSelectedVoice] = useState('')
   const nextEffect = useNextEffect()
   const [voiceList, setVoiceList] = useState<SpeechSynthesisVoice[] | null>(() => {
     const list = speechSynthesis.getVoices()

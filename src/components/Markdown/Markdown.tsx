@@ -71,13 +71,16 @@ const components: Components = {
     }
 
     return (
-      <code className={cn('overflow-clip', className)}>
+      <code className={cn('overflow-clip grid', className)}>
         {/* Header */}
-        <div className="grid justify-items-end justify-end grid-flow-col items-center gap-2">
+        <div className="px-4 py-1 gap-2 area-[1/1]">
           <span>{language}</span>
+        </div>
 
+        {/* 为使 sticky 生效，须要将 sticky 元素提升到相对元素的直接子元素 */}
+        <div className="code-block-header bg-inherit sticky top-2 @container-[scroll-state] bottom-2 area-[1/1] justify-self-end">
           <button
-            className="border-none flex p-1"
+            className="border-none @stuck-top:shadow-md rounded-md flex p-1 me-2 my-1 size-fit bg-transparent"
             title="Copy code"
             aria-label="Copy code"
             onClick={() => {
@@ -92,7 +95,7 @@ const components: Components = {
           </button>
         </div>
 
-        <div className="overflow-x-auto overflow-y-clip px-4 pb-5 scrollbar-thin">
+        <div className="overflow-x-auto overflow-y-clip px-4 pb-3 scrollbar-thin">
           {children}
         </div>
       </code>
@@ -125,7 +128,7 @@ const components: Components = {
 
     return (
       <div
-        className="grid transition-[grid-template-rows] duration-100"
+        className="grid transition-[grid-template-rows] duration-150"
         style={{
           gridTemplateRows: isOpen ? 'max-content 1fr' : 'max-content 0fr',
         }}
@@ -147,7 +150,7 @@ const components: Components = {
 
         <div
           className={clsx(
-            'overflow-hidden transition-opacity duration-100',
+            'overflow-hidden transition-opacity duration-150',
             isOpen ? 'opacity-100' : 'opacity-0',
           )}
         >

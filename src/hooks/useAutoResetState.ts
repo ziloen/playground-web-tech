@@ -26,7 +26,7 @@ export function useAutoResetState<T>(
   defautValue: T,
   resetMilliseconds = 1_000,
 ): [T, Dispatch<SetStateAction<T>>] {
-  const [state, setState] = useState<T>(defautValue)
+  const [state, setState] = useState(defautValue)
   const timer = useRef<number | undefined>(undefined)
 
   const set: typeof setState = useMemoizedFn((value) => {
