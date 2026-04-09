@@ -15,7 +15,7 @@ export { useNextEffect } from './useNextEffect'
  * ```
  */
 export function mergeRefs<T>(...refs: (React.Ref<T> | undefined)[]): React.RefCallback<T> {
-  return function(instance: T | null) {
+  return function (instance: T | null) {
     for (const ref of refs) {
       if (typeof ref === 'function') {
         ref(instance)

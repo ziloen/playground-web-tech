@@ -45,7 +45,7 @@ export default function Warframe() {
 function News({ data }: { data: WorldState }) {
   return (
     <div
-      className="grid gap-1 px-2 py-2 w-fit max-w-[500px] border border-solid border-white/60 backdrop-blur-sm"
+      className="grid w-fit max-w-[500px] gap-1 border border-solid border-white/60 px-2 py-2 backdrop-blur-sm"
       style={{
         gridTemplateColumns: 'max-content 1fr',
         gridAutoRows: 'max-content',
@@ -58,7 +58,7 @@ function News({ data }: { data: WorldState }) {
             key={news.id}
             target="_blank"
             rel="noreferrer"
-            className="grid relative py-0.5 gap-0.5 no-underline text-light-gray-200 visited:text-light-gray-900 grid-cols-subgrid col-span-full"
+            className="relative col-span-full grid grid-cols-subgrid gap-0.5 py-0.5 text-light-gray-200 no-underline visited:text-light-gray-900"
           >
             {index === 0 && (
               <div className="col-span-full flex w-full contain-inline-size">
@@ -74,14 +74,10 @@ function News({ data }: { data: WorldState }) {
               </div>
             )}
 
-            <div className="grid gap-1 grid-cols-subgrid col-span-2">
-              <span>
-                {'[' + getRelativeString(news.date) + ']'}
-              </span>
+            <div className="col-span-2 grid grid-cols-subgrid gap-1">
+              <span>{'[' + getRelativeString(news.date) + ']'}</span>
 
-              <span>
-                {news.message}
-              </span>
+              <span>{news.message}</span>
             </div>
           </a>
         )

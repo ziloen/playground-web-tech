@@ -26,31 +26,38 @@ export default function ContentEditableText() {
 
     el.addEventListener('beforeinput', onBeforeInput, { signal: ac.signal })
 
-    el.addEventListener('input', (e) => {
-      asType<InputEvent>(e)
-      const inputType = e.inputType as InputEventInputType
-      if (inputType === 'insertParagraph') {
-        // const text = transformContent(el)
-        // if (!text) return
-        // messages.push({ text })
-        // el.innerHTML = ''
-        const mentions = getMentionsFromTarget(el)
-        console.log(mentions)
-      }
+    el.addEventListener(
+      'input',
+      (e) => {
+        asType<InputEvent>(e)
+        const inputType = e.inputType as InputEventInputType
+        if (inputType === 'insertParagraph') {
+          // const text = transformContent(el)
+          // if (!text) return
+          // messages.push({ text })
+          // el.innerHTML = ''
+          const mentions = getMentionsFromTarget(el)
+          console.log(mentions)
+        }
 
-      const length = el.innerText.length ?? 0
-      currentLength.set(length)
-    }, { signal: ac.signal })
+        const length = el.innerText.length ?? 0
+        currentLength.set(length)
+      },
+      { signal: ac.signal },
+    )
 
-    el.addEventListener('keydown', (e) => {
-      const key = e.key as KeyboardEventKey
+    el.addEventListener(
+      'keydown',
+      (e) => {
+        const key = e.key as KeyboardEventKey
 
-      if (key === 'Enter') {
-      }
-    }, { signal: ac.signal })
+        if (key === 'Enter') {
+        }
+      },
+      { signal: ac.signal },
+    )
 
-    el.addEventListener('compositionstart', (e) => {
-    }, { signal: ac.signal })
+    el.addEventListener('compositionstart', (e) => {}, { signal: ac.signal })
 
     return () => ac.abort()
   }, [])
@@ -64,16 +71,17 @@ export default function ContentEditableText() {
       }}
     >
       {/* add backdrop-filter blur */}
-      <div className="overflow-y-auto w-full relative">
-        <div className="sticky flex-col flex w-full top-0 left-0 right-0 border-b border-b-white/20">
-          <div className="backdrop-blur-[8px] bg-black/20 shrink-0 px-[10px] py-[8px]">
+      <div className="relative w-full overflow-y-auto">
+        <div className="sticky top-0 right-0 left-0 flex w-full flex-col border-b border-b-white/20">
+          <div className="shrink-0 bg-black/20 px-[10px] py-[8px] backdrop-blur-[8px]">
             Chat room
           </div>
-          <div className="h-[2px] backdrop-blur-[90px] backdrop-saturate-[1.05] backdrop-brightness-[1.05]">
-          </div>
+          <div className="h-[2px] backdrop-blur-[90px] backdrop-brightness-[1.05] backdrop-saturate-[1.05]"></div>
         </div>
 
-        {messages.map((m, i) => <Message key={i} text={m.text} />)}
+        {messages.map((m, i) => (
+          <Message key={i} text={m.text} />
+        ))}
       </div>
 
       {/* [ ] drag to resize the height */}
@@ -83,7 +91,7 @@ export default function ContentEditableText() {
       {/* [ ] focus({ cursor: "start" | "end" | "all" | undefined }) */}
       {/* [ ] overflow issue when input */}
       {/* [ ] max length, crop text when pasting */}
-      <div className="border-t border-t-white/20 grid">
+      <div className="grid border-t border-t-white/20">
         <div
           ref={inputRef}
           contentEditable
@@ -92,12 +100,11 @@ export default function ContentEditableText() {
           data-placeholder="Type something..."
           tabIndex={0}
           className={clsx(
-            'min-h-[54px] px-[8px] py-[10px] focus:outline-lightBlue-6 inline-block whitespace-pre-wrap word-wrap-break overflow-y-auto box-border leading-[17px] text-[14px] outline-none max-w-full empty:before:content-[attr(data-placeholder)] empty:before:text-light-gray-500',
+            'focus:outline-lightBlue-6 word-wrap-break box-border inline-block min-h-[54px] max-w-full overflow-y-auto px-[8px] py-[10px] text-[14px] leading-[17px] whitespace-pre-wrap outline-none empty:before:text-light-gray-500 empty:before:content-[attr(data-placeholder)]',
           )}
-        >
-        </div>
+        ></div>
 
-        <div className="flex justify-self-end mr-[10px] mb-[10px]">
+        <div className="mr-[10px] mb-[10px] flex justify-self-end">
           <motion.div>{currentLength}</motion.div>&nbsp;/&nbsp;{MAX_LENGTH}
         </div>
       </div>
@@ -115,7 +122,7 @@ function useMessages() {
 
 function Message({ text }: { text: string }) {
   return (
-    <div className="rounded-[4px] bg-blue-4 max-w-fit whitespace-pre-wrap word-wrap-break my-[12px] mx-[12px] p-[10px]">
+    <div className="bg-blue-4 word-wrap-break mx-[12px] my-[12px] max-w-fit rounded-[4px] p-[10px] whitespace-pre-wrap">
       {text}
     </div>
   )
@@ -215,10 +222,7 @@ function skipNonEditable() {
   const node = selection.anchorNode
   const parent = selection.anchorNode?.parentNode
 
-  if (
-    parent instanceof HTMLElement
-    && !parent.isContentEditable
-  ) {
+  if (parent instanceof HTMLElement && !parent.isContentEditable) {
     selection.removeAllRanges()
     const range = document.createRange()
     range.setEndAfter(parent)
@@ -265,17 +269,13 @@ function getMentionsFromTarget(target: HTMLElement) {
   return mentions
 }
 
-function getSelectionStartPosition() {
-}
+function getSelectionStartPosition() {}
 
-function getSelectionEndPosition() {
-}
+function getSelectionEndPosition() {}
 
-function getCaretPosition() {
-}
+function getCaretPosition() {}
 
-function moveCaret(pos: number) {
-}
+function moveCaret(pos: number) {}
 
 function truncToMaxLength(target: HTMLElement, maxLength: number) {
   const length = target.innerText.length

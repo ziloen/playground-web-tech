@@ -14,22 +14,16 @@ async function embedProp(propName: string, node: HTMLElement, options: Options) 
   return false
 }
 
-async function embedBackground<T extends HTMLElement>(
-  clonedNode: T,
-  options: Options,
-) {
-  ;(await embedProp('background', clonedNode, options))
-    || (await embedProp('background-image', clonedNode, options))
-  ;(await embedProp('mask', clonedNode, options))
-    || (await embedProp('-webkit-mask', clonedNode, options))
-    || (await embedProp('mask-image', clonedNode, options))
-    || (await embedProp('-webkit-mask-image', clonedNode, options))
+async function embedBackground<T extends HTMLElement>(clonedNode: T, options: Options) {
+  ;(await embedProp('background', clonedNode, options)) ||
+    (await embedProp('background-image', clonedNode, options))
+  ;(await embedProp('mask', clonedNode, options)) ||
+    (await embedProp('-webkit-mask', clonedNode, options)) ||
+    (await embedProp('mask-image', clonedNode, options)) ||
+    (await embedProp('-webkit-mask-image', clonedNode, options))
 }
 
-async function embedImageNode(
-  clonedNode: HTMLElement | SVGImageElement,
-  options: Options,
-) {
+async function embedImageNode(clonedNode: HTMLElement | SVGImageElement, options: Options) {
   const isImageElement = isInstanceOfElement(clonedNode, HTMLImageElement)
 
   // src is empty string or unset
@@ -38,8 +32,8 @@ async function embedImageNode(
   }
 
   if (
-    !(isImageElement && !isDataUrl(clonedNode.src))
-    && !(isInstanceOfElement(clonedNode, SVGImageElement) && !isDataUrl(clonedNode.href.baseVal))
+    !(isImageElement && !isDataUrl(clonedNode.src)) &&
+    !(isInstanceOfElement(clonedNode, SVGImageElement) && !isDataUrl(clonedNode.href.baseVal))
   ) {
     return
   }

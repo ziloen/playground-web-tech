@@ -3,7 +3,6 @@
 
 import { mergeRefs, useMemoizedFn } from '~/hooks'
 
-
 type Props = React.ComponentProps<'textarea'>
 
 // FIXME: not working when window resized
@@ -45,7 +44,6 @@ export function AutoSizeTextarea({ ref, onChange, ...props }: Props) {
         onChange?.(e)
       }}
       {...props}
-    >
-    </textarea>
+    ></textarea>
   )
 }

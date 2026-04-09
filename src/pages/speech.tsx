@@ -1,6 +1,6 @@
 import { Combobox } from '@base-ui/react'
-import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
 import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
+import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
 import { asNonNullable } from '@wai-ri/core'
@@ -21,18 +21,17 @@ import { LRUCache } from '~/utils'
 import CarbonCloud from '~icons/carbon/cloud'
 import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
 
-const defaultZhText =
-  `从零开始学习 Web 开发极具挑战性，该教程将为你提供详细的资料，手把手帮助你轻松愉快地学习。无论你是正在学习 Web 开发的学生（自学或参与课程）、寻找材料的老师、编程爱好者，亦或是仅仅想了解一点点 Web 技术，我们都希望你能感到宾至如归。`
+const defaultZhText = `从零开始学习 Web 开发极具挑战性，该教程将为你提供详细的资料，手把手帮助你轻松愉快地学习。无论你是正在学习 Web 开发的学生（自学或参与课程）、寻找材料的老师、编程爱好者，亦或是仅仅想了解一点点 Web 技术，我们都希望你能感到宾至如归。`
 
-const defaultEnText =
-  `If you are a complete beginner, web development can be challenging — we will hold your hand and provide enough detail for you to feel comfortable and learn the topics properly. You should feel at home whether you are a student learning web development (on your own or as part of a class), a teacher looking for class materials, a hobbyist, or someone who just wants to understand more about how web technologies work.`
+const defaultEnText = `If you are a complete beginner, web development can be challenging — we will hold your hand and provide enough detail for you to feel comfortable and learn the topics properly. You should feel at home whether you are a student learning web development (on your own or as part of a class), a teacher looking for class materials, a hobbyist, or someone who just wants to understand more about how web technologies work.`
 
 // @ts-expect-error navigator has no type
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const isChrome = navigator.userAgentData
+const isChrome =
+  navigator.userAgentData &&
   // @ts-expect-error navigator has no type
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  && navigator.userAgentData.brands.some((brand) => brand.brand === 'Google Chrome')
+  navigator.userAgentData.brands.some((brand) => brand.brand === 'Google Chrome')
 
 export default function WebSpeechAPIPage() {
   const [inputText, setInputText, getInputText] = useGetState(defaultZhText)
@@ -43,9 +42,13 @@ export default function WebSpeechAPIPage() {
 
     if (list.length) return list
 
-    speechSynthesis.addEventListener('voiceschanged', (e) => {
-      nextEffect(() => setVoiceList(speechSynthesis.getVoices()))
-    }, { once: true })
+    speechSynthesis.addEventListener(
+      'voiceschanged',
+      (e) => {
+        nextEffect(() => setVoiceList(speechSynthesis.getVoices()))
+      },
+      { once: true },
+    )
 
     return null
   })
@@ -198,7 +201,7 @@ export default function WebSpeechAPIPage() {
           gridAutoRows: 'min-content',
         }}
       >
-        <div className="grid grid-cols-subgrid col-span-full">
+        <div className="col-span-full grid grid-cols-subgrid">
           <span>voice</span>
 
           <Combobox.Root
@@ -210,7 +213,7 @@ export default function WebSpeechAPIPage() {
           >
             <div className="relative">
               <Combobox.Input
-                className="grid min-h-[1lh] w-stretch min-w-[200px] grid-flow-col items-center justify-between rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 px-3 py-2 shadow-sm outline-2 outline-offset-2 outline-blue-500 outline-none select-none hover:bg-dark-gray-700 focus-visible:outline-solid field-sizing-content"
+                className="grid field-sizing-content min-h-[1lh] w-stretch min-w-[200px] grid-flow-col items-center justify-between rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 px-3 py-2 shadow-sm outline-2 outline-offset-2 outline-blue-500 outline-none select-none hover:bg-dark-gray-700 focus-visible:outline-solid"
                 style={{
                   fontFamily: 'inherit',
                   fontSize: 'inherit',
@@ -218,7 +221,7 @@ export default function WebSpeechAPIPage() {
                 }}
               />
 
-              <Combobox.Trigger className="absolute end-2 inset-y-0 my-auto border-none bg-transparent ">
+              <Combobox.Trigger className="absolute inset-y-0 end-2 my-auto border-none bg-transparent">
                 <OcticonChevronDown12
                   className="opacity-50 in-data-popup-open:rotate-180"
                   width={14}
@@ -231,27 +234,25 @@ export default function WebSpeechAPIPage() {
               <Combobox.Positioner align="start" side="bottom" sideOffset={8}>
                 <Combobox.Popup className="max-h-[min(var(--available-height),500px)] min-w-[200px] origin-(--transform-origin) overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 shadow-lg transition-[scale,opacity] outline-none data-ending-style:scale-90 data-ending-style:opacity-0 data-starting-style:scale-90 data-starting-style:opacity-0">
                   <Combobox.Empty>
-                    <div className="px-3 py-2">
-                      Nothing found
-                    </div>
+                    <div className="px-3 py-2">Nothing found</div>
                   </Combobox.Empty>
 
                   <Combobox.List>
                     {(group: (typeof options)[number]) => (
                       <Combobox.Group key={group.value}>
-                        <Combobox.GroupLabel className="text-light-gray-800 py-2 ps-3">
+                        <Combobox.GroupLabel className="py-2 ps-3 text-light-gray-800">
                           {group.label}
                         </Combobox.GroupLabel>
 
                         {group.items.map((item) => (
                           <Combobox.Item
                             key={item.value}
-                            className="relative flex cursor-default items-center gap-2 py-2 outline-none data-selected:bg-dark-gray-600 data-[highlighted]:bg-dark-gray-400 ps-5 pe-3"
+                            className="relative flex cursor-default items-center gap-2 py-2 ps-5 pe-3 outline-none data-selected:bg-dark-gray-600 data-[highlighted]:bg-dark-gray-400"
                             value={item.value}
                           >
                             <span>{item.voice.name}</span>
                             {!item.voice.localService && (
-                              <CarbonCloud className="text-lg shrink-0 text-blue-600" />
+                              <CarbonCloud className="shrink-0 text-lg text-blue-600" />
                             )}
                           </Combobox.Item>
                         ))}
@@ -265,7 +266,7 @@ export default function WebSpeechAPIPage() {
         </div>
 
         {groupByLang && (
-          <div className="grid grid-cols-subgrid col-span-full">
+          <div className="col-span-full grid grid-cols-subgrid">
             <span>lang</span>
 
             <Select
@@ -296,7 +297,7 @@ export default function WebSpeechAPIPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-subgrid col-span-full">
+        <div className="col-span-full grid grid-cols-subgrid">
           <span>pitch</span>
           <Slider
             value={pitch}
@@ -313,7 +314,7 @@ export default function WebSpeechAPIPage() {
           />
         </div>
 
-        <div className="grid grid-cols-subgrid col-span-full">
+        <div className="col-span-full grid grid-cols-subgrid">
           <span>volume</span>
           <Slider
             value={volume}
@@ -330,7 +331,7 @@ export default function WebSpeechAPIPage() {
           />
         </div>
 
-        <div className="grid grid-cols-subgrid col-span-full">
+        <div className="col-span-full grid grid-cols-subgrid">
           <span>rate</span>
           <Slider
             value={rate}
@@ -349,7 +350,7 @@ export default function WebSpeechAPIPage() {
       </div>
 
       <TextareaAutosize
-        className="max-w-[600px] w-[min(100%,600px)] m-0 p-0 box-border resize-none"
+        className="m-0 box-border w-[min(100%,600px)] max-w-[600px] resize-none p-0"
         value={inputText}
         minRows={3}
         onChange={(e) => setInputText(e.currentTarget.value)}
@@ -357,9 +358,7 @@ export default function WebSpeechAPIPage() {
 
       <br />
 
-      <button onClick={onSpeek}>
-        Speak
-      </button>
+      <button onClick={onSpeek}>Speak</button>
 
       <button
         onClick={(e) => {
@@ -406,8 +405,7 @@ export default function WebSpeechAPIPage() {
       </button>
 
       <div className="grid">
-        <div className="grid-cols-subgrid">
-        </div>
+        <div className="grid-cols-subgrid"></div>
       </div>
 
       <table className="border-collapse">
@@ -442,7 +440,7 @@ export default function WebSpeechAPIPage() {
           if (SpeechRecognition) {
             recognitionRef.current?.stop()
             setRecogText('')
-            const recognition = recognitionRef.current = new SpeechRecognition()
+            const recognition = (recognitionRef.current = new SpeechRecognition())
 
             recognition.continuous = true
             recognition.lang = lang
@@ -489,9 +487,9 @@ export default function WebSpeechAPIPage() {
               const atLeast = 1000
 
               if (
-                getRecording()
-                && duration > atLeast
-                && !['not-allowed', 'network'].includes(error)
+                getRecording() &&
+                duration > atLeast &&
+                !['not-allowed', 'network'].includes(error)
               ) {
                 setRecording(true)
                 recognition.start()
@@ -537,9 +535,7 @@ export default function WebSpeechAPIPage() {
 
       <div>{resultText}</div>
 
-      <div className="text-red-400">
-        {recogError}
-      </div>
+      <div className="text-red-400">{recogError}</div>
 
       <AudioVisualization />
     </main>
@@ -554,7 +550,7 @@ function useRecognition() {
   const startRecord = useMemoizedFn(() => {
     ref.current?.stop()
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    const recognition = ref.current = new SpeechRecognition()
+    const recognition = (ref.current = new SpeechRecognition())
     recognition.interimResults = true
     recognition.continuous = true
     recognition.lang = 'zh-Hans'
@@ -583,8 +579,8 @@ type AudioSegment = {
 }
 
 function AudioVisualization() {
-  const [visualizationData, setVisualizationData, getVisualizationData] = useGetState(() =>
-    new LRUCache<number, AudioSegment>(200)
+  const [visualizationData, setVisualizationData, getVisualizationData] = useGetState(
+    () => new LRUCache<number, AudioSegment>(200),
   )
 
   const [startTime, setStartTime] = useState(Infinity)
@@ -595,7 +591,7 @@ function AudioVisualization() {
   const recorderRef = useRef<MediaRecorder | null>(null)
 
   const startRecording = useMemoizedFn(async () => {
-    const stream = streamRef.current = await navigator.mediaDevices.getDisplayMedia({
+    const stream = (streamRef.current = await navigator.mediaDevices.getDisplayMedia({
       video: {
         width: 0,
         height: 0,
@@ -607,7 +603,7 @@ function AudioVisualization() {
         suppressLocalAudioPlayback: false,
       },
       systemAudio: 'include',
-    })
+    }))
 
     // disable video
     stream.getVideoTracks().forEach((track) => track.stop())
@@ -620,10 +616,10 @@ function AudioVisualization() {
 
     const mimeType = 'audio/webm;codecs=opus'
 
-    const mediaRecorder = recorderRef.current = new MediaRecorder(stream, {
+    const mediaRecorder = (recorderRef.current = new MediaRecorder(stream, {
       mimeType: mimeType,
       audioBitsPerSecond: 128_000,
-    })
+    }))
 
     const chunks: Blob[] = []
 
@@ -695,9 +691,9 @@ function AudioVisualization() {
 
   const end = useMemo(() => {
     if (recording) {
-      return (Math.floor(now / 125)) * 125
+      return Math.floor(now / 125) * 125
     } else {
-      return (Math.floor(stopTimeMV.get() / 125)) * 125
+      return Math.floor(stopTimeMV.get() / 125) * 125
     }
   }, [now, recording])
 
@@ -706,7 +702,7 @@ function AudioVisualization() {
 
     // length 150
     for (let i = 149; i >= 0; i--) {
-      const t = end - (i * 125)
+      const t = end - i * 125
 
       result.push(
         <WaveItem
@@ -726,12 +722,12 @@ function AudioVisualization() {
 
   return (
     <div className="w-[600px] bg-white">
-      <button onClick={() => recording ? stopRecording() : startRecording()}>
+      <button onClick={() => (recording ? stopRecording() : startRecording())}>
         {recording ? '🔴' : '🎙'}
       </button>
 
       <div
-        className="h-8 w-[600px] flex items-center gap-0.5 overflow-visible relative transition-[--animatable-number-1] duration-200"
+        className="relative flex h-8 w-[600px] items-center gap-0.5 overflow-visible transition-[--animatable-number-1] duration-200"
         style={{
           '--animatable-number-1': recording ? '1' : '0',
           '--fade-length': '11%',
@@ -751,8 +747,8 @@ function AudioVisualization() {
   )
 }
 
-const WaveItem = /* #__PURE__ */ memo(function WaveItem(
-  {
+const WaveItem = /* #__PURE__ */ memo(
+  function WaveItem({
     t,
     visualizationData,
     nowMV,
@@ -766,31 +762,32 @@ const WaveItem = /* #__PURE__ */ memo(function WaveItem(
     stopTimeMV: MotionValue<number>
     recording: boolean
     startTime: number
+  }) {
+    const height = useMemo(() => {
+      return ((visualizationData.get(t)?.volume ?? 0) * 28) / 255 + 4
+    }, [t, visualizationData])
+
+    const x = useTransform(() => {
+      return -0.032 * (nowMV.get() - t)
+    })
+
+    const endX = useTransform(() => {
+      return -0.032 * (stopTimeMV.get() - t)
+    })
+
+    return (
+      <motion.div
+        style={{ x: recording ? x : endX, height }}
+        transition={{ type: 'tween' }}
+        className={clsx(
+          'absolute end-0 w-0.5 shrink-0 rounded',
+          t <= startTime ? 'bg-[#0A0D332E]' : 'bg-[#0A0D3399]',
+        )}
+      />
+    )
   },
-) {
-  const height = useMemo(() => {
-    return ((visualizationData.get(t)?.volume ?? 0) * 28 / 255) + 4
-  }, [t, visualizationData])
-
-  const x = useTransform(() => {
-    return -0.032 * (nowMV.get() - t)
-  })
-
-  const endX = useTransform(() => {
-    return -0.032 * (stopTimeMV.get() - t)
-  })
-
-  return (
-    <motion.div
-      style={{ x: recording ? x : endX, height }}
-      transition={{ type: 'tween' }}
-      className={clsx(
-        'w-0.5 end-0 rounded shrink-0 absolute',
-        t <= startTime ? 'bg-[#0A0D332E]' : 'bg-[#0A0D3399]',
-      )}
-    />
-  )
-}, (prev, next) => prev.startTime === next.startTime && prev.recording === next.recording)
+  (prev, next) => prev.startTime === next.startTime && prev.recording === next.recording,
+)
 
 function useNow(): [number, MotionValue<number>] {
   const [now, setNow] = useState(() => Date.now())
@@ -842,7 +839,7 @@ async function webmToMp3(blob: Blob): Promise<Blob> {
     'output.mp3',
   ])
 
-  const data = await ffmpeg.readFile('output.mp3') as Uint8Array<ArrayBuffer>
+  const data = (await ffmpeg.readFile('output.mp3')) as Uint8Array<ArrayBuffer>
 
   return new Blob([data], { type: 'audio/mpeg' })
 }

@@ -1,9 +1,7 @@
 // https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useMemoizedFn/index.ts
 import { useRef } from 'react'
 
-export function useMemoizedFn<T extends (this: any, ...args: any[]) => any>(
-  fn: T,
-): T {
+export function useMemoizedFn<T extends (this: any, ...args: any[]) => any>(fn: T): T {
   const fnRef = useRef(fn)
   const memoizedFn = useRef<T | undefined>(undefined)
 
@@ -11,7 +9,7 @@ export function useMemoizedFn<T extends (this: any, ...args: any[]) => any>(
 
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   if (!memoizedFn.current) {
-    memoizedFn.current = function(this, ...args) {
+    memoizedFn.current = function (this, ...args) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return fnRef.current.apply(this, args)
     } as T

@@ -76,12 +76,7 @@ export interface Options {
    * The preferred font format. If specified all other font formats are ignored.
    */
   preferredFontFormat?: LiteralUnion<
-    | 'woff'
-    | 'woff2'
-    | 'truetype'
-    | 'opentype'
-    | 'embedded-opentype'
-    | 'svg',
+    'woff' | 'woff2' | 'truetype' | 'opentype' | 'embedded-opentype' | 'svg',
     string
   >
 

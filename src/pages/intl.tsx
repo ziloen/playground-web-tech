@@ -56,9 +56,9 @@ export default function IntlPage() {
   const [language, setLanguage] = useState('en')
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="flex h-full w-full flex-col">
       {/* Header */}
-      <div className="px-[20px] py-[8px] bg-white/10 flex justify-between items-center">
+      <div className="flex items-center justify-between bg-white/10 px-[20px] py-[8px]">
         <div>Intl</div>
         <LanguageSelect language={language} onChange={setLanguage} />
       </div>
@@ -80,18 +80,18 @@ function LanguageSelect({
   const [isOpen, setIsOpen] = useState(false)
 
   const options = useMemo(() => {
-    return Intl.DisplayNames.supportedLocalesOf(Languages, { localeMatcher: 'best fit' }).map(
-      (lang) => {
-        const nativeDisplayName = getLanguageDisplayName(lang, lang)
-        const displayName = getLanguageDisplayName(lang, language)
+    return Intl.DisplayNames.supportedLocalesOf(Languages, {
+      localeMatcher: 'best fit',
+    }).map((lang) => {
+      const nativeDisplayName = getLanguageDisplayName(lang, lang)
+      const displayName = getLanguageDisplayName(lang, language)
 
-        return {
-          value: lang,
-          nativeDisplayName,
-          displayName,
-        }
-      },
-    )
+      return {
+        value: lang,
+        nativeDisplayName,
+        displayName,
+      }
+    })
   }, [language])
 
   const items = useMemo(() => {
@@ -99,11 +99,9 @@ function LanguageSelect({
       <SelectItem
         value={option.value}
         key={option.value}
-        className="flex justify-between items-center gap-[2em] min-w-max"
+        className="flex min-w-max items-center justify-between gap-[2em]"
       >
-        <SelectItemText>
-          {option.displayName}
-        </SelectItemText>
+        <SelectItemText>{option.displayName}</SelectItemText>
         <span>{option.nativeDisplayName}</span>
       </SelectItem>
     ))
@@ -114,16 +112,14 @@ function LanguageSelect({
 
   const selectedOption = options.find((option) => option.value === language)
 
-  const onOpenChange = useMemoizedFn(
-    (open: boolean) => {
-      setIsOpen(open)
-      if (open) {
-        setCachedItems(null)
-      } else {
-        setCachedItems(items)
-      }
-    },
-  )
+  const onOpenChange = useMemoizedFn((open: boolean) => {
+    setIsOpen(open)
+    if (open) {
+      setCachedItems(null)
+    } else {
+      setCachedItems(items)
+    }
+  })
 
   return (
     <Select
@@ -137,7 +133,7 @@ function LanguageSelect({
       </SelectTrigger>
 
       <SelectContent
-        className="max-h-[300px] w-fit scrollbar-thin scrollbar-gutter-stable"
+        className="max-h-[300px] w-fit scrollbar-gutter-stable scrollbar-thin"
         align="end"
       >
         {cachedItems ?? items}
@@ -147,18 +143,21 @@ function LanguageSelect({
 }
 
 function TimeNow({ language }: { language: string }) {
-  const formatter = useMemo(() =>
-    new Intl.DateTimeFormat(language, {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'long',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-      hourCycle: 'h23',
-    }), [language])
+  const formatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(language, {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        hourCycle: 'h23',
+      }),
+    [language],
+  )
 
   const nowStr = useMotionValue('')
   const [dateTime, setDateTime] = useState('')

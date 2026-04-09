@@ -71,19 +71,16 @@ export default function DexiePage() {
           </SelectTrigger>
 
           <SelectContent>
-            {recurrenceItems
-              .map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  <SelectItemText>
-                    {item.label}
-                  </SelectItemText>
-                </SelectItem>
-              ))}
+            {recurrenceItems.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                <SelectItemText>{item.label}</SelectItemText>
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </form>
 
-      <ul className="ps-2 grid gap-2">
+      <ul className="grid gap-2 ps-2">
         {todos.map((todo, i) => (
           <li
             key={todo.id}

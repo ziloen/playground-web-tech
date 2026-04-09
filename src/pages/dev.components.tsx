@@ -21,9 +21,7 @@ export default function ComponentsPage() {
       <p>Select</p>
 
       <div>
-        <Select
-          items={selectItems}
-        >
+        <Select items={selectItems}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>

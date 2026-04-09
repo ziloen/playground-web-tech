@@ -6,9 +6,9 @@
 // References:
 // https://github.com/addyosmani/squish
 
+import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import ffmpegWasmUrl from '@ffmpeg/core-mt/wasm?url'
 import ffmpegWorkerUrl from '@ffmpeg/core-mt/worker?url'
-import ffmpegCoreUrl from '@ffmpeg/core-mt?url'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
 import type { FileInfo } from 'ffprobe-wasm'
@@ -51,7 +51,10 @@ export default function Compression() {
       ],
     })
 
-    console.log(builtinPlugins.find((p) => p.name === 'preset-default'), output.data)
+    console.log(
+      builtinPlugins.find((p) => p.name === 'preset-default'),
+      output.data,
+    )
 
     return () => ffmpeg.terminate()
   }, [])
@@ -90,7 +93,7 @@ export default function Compression() {
       '18',
       'output.mp4',
     ])
-    const data = await ffmpeg.readFile('output.mp4') as Uint8Array<ArrayBuffer>
+    const data = (await ffmpeg.readFile('output.mp4')) as Uint8Array<ArrayBuffer>
     console.log(data)
     setOutputBlob(new Blob([data], { type: 'video/mp4' }))
   })
@@ -122,55 +125,52 @@ export default function Compression() {
 
   return (
     <div className="flex flex-col items-center">
-      {loaded
-        ? (
-          <div className="self-stretch flex flex-col px-3 mt-4">
-            {!file && (
+      {loaded ? (
+        <div className="mt-4 flex flex-col self-stretch px-3">
+          {!file && (
+            <div
+              className="mx-auto my-4 flex-center size-32 rounded-md border-2 border-dashed border-dark-gray-50 bg-dark-gray-700"
+              onDragEnter={(e) => e.preventDefault()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault()
+                const file = e.dataTransfer.files[0]
+                setFile(file)
+                getVideoInfo(file)
+              }}
+            >
               <div
-                className="size-32 my-4 flex-center rounded-md border-dashed bg-dark-gray-700 border-dark-gray-50 border-2 mx-auto"
-                onDragEnter={(e) => e.preventDefault()}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault()
-                  const file = e.dataTransfer.files[0]
-                  setFile(file)
-                  getVideoInfo(file)
+                className="cursor-pointer rounded-[4px] bg-blue-400 px-4 py-2 text-white shadow-blue-600"
+                style={{
+                  boxShadow: '0 5px 20px var(--tw-shadow-color)',
                 }}
+                onClick={() => {}}
               >
-                <div
-                  className="rounded-[4px] cursor-pointer px-4 py-2 shadow-blue-600 bg-blue-400 text-white"
-                  style={{
-                    boxShadow: '0 5px 20px var(--tw-shadow-color)',
-                  }}
-                  onClick={() => {}}
-                >
-                  <span className="text-white">
-                    Drop video
-                  </span>
-                </div>
+                <span className="text-white">Drop video</span>
               </div>
-            )}
-            {file
-              && (
-                <div className="flex flex-col gap-1 border-dark-gray-300 border border-solid px-2 py-2">
-                  <div>
-                    <span>
-                      {file.name}
-                    </span>
-                  </div>
-                  <div className="text-light-gray-800">{formatBytes(file.size)}</div>
-                  {fileInfo && (
-                    <div className="text-light-gray-800">
-                      Duration: {formatDuration(fileInfo.format.duration)}
-                    </div>
-                  )}
+            </div>
+          )}
+          {file && (
+            <div className="flex flex-col gap-1 border border-solid border-dark-gray-300 px-2 py-2">
+              <div>
+                <span>{file.name}</span>
+              </div>
+              <div className="text-light-gray-800">{formatBytes(file.size)}</div>
+              {fileInfo && (
+                <div className="text-light-gray-800">
+                  Duration: {formatDuration(fileInfo.format.duration)}
                 </div>
               )}
+            </div>
+          )}
 
-            <button className="mx-auto" onClick={transcode}>transcode</button>
-          </div>
-        )
-        : <button onClick={load}>load</button>}
+          <button className="mx-auto" onClick={transcode}>
+            transcode
+          </button>
+        </div>
+      ) : (
+        <button onClick={load}>load</button>
+      )}
 
       {/* {outputBlob && <video src={URL.createObjectURL(outputBlob)} controls />} */}
     </div>

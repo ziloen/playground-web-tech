@@ -3,10 +3,7 @@ import styles from './index.module.css'
 export default function Scrollbar() {
   return (
     <div
-      className={clsx(
-        styles.scrollbar,
-        'size-[400px] bg-[#24292e] overflow-auto rounded-[24px]',
-      )}
+      className={clsx(styles.scrollbar, 'size-[400px] overflow-auto rounded-[24px] bg-[#24292e]')}
       style={{
         '--scrollbar-margin-block': '24px',
         '--scrollbar-margin-inline': '24px',

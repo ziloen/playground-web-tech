@@ -28,20 +28,24 @@ export default function KeyCode() {
 
     const ac = new AbortController()
 
-    el.addEventListener('keydown', (e) => {
-      console.log(e)
+    el.addEventListener(
+      'keydown',
+      (e) => {
+        console.log(e)
 
-      if (getPreventDefault()) e.preventDefault()
-      if (getStopPropagation()) e.stopPropagation()
+        if (getPreventDefault()) e.preventDefault()
+        if (getStopPropagation()) e.stopPropagation()
 
-      setEvent(e)
-    }, { signal: ac.signal })
+        setEvent(e)
+      },
+      { signal: ac.signal },
+    )
 
     return () => ac.abort()
   }, [])
 
   return (
-    <div className="p-2 flex flex-col gap-2">
+    <div className="flex flex-col gap-2 p-2">
       <div>
         <label>
           Prevent default
@@ -81,16 +85,13 @@ export default function KeyCode() {
           '--focus-shadow':
             '0 0 0 3px var(--newtab-primary-action-background-dimmed), 0 0 0 1px var(--newtab-primary-action-background)',
         }}
-        className="rounded-[12px] size-20 bg-dark-gray-300 focus:[box-shadow:--focus-shadow]"
+        className="size-20 rounded-[12px] bg-dark-gray-300 focus:[box-shadow:--focus-shadow]"
       >
         Focus me and press any key
       </div>
 
       {event && (
-        <div
-          className="grid gap-2"
-          style={{ gridTemplateColumns: 'repeat(auto-fit, 200px)' }}
-        >
+        <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fit, 200px)' }}>
           {properties.map((item) => {
             if (hideDeprecated && item.deprecated) return null
 
@@ -122,24 +123,20 @@ function Item({
 }) {
   return (
     <div
-      className={clsx('w-[200px] bg-dark-gray-500 h-[100px]', deprecated && 'text-light-gray-600')}
+      className={clsx('h-[100px] w-[200px] bg-dark-gray-500', deprecated && 'text-light-gray-600')}
     >
       <div
         className={clsx(
-          'text-center bg-white/20 py-2 font-semibold text-lg',
+          'bg-white/20 py-2 text-center text-lg font-semibold',
           deprecated && 'line-through decoration-[2px]',
         )}
       >
         {title}
       </div>
 
-      <div className="text-center whitespace-pre py-2">
-        {String(value)}
-      </div>
+      <div className="py-2 text-center whitespace-pre">{String(value)}</div>
 
-      <div>
-        {description}
-      </div>
+      <div>{description}</div>
     </div>
   )
 }

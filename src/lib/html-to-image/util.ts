@@ -174,11 +174,7 @@ export function svgToDataURL(svg: SVGElement): string {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(html)}`
 }
 
-export function nodeToDataURL(
-  node: HTMLElement,
-  width: number,
-  height: number,
-): string {
+export function nodeToDataURL(node: HTMLElement, width: number, height: number): string {
   const svg = nodeToSvgElement(node, width, height)
   return svgToDataURL(svg)
 }
@@ -205,10 +201,7 @@ export function nodeToSvgElement(node: HTMLElement, width: number, height: numbe
 
 export function isInstanceOfElement<
   T extends typeof Element | typeof HTMLElement | typeof SVGImageElement,
->(
-  node: Element | HTMLElement | SVGImageElement,
-  instance: T,
-): node is T['prototype'] {
+>(node: Element | HTMLElement | SVGImageElement, instance: T): node is T['prototype'] {
   if (node instanceof instance) return true
 
   const nodePrototype = Object.getPrototypeOf(node) as T['prototype'] | null

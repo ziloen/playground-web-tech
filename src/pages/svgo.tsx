@@ -48,16 +48,18 @@ export default function SVGOPage() {
     >
       {/* TODO: support drop svg file */}
       {/* Left side menus */}
-      <div className="w-60 bg-dark-gray-300 h-full">
+      <div className="h-full w-60 bg-dark-gray-300">
         <div className="px-4 py-1">
-          Powered by <a href="https://github.com/svg/svgo" target="_blank" rel="noreferrer">SVGO</a>
-          {' '}
+          Powered by{' '}
+          <a href="https://github.com/svg/svgo" target="_blank" rel="noreferrer">
+            SVGO
+          </a>{' '}
           {VERSION}
         </div>
-        <div className="cursor-pointer hover:bg-dark-gray-400 py-3 px-4">Open SVG</div>
-        <label className="cursor-pointer hover:bg-dark-gray-400 py-3 px-4 grid">
+        <div className="cursor-pointer px-4 py-3 hover:bg-dark-gray-400">Open SVG</div>
+        <label className="grid cursor-pointer px-4 py-3 hover:bg-dark-gray-400">
           <textarea
-            className="col-[1/1] row-[1/1] peer bg-transparent resize-none border-none h-lh font-[inherit] text-inherit placeholder:text-inherit focus:outline-none"
+            className="peer col-[1/1] row-[1/1] h-lh resize-none border-none bg-transparent font-[inherit] text-inherit placeholder:text-inherit focus:outline-none"
             onInput={(e) => {
               const value = e.currentTarget.value.trim()
               e.currentTarget.blur()
@@ -109,12 +111,10 @@ export default function SVGOPage() {
               }
             }}
           />
-          <span className="col-[1/1] row-[1/1] peer-focus:hidden">
-            Paste markup
-          </span>
+          <span className="col-[1/1] row-[1/1] peer-focus:hidden">Paste markup</span>
         </label>
         <div
-          className="cursor-pointer hover:bg-dark-gray-400 py-3 px-4"
+          className="cursor-pointer px-4 py-3 hover:bg-dark-gray-400"
           onClick={() => {
             import('../assets/figma.svg?raw').then((v) => {
               const { data: optimizedSvg, dimensions } = optimizeSvg(v.default, { pretty: true })
@@ -131,7 +131,7 @@ export default function SVGOPage() {
         </div>
 
         <div
-          className="cursor-pointer hover:bg-dark-gray-400 py-3 px-4"
+          className="cursor-pointer px-4 py-3 hover:bg-dark-gray-400"
           onClick={() => setShowGridLines(!showGridLines)}
         >
           Toggle Grid Lines
@@ -172,7 +172,7 @@ export default function SVGOPage() {
             frameBorder="0"
             title="SVG preview"
             scrolling="no"
-            className="bg-transparent border-none overflow-hidden pointer-events-none"
+            className="pointer-events-none overflow-hidden border-none bg-transparent"
             style={{
               width: dimensions.width ? `${dimensions.width}px` : '100%',
               height: dimensions.height ? `${dimensions.height}px` : '100%',
@@ -185,7 +185,7 @@ export default function SVGOPage() {
             <>
               {/* top */}
               <div
-                className="bg-blue-200/40 w-full h-px place-self-end"
+                className="h-px w-full place-self-end bg-blue-200/40"
                 style={{
                   gridColumn: '1 / -1',
                   gridRow: '1 / 2',
@@ -193,7 +193,7 @@ export default function SVGOPage() {
               />
               {/* bottom */}
               <div
-                className="bg-blue-200/40 w-full h-px place-self-start"
+                className="h-px w-full place-self-start bg-blue-200/40"
                 style={{
                   gridColumn: '1 / -1',
                   gridRow: '3 / 4',
@@ -201,7 +201,7 @@ export default function SVGOPage() {
               />
               {/* left */}
               <div
-                className="bg-blue-200/40 w-px h-full place-self-end"
+                className="h-full w-px place-self-end bg-blue-200/40"
                 style={{
                   gridColumn: '1 / 2',
                   gridRow: '1 / -1',
@@ -209,7 +209,7 @@ export default function SVGOPage() {
               />
               {/* right */}
               <div
-                className="bg-blue-200/40 w-px h-full place-self-start"
+                className="h-full w-px place-self-start bg-blue-200/40"
                 style={{
                   gridColumn: '3 / 4',
                   gridRow: '1 / -1',
@@ -224,27 +224,21 @@ export default function SVGOPage() {
       <div className={clsx('relative', optimizedSvg ? 'block' : 'hidden')}>
         <div className="absolute right-0 bottom-0 grid justify-items-end">
           {!!originalSvg && !!optimizedSvg && (
-            <SizeCompare
-              originalSvg={originalSvg}
-              optimizedSvg={optimizedSvg}
-            />
+            <SizeCompare originalSvg={originalSvg} optimizedSvg={optimizedSvg} />
           )}
 
           {/* Copy text */}
-          {!!optimizedSvg && (
-            <CopyButton text={optimizedSvg}>
-            </CopyButton>
-          )}
+          {!!optimizedSvg && <CopyButton text={optimizedSvg}></CopyButton>}
 
           {/* Download svg */}
           {!!svgUri && (
             <>
               {/* Copy as data url */}
-              <CopyButton text={svgUri}>
-                data URL
-              </CopyButton>
+              <CopyButton text={svgUri}>data URL</CopyButton>
 
-              <a href={svgUri} download="image.svg">Download</a>
+              <a href={svgUri} download="image.svg">
+                Download
+              </a>
             </>
           )}
         </div>
@@ -268,20 +262,13 @@ function CopyButton({ children, text }: { children?: React.ReactNode; text: stri
         })
       }}
     >
-      {copied
-        ? <CarbonCheckmark width={14} height={14} />
-        : <CarbonCopy width={14} height={14} />}
+      {copied ? <CarbonCheckmark width={14} height={14} /> : <CarbonCopy width={14} height={14} />}
       {children}
     </button>
   )
 }
 
-function SizeCompare(
-  props: {
-    originalSvg: string
-    optimizedSvg: string
-  },
-) {
+function SizeCompare(props: { originalSvg: string; optimizedSvg: string }) {
   const originalSize = useMemo(() => new Blob([props.originalSvg]).size, [props.originalSvg])
   const optimizedSize = useMemo(() => new Blob([props.optimizedSvg]).size, [props.optimizedSvg])
 
@@ -291,9 +278,7 @@ function SizeCompare(
       {' → '}
       <span>{formatBytes(optimizedSize)}</span>{' '}
       <span className="text-light-gray-800">
-        ({((optimizedSize / originalSize) * 100).toFixed(
-          2,
-        )}%)
+        ({((optimizedSize / originalSize) * 100).toFixed(2)}%)
       </span>
     </span>
   )
@@ -337,10 +322,7 @@ function optimizeJsonObject(value: JsonValue): JsonValue {
   return value
 }
 
-function createDimensionsExtractor(dimensions: {
-  width: number
-  height: number
-}) {
+function createDimensionsExtractor(dimensions: { width: number; height: number }) {
   const plugin: CustomPlugin = {
     name: 'extract-dimensions',
     fn(root, params, info) {
@@ -356,10 +338,7 @@ function createDimensionsExtractor(dimensions: {
               return
             }
 
-            if (
-              attributes.width !== undefined
-              && attributes.height !== undefined
-            ) {
+            if (attributes.width !== undefined && attributes.height !== undefined) {
               dimensions.width = Number.parseFloat(attributes.width)
               dimensions.height = Number.parseFloat(attributes.height)
             } else if (attributes.viewBox !== undefined) {
@@ -376,10 +355,7 @@ function createDimensionsExtractor(dimensions: {
   return plugin
 }
 
-function optimizeSvg(
-  value: string,
-  options: { pretty?: boolean; datauri?: DataUri } = {},
-) {
+function optimizeSvg(value: string, options: { pretty?: boolean; datauri?: DataUri } = {}) {
   // https://github.com/svg/svgo/issues?q=is%3Aissue%20state%3Aopen%20foreignObject
   if (value.includes('<foreignObject')) {
     console.warn('SVG contains <foreignObject>, which may not be supported by SVGO properly.')

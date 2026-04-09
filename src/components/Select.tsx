@@ -7,13 +7,11 @@ export function Select<T>({ ...props }: ComponentProps<typeof BaseSelect.Root<T>
   return <BaseSelect.Root<T> {...props} />
 }
 
-export function SelectTrigger(
-  { children, className, ...props }: BaseSelect.Trigger.Props,
-) {
+export function SelectTrigger({ children, className, ...props }: BaseSelect.Trigger.Props) {
   return (
     <BaseSelect.Trigger
       className={cn(
-        'grid min-h-[1lh] w-fit min-w-[200px] grid-flow-col items-center justify-between rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 px-3 py-2 shadow-sm select-none hover:bg-dark-gray-700 outline-none focus-visible:outline-solid outline-2 outline-offset-2 outline-blue-500',
+        'grid min-h-[1lh] w-fit min-w-[200px] grid-flow-col items-center justify-between rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 px-3 py-2 shadow-sm outline-2 outline-offset-2 outline-blue-500 outline-none select-none hover:bg-dark-gray-700 focus-visible:outline-solid',
         className,
       )}
       {...props}
@@ -31,9 +29,7 @@ export function SelectTrigger(
 
 export const SelectValue = BaseSelect.Value
 
-export function SelectItem(
-  { className, ...props }: BaseSelect.Item.Props,
-) {
+export function SelectItem({ className, ...props }: BaseSelect.Item.Props) {
   return (
     <BaseSelect.Item
       className={cn(
@@ -53,11 +49,12 @@ export function SelectIndicator() {
   )
 }
 
-export function SelectContent(
-  { className, children, ...props }:
-    & Pick<BaseSelect.Popup.Props, 'className' | 'children'>
-    & Omit<BaseSelect.Positioner.Props, 'className' | 'children'>,
-) {
+export function SelectContent({
+  className,
+  children,
+  ...props
+}: Pick<BaseSelect.Popup.Props, 'className' | 'children'> &
+  Omit<BaseSelect.Positioner.Props, 'className' | 'children'>) {
   return (
     <BaseSelect.Portal>
       <BaseSelect.Positioner
@@ -71,7 +68,7 @@ export function SelectContent(
       >
         <BaseSelect.Popup
           className={cn(
-            'max-h-(--available-height) min-w-[200px] overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 shadow-lg outline-none data-starting-style:opacity-0 transition-[scale,opacity] data-starting-style:scale-90 data-ending-style:opacity-0 data-ending-style:scale-90 origin-(--transform-origin)',
+            'max-h-(--available-height) min-w-[200px] origin-(--transform-origin) overflow-y-auto rounded-md border border-solid border-dark-gray-200 bg-dark-gray-800 shadow-lg transition-[scale,opacity] outline-none data-ending-style:scale-90 data-ending-style:opacity-0 data-starting-style:scale-90 data-starting-style:opacity-0',
             className,
           )}
         >

@@ -101,7 +101,7 @@ export default function DOMToImage() {
       <div className="">
         <div
           ref={containerRef}
-          className="text-white border rounded-2xl overflow-hidden border-red-200 border-solid h-[100px]"
+          className="h-[100px] overflow-hidden rounded-2xl border border-solid border-red-200 text-white"
         >
           <div>dom to image</div>
           <img
@@ -119,7 +119,7 @@ export default function DOMToImage() {
           <div>dom to image</div>
         </div>
 
-        <div className="overflow-auto max-h-[500px]">
+        <div className="max-h-[500px] overflow-auto">
           <Mermaid code={defaultTestMermaid} ref={mermaidRef} />
         </div>
       </div>
@@ -142,9 +142,7 @@ export default function DOMToImage() {
 
       {loading && <div>Loading...</div>}
 
-      <div>
-        {svgElement && <TeleportElement element={svgElement} />}
-      </div>
+      <div>{svgElement && <TeleportElement element={svgElement} />}</div>
     </div>
   )
 }
@@ -172,13 +170,7 @@ function TeleportElement({ element }: { element: Element }) {
   return <div ref={ref} className="contents"></div>
 }
 
-function Mermaid({
-  code,
-  ref,
-}: {
-  code: string
-  ref: React.ForwardedRef<HTMLElement>
-}) {
+function Mermaid({ code, ref }: { code: string; ref: React.ForwardedRef<HTMLElement> }) {
   const id = useId()
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -187,16 +179,13 @@ function Mermaid({
     if (!container) return
     container.innerHTML = code
 
-    mermaid.render(`mermaid-diagram-${id}`, code, container).then(
-      ({ svg, bindFunctions, diagramType }) => {
+    mermaid
+      .render(`mermaid-diagram-${id}`, code, container)
+      .then(({ svg, bindFunctions, diagramType }) => {
         containerRef.current!.innerHTML = svg
         bindFunctions?.(container)
-      },
-    )
+      })
   }, [code])
 
-  return (
-    <div ref={mergeRefs(containerRef, ref)} id={id}>
-    </div>
-  )
+  return <div ref={mergeRefs(containerRef, ref)} id={id}></div>
 }

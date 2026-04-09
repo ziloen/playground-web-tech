@@ -9,7 +9,7 @@ export default function Slider() {
 
   return (
     <div
-      className="py-2 px-10"
+      className="px-10 py-2"
       style={{
         '--value': value,
       }}

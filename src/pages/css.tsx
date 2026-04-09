@@ -1,19 +1,19 @@
 import './css.css'
 
-import { range } from 'es-toolkit'
-import type { RefCallback } from 'react'
 import styles from './scrollbar/index.module.css'
 
-const testString =
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vel rhoncus nisl. Nunc accumsan ornare augue, et efficitur orci. Ut. `
+import { range } from 'es-toolkit'
+import type { RefCallback } from 'react'
+
+const testString = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vel rhoncus nisl. Nunc accumsan ornare augue, et efficitur orci. Ut. `
 
 export default function CSSPage() {
   return (
-    <div className="grid gap-4 max-h-full overflow-y-auto scrollbar-gutter-stable grid-cols-1">
-      <div className="w-[800px] max-w-full text-sm resizable-x">
+    <div className="grid max-h-full grid-cols-1 gap-4 overflow-y-auto scrollbar-gutter-stable">
+      <div className="w-[800px] max-w-full resizable-x text-sm">
         <EllipsisMiddle text={testString} />
       </div>
-      <div className="w-[750px] max-w-full text-sm resizable-x">
+      <div className="w-[750px] max-w-full resizable-x text-sm">
         <ShowMore text={testString} />
       </div>
 
@@ -67,9 +67,7 @@ export default function CSSPage() {
  *
  * ref: https://codepen.io/xboxyan/pen/VwpPNbm
  */
-function EllipsisMiddle({ text }: {
-  text: string
-}) {
+function EllipsisMiddle({ text }: { text: string }) {
   return (
     <div className="relative h-[2em] overflow-clip bg-dark-gray-700 leading-[2em]">
       {/* When not overflow */}
@@ -123,11 +121,11 @@ function HolyGrail() {
       className="grid max-w-[600px] bg-dark-gray-600"
       style={{ gridTemplateColumns: '1fr auto 1fr' }}
     >
-      <div className="bg-green-600/15 me-auto">Looooooooooooong text</div>
+      <div className="me-auto bg-green-600/15">Looooooooooooong text</div>
 
       <div className="mx-auto bg-violet-300/30">Center Title</div>
 
-      <div className="flex ms-auto bg-red-700/15">Short text</div>
+      <div className="ms-auto flex bg-red-700/15">Short text</div>
     </div>
   )
 }
@@ -137,10 +135,10 @@ function HolyGrail() {
  */
 function SameWidthFlexWrap() {
   return (
-    <div className="flex w-[300px] flex-wrap gap-[12px] bg-dark-gray-700 resizable-x">
+    <div className="flex w-[300px] resizable-x flex-wrap gap-[12px] bg-dark-gray-700">
       <div
         // FIXME: white-space: nowrap 导致一行时无法继续进行文字换行
-        className="shrink-0 grow whitespace-nowrap bg-blue-400/20 text-center"
+        className="shrink-0 grow bg-blue-400/20 text-center whitespace-nowrap"
         style={{
           flexBasis: 'calc(50% - 6px)',
           width: 'fit-content',
@@ -150,7 +148,7 @@ function SameWidthFlexWrap() {
       </div>
 
       <div
-        className="shrink-0 grow whitespace-nowrap bg-green-400/20 text-center"
+        className="shrink-0 grow bg-green-400/20 text-center whitespace-nowrap"
         style={{
           flexBasis: 'calc(50% - 6px)',
           width: 'fit-content',
@@ -165,23 +163,19 @@ function SameWidthFlexWrap() {
 // 另一种实现方式：把两个按钮里的文字在另一个里也放一份并隐藏
 function SameWidthFlexWrap2() {
   return (
-    <div className="flex flex-wrap w-[300px] gap-[12px] bg-dark-gray-700 resizable-x">
-      <div className="grid shrink-0 grow bg-blue-400/20 text-center max-w-full">
-        <span className="area-[1/1]">
-          Lorem ipsum
-        </span>
+    <div className="flex w-[300px] resizable-x flex-wrap gap-[12px] bg-dark-gray-700">
+      <div className="grid max-w-full shrink-0 grow bg-blue-400/20 text-center">
+        <span className="area-[1/1]">Lorem ipsum</span>
 
-        <span inert aria-hidden className="area-[1/1] invisible h-0">
+        <span inert aria-hidden className="invisible h-0 area-[1/1]">
           dolor
         </span>
       </div>
 
-      <div className="grid shrink-0 grow bg-green-400/20 text-center max-w-full">
-        <span className="area-[1/1]">
-          dolor
-        </span>
+      <div className="grid max-w-full shrink-0 grow bg-green-400/20 text-center">
+        <span className="area-[1/1]">dolor</span>
 
-        <span inert aria-hidden className="area-[1/1] invisible h-0">
+        <span inert aria-hidden className="invisible h-0 area-[1/1]">
           Lorem ipsum
         </span>
       </div>
@@ -193,34 +187,30 @@ function AspectRatio() {
   return (
     <div className="flex">
       {/* Works on Firefox */}
-      <div className="flex size-[100px] min-h-[40px] min-w-[40px] bg-light-gray-900 resizable">
-        <div className="m-auto aspect-video max-h-full max-w-full bg-green-900 w-stretch">
+      <div className="flex size-[100px] min-h-[40px] min-w-[40px] resizable bg-light-gray-900">
+        <div className="m-auto aspect-video max-h-full w-stretch max-w-full bg-green-900">
           Only works on Firefox
         </div>
       </div>
 
       {/* Works on All */}
-      <div className="flex size-[100px] min-h-[40px] min-w-[40px] bg-dark-gray-600 resizable">
+      <div className="flex size-[100px] min-h-[40px] min-w-[40px] resizable bg-dark-gray-600">
         {/* viewBox or el.getBBox() */}
-        <svg viewBox="0 0 300 200" className="max-w-full max-h-full m-auto">
+        <svg viewBox="0 0 300 200" className="m-auto max-h-full max-w-full">
           <image href="https://dummyimage.com/300x200/554d3e/ffffff.png&text=300x200 SVG" />
         </svg>
       </div>
 
-      <div className="flex size-[100px] min-h-[40px] min-w-[40px] bg-light-gray-900 resizable">
-        <div className="relative m-auto aspect-video max-h-full min-h-0 min-w-0 max-w-full overflow-clip bg-green-900">
-          <div className="size-[99999px]">
-            Hack
-          </div>
+      <div className="flex size-[100px] min-h-[40px] min-w-[40px] resizable bg-light-gray-900">
+        <div className="relative m-auto aspect-video max-h-full min-h-0 max-w-full min-w-0 overflow-clip bg-green-900">
+          <div className="size-[99999px]">Hack</div>
         </div>
       </div>
     </div>
   )
 }
 
-function ShowMore({ text }: {
-  text: string
-}) {
+function ShowMore({ text }: { text: string }) {
   const [isShowMore, setIsShowMore] = useState(false)
 
   if (isShowMore) {
@@ -233,7 +223,7 @@ function ShowMore({ text }: {
         </span>
 
         <div
-          className="absolute bottom-0 cursor-pointer text-purple-400 right-2"
+          className="absolute right-2 bottom-0 cursor-pointer text-purple-400"
           onClick={() => setIsShowMore(false)}
           style={{
             top: `max(1lh, calc(100% - 1lh))`,
@@ -246,15 +236,15 @@ function ShowMore({ text }: {
   }
 
   return (
-    <div className="relative leading-[2em] h-[1lh] bg-dark-gray-700">
+    <div className="relative h-[1lh] bg-dark-gray-700 leading-[2em]">
       {/* When not overflow */}
       <div className="max-h-[4em] w-fit overflow-visible">{text}</div>
 
       {/* When overflow, this will cover above text */}
-      <div className="relative -top-[4em] bg-inherit flex" title={text}>
+      <div className="relative -top-[4em] flex bg-inherit" title={text}>
         {/* Left part */}
         <div
-          className="overflow-hidden whitespace-nowrap text-ellipsis"
+          className="overflow-hidden text-ellipsis whitespace-nowrap"
           style={{
             maskImage: 'linear-gradient(to left, transparent, black 10em)',
           }}
@@ -264,7 +254,7 @@ function ShowMore({ text }: {
 
         {/* Right part */}
         <div
-          className="w-max cursor-pointer ml-2 text-purple-400 shrink-0"
+          className="ml-2 w-max shrink-0 cursor-pointer text-purple-400"
           onClick={() => setIsShowMore((prev) => !prev)}
         >
           Show more
@@ -296,58 +286,46 @@ function ScrollAutoAnchor() {
 
 function AutoShrinkButton() {
   return (
-    <div className="text-sm resizable-x w-[300px] max-w-full flex gap-2 bg-dark-gray-700">
-      <div className="flex-1 h-[1lh]">
-        <div className="bg-blue-400/20 gap-x-2 px-2 flex flex-wrap max-h-[2lh] max-w-max">
-          <div className="h-[1lh]">
-            🏐
-          </div>
+    <div className="flex w-[300px] max-w-full resizable-x gap-2 bg-dark-gray-700 text-sm">
+      <div className="h-[1lh] flex-1">
+        <div className="flex max-h-[2lh] max-w-max flex-wrap gap-x-2 bg-blue-400/20 px-2">
+          <div className="h-[1lh]">🏐</div>
 
-          <div className="break-all">
-            Button 1
-          </div>
+          <div className="break-all">Button 1</div>
         </div>
 
         <div className="relative -top-[2lh] flex bg-dark-gray-700">
-          <div className="bg-blue-400/20 px-2">
-            🏀
-          </div>
+          <div className="bg-blue-400/20 px-2">🏀</div>
         </div>
       </div>
 
       <div className="shrink-0 bg-green-400/20 px-2">Button 2</div>
 
-      <div className="bg-red-400/20 shrink-0 px-2">Button 3</div>
+      <div className="shrink-0 bg-red-400/20 px-2">Button 3</div>
     </div>
   )
 }
 
 function AutoShrinkButton2() {
   return (
-    <div className="flex w-[450px] max-w-full gap-2 bg-dark-gray-700 text-sm resizable-x">
+    <div className="flex w-[450px] max-w-full resizable-x gap-2 bg-dark-gray-700 text-sm">
       <div className="mr-auto h-[1lh]">
         <div className="flex gap-2 overflow-hidden">
           <div className="flex max-h-[2lh] max-w-max flex-wrap gap-x-2 bg-blue-400/20 px-2">
-            <div className="h-[1lh]">
-              🏐
-            </div>
+            <div className="h-[1lh]">🏐</div>
 
-            <div className="break-all">
-              Button 1
-            </div>
+            <div className="break-all">Button 1</div>
           </div>
 
           <div className="flex shrink-0 gap-2">
-            <div className="shrink-0 whitespace-nowrap bg-green-400/20 px-2">Button 2</div>
+            <div className="shrink-0 bg-green-400/20 px-2 whitespace-nowrap">Button 2</div>
 
-            <div className="shrink-0 whitespace-nowrap bg-red-400/20 px-2">Button 3</div>
+            <div className="shrink-0 bg-red-400/20 px-2 whitespace-nowrap">Button 3</div>
           </div>
         </div>
 
         <div className="relative -top-[2lh] flex gap-2 bg-dark-gray-700">
-          <div className="bg-blue-400/20 px-2">
-            🏀
-          </div>
+          <div className="bg-blue-400/20 px-2">🏀</div>
 
           <div className="shrink-0 bg-green-400/20 px-2">Button 2</div>
 
@@ -364,15 +342,13 @@ function AutoShrinkButton2() {
 
 function AutoShrinkButton3() {
   return (
-    <div className="text-sm w-[100px] resizable-x max-w-full flex gap-2">
+    <div className="flex w-[100px] max-w-full resizable-x gap-2 text-sm">
       <div className="h-[1lh]">
         <div className="relative flex flex-row flex-wrap-reverse">
           <div className="h-[1lh] shrink-0">Button</div>
-          <div className="w-px h-[1lh]"></div>
+          <div className="h-[1lh] w-px"></div>
 
-          <div className="absolute bottom-[1lh] shrink-0 whitespace-nowrap">
-            AAAA djaiowjdoi
-          </div>
+          <div className="absolute bottom-[1lh] shrink-0 whitespace-nowrap">AAAA djaiowjdoi</div>
         </div>
       </div>
     </div>
@@ -383,16 +359,12 @@ function AutoShrinkButton3() {
  * https://stackoverflow.com/questions/32118013/align-icon-vertically-to-the-center-of-the-first-line-of-text
  */
 function FlexAlignFirstLine() {
-  return (
-    <div className="flex">
-      WIP
-    </div>
-  )
+  return <div className="flex">WIP</div>
 }
 
 function GridRepeat() {
   return (
-    <div className="resizable-x @container">
+    <div className="@container resizable-x">
       {/* item min width: 200px, at least 2 columns */}
       <div
         className={clsx(
@@ -400,7 +372,7 @@ function GridRepeat() {
           // items
           '[&>div]:bg-red-300',
           // titles
-          '[&>span]:bg-blue-300 [&>span]:justify-self-start',
+          '[&>span]:justify-self-start [&>span]:bg-blue-300',
         )}
         style={{
           '--item-size': 'minmax(min(200px, 50% - 4px), 1fr)',
@@ -427,11 +399,11 @@ function GridRepeat() {
       {/* item max width: 200px, at least 2 columns */}
       <div
         className={clsx(
-          'grid gap-2 mt-4',
+          'mt-4 grid gap-2',
           // items
           '[&>div]:bg-red-300',
           // titles
-          '[&>span]:bg-blue-300 [&>span]:justify-self-start',
+          '[&>span]:justify-self-start [&>span]:bg-blue-300',
         )}
         style={{
           // columns = round(up, (width + gap) / (item-max-width + gap))
@@ -468,14 +440,14 @@ function DynamicMultiLineClamp() {
   return (
     <div
       // TODO: fit initial height to content instead of fixed height
-      className="resizable-y w-[200px] h-[120px] bg-dark-gray-600"
+      className="h-[120px] w-[200px] resizable-y bg-dark-gray-600"
       style={{ containerType: 'size' }}
     >
       <div
         className={clsx(
           'line-clamp-(--line-clamp) max-h-full',
           // debug text
-          'relative before:content-[counter(v)] before:[counter-reset:v_var(--line-clamp)] before:absolute before:top-0 before:left-0 before:text-red before:bg-white before:font-extrabold before:text-lg',
+          'relative before:absolute before:top-0 before:left-0 before:bg-white before:text-lg before:font-extrabold before:text-red before:content-[counter(v)] before:[counter-reset:v_var(--line-clamp)]',
         )}
         style={{
           // line-clamp = round(height / line-height)
@@ -513,7 +485,9 @@ function ImageNewLine() {
 
         {isTextNode ? '#text 2' : <span>#text 2</span>}
 
-        {[0, 1, 2].map((v) => <ImageItem key={v} />)}
+        {[0, 1, 2].map((v) => (
+          <ImageItem key={v} />
+        ))}
 
         {isTextNode ? '#text 3' : <span>#text 3</span>}
 
@@ -531,15 +505,14 @@ function ImageItem() {
       className={clsx(
         'inline align-top',
         // 仅第一个连续的图片且前面有元素，前 换行
-        '[--s-br:inline] [&_+_div]:[--s-br:none] first:[--s-br:none]',
+        '[--s-br:inline] first:[--s-br:none] [&_+_div]:[--s-br:none]',
         // 仅最后一个连续的图片且后面有元素 后 换行
-        '[--e-br:inline] has-[+_div]:[--e-br:none] last:[--e-br:none]',
+        '[--e-br:inline] last:[--e-br:none] has-[+_div]:[--e-br:none]',
       )}
     >
       <br className="[display:var(--s-br)]" />
 
-      <div className="inline-block size-20 bg-linear-to-r/oklch from-blue-300 via-green-500 via-35% to-yellow-400">
-      </div>
+      <div className="inline-block size-20 bg-linear-to-r/oklch from-blue-300 via-green-500 via-35% to-yellow-400"></div>
 
       <br className="[display:var(--e-br)]" />
     </div>
@@ -551,23 +524,19 @@ function BleedLayout() {
 
   return (
     <div
-      className="grid [:where(&>*)]:col-start-2 gap-y-2 text-center resizable-x"
+      className="grid resizable-x gap-y-2 text-center [:where(&>*)]:col-start-2"
       style={{
         gridTemplateColumns: state
           ? '24px 1fr 24px' // 左右固定宽度，中间自适应
           : '1fr min(600px, 100%) 1fr', // 左右自适应，中间固定最大宽度
       }}
     >
-      <div className="bg-green-800">
-        Normal element
-      </div>
+      <div className="bg-green-800">Normal element</div>
       <button onClick={() => setState((v) => !v)}>
         Toggle Layout (current: {state ? 'fixed sides' : 'fixed center'})
       </button>
 
-      <div className="col-span-full bg-blue-700">
-        Full width element
-      </div>
+      <div className="col-span-full bg-blue-700">Full width element</div>
 
       <div className="bg-green-800">Normal element</div>
       <div className="bg-green-800">Normal element</div>
@@ -582,7 +551,7 @@ function GridItemFlexGrow() {
   const [state, setState] = useState(false)
 
   return (
-    <div className="grid grid-flow-row h-70 gap-2 bg-purple-400/15 max-w-36 relative pe-6 auto-rows-[minmax(0,min-content)]">
+    <div className="relative grid h-70 max-w-36 grid-flow-row auto-rows-[minmax(0,min-content)] gap-2 bg-purple-400/15 pe-6">
       {/* 这几项应当为 min-content 高度，且数量不确定 */}
       <button onClick={() => setState((v) => !v)}>Toggle</button>
       <div className="bg-green-800">1</div>
@@ -590,7 +559,7 @@ function GridItemFlexGrow() {
 
       {/* 这一项应当始终撑满容器但不溢出 */}
       <div
-        className="bg-blue-700 overflow-auto"
+        className="overflow-auto bg-blue-700"
         style={{
           containerType: 'size',
           // 非常大的内在高度，确保撑满容器哦
@@ -624,24 +593,24 @@ function ScrollClipMargin() {
   const editorRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className="w-[300px] h-[300px] overflow-visible relative ms-10 my-20">
-      <div className="absolute inset-y-0 -inset-x-2 border bg-white/10 z-1 pointer-events-none" />
+    <div className="relative my-20 ms-10 h-[300px] w-[300px] overflow-visible">
+      <div className="pointer-events-none absolute -inset-x-2 inset-y-0 z-1 border bg-white/10" />
 
       <div
         className={clsx(
           styles.scrollbar,
-          'h-[400px] overflow-y-auto relative -top-[50px] overscroll-contain scroll-py-[50px]',
+          'relative -top-[50px] h-[400px] scroll-py-[50px] overflow-y-auto overscroll-contain',
         )}
         style={{
           '--scrollbar-margin-block': '50px',
         }}
       >
-        <div className="bg-green/20 flex flex-col py-[50px]">
+        <div className="flex flex-col bg-green/20 py-[50px]">
           {/* <div className="h-[50px] bg-green-700"></div> */}
           <div
             ref={editorRef}
             contentEditable
-            className="min-h-[200px] basis-max grow bg-dark-gray-500 outline-none"
+            className="min-h-[200px] grow basis-max bg-dark-gray-500 outline-none"
             // FIXME: 使用 scroll-padding 来添加输入内边距时，手动添加的内容无效
             // 例如手动添加换行时
             onKeyDown={(e) => {
@@ -663,11 +632,14 @@ function ScrollClipMargin() {
 
                 sel.addRange(range)
 
-                p.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' })
+                p.scrollIntoView({
+                  block: 'nearest',
+                  inline: 'nearest',
+                  behavior: 'instant',
+                })
               }
             }}
-          >
-          </div>
+          ></div>
           {/* <textarea className="grow basis-max min-h-[300px] field-sizing-content"></textarea> */}
           {/* <div className="h-[50px] bg-green-700 mt-auto"></div> */}
         </div>
@@ -689,11 +661,11 @@ function ScrollDefaultCenter() {
   }, [])
 
   return (
-    <div className="overflow-x-auto snap-x w-100 h-10 snap-mandatory">
-      <div className="w-200 relative h-full bg-linear-to-r/oklch from-blue-400 to-green-400">
+    <div className="h-10 w-100 snap-x snap-mandatory overflow-x-auto">
+      <div className="relative h-full w-200 bg-linear-to-r/oklch from-blue-400 to-green-400">
         <div
           aria-hidden
-          className="absolute inset-0 size-0 m-auto pointer-events-none snap-center invisible"
+          className="pointer-events-none invisible absolute inset-0 m-auto size-0 snap-center"
           ref={hideOnLoad}
         />
       </div>
@@ -710,9 +682,9 @@ function TextFitToWidth() {
   const text = 'Resize me'
 
   return (
-    <div className="resizable-x w-[400px] bg-dark-gray-200 flex @container">
+    <div className="@container flex w-[400px] resizable-x bg-dark-gray-200">
       <div
-        className="outline flex-1 @container"
+        className="@container flex-1 outline"
         style={{
           '--captured-length': '100cqi',
           '--available-space': 'var(--captured-length)',
@@ -736,9 +708,7 @@ function TextFitToWidth() {
         </div>
       </div>
 
-      <div className="outline whitespace-nowrap">
-        {text}
-      </div>
+      <div className="whitespace-nowrap outline">{text}</div>
     </div>
   )
 }
@@ -746,12 +716,12 @@ function TextFitToWidth() {
 function AnchorPositionInScroll() {
   return (
     <div
-      className="h-100 relative flex w-auto gap-12"
+      className="relative flex h-100 w-auto gap-12"
       style={{
         anchorScope: '--anchor-a, --anchor-b, --proxy-a, --proxy-b',
       }}
     >
-      <div className="overflow-y-auto h-full">
+      <div className="h-full overflow-y-auto">
         <p
           style={{
             anchorName: '--anchor-a',
@@ -803,7 +773,7 @@ function AnchorPositionInScroll() {
           dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
         </p>
       </div>
-      <div className="overflow-y-auto h-full">
+      <div className="h-full overflow-y-auto">
         <p>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
           est expedita nesciunt exercitationem sunt quaerat quos deserunt aliquid dolorum
@@ -857,7 +827,7 @@ function AnchorPositionInScroll() {
       </div>
 
       <div
-        className="absolute bg-blue/40 size-stretch pointer-events-none"
+        className="pointer-events-none absolute size-stretch bg-blue/40"
         style={{
           positionAnchor: '--anchor-a',
           top: 'anchor(top)',
@@ -867,11 +837,10 @@ function AnchorPositionInScroll() {
           positionVisibility: 'always',
           anchorName: '--proxy-a',
         }}
-      >
-      </div>
+      ></div>
 
       <div
-        className="absolute bg-green/40 size-stretch pointer-events-none"
+        className="pointer-events-none absolute size-stretch bg-green/40"
         style={{
           positionAnchor: '--anchor-b',
           top: 'anchor(top)',
@@ -881,12 +850,11 @@ function AnchorPositionInScroll() {
           positionVisibility: 'always',
           anchorName: '--proxy-b',
         }}
-      >
-      </div>
+      ></div>
 
       {/* FIXME: 现仅 Firefox 有效（不稳定），且必须要 proxy 和 positionAnchor */}
       <div
-        className="absolute bg-red/40 size-stretch pointer-events-none"
+        className="pointer-events-none absolute size-stretch bg-red/40"
         style={{
           positionAnchor: '--proxy-a',
           top: 'min(anchor(--proxy-a top), anchor(--proxy-b top))',
@@ -895,8 +863,7 @@ function AnchorPositionInScroll() {
           left: 'anchor(--proxy-a right)',
           positionVisibility: 'always',
         }}
-      >
-      </div>
+      ></div>
     </div>
   )
 }
@@ -907,7 +874,7 @@ function AnchorPositionInScroll() {
 function GridMinMaxColumns() {
   return (
     <div
-      className="resizable-x grid w-[min(100%,400px)]"
+      className="grid w-[min(100%,400px)] resizable-x"
       style={{
         '--col-gap': '8px',
         '--col-size': '100px',
@@ -923,7 +890,7 @@ function GridMinMaxColumns() {
       }}
     >
       {range(10).map((i) => (
-        <div key={i} className="bg-red-300 h-10 flex items-center justify-center">
+        <div key={i} className="flex h-10 items-center justify-center bg-red-300">
           {i + 1}
         </div>
       ))}
@@ -964,22 +931,18 @@ function GridLastItemFlexGrow() {
   return (
     <div className="w-[min(100%,400px)] resizable-x">
       <div>
-        <button onClick={() => setItemCount((v) => v > 0 ? v - 1 : 0)}>
-          -1
-        </button>
+        <button onClick={() => setItemCount((v) => (v > 0 ? v - 1 : 0))}>-1</button>
 
         {itemCount}
 
-        <button onClick={() => setItemCount((v) => v + 1)}>
-          +1
-        </button>
+        <button onClick={() => setItemCount((v) => v + 1)}>+1</button>
       </div>
 
-      <div className="grid  gap-2 grid-cols-fit-[100px] @container">
+      <div className="@container grid grid-cols-fit-[100px] gap-2">
         {range(itemCount).map((i) => (
           <div
             key={i}
-            className="bg-red-300 h-10 flex-center last:col-end-[span_2] last:col-start-auto"
+            className="flex-center h-10 bg-red-300 last:col-start-auto last:col-end-[span_2]"
           >
             {i + 1}
           </div>
@@ -992,5 +955,4 @@ function GridLastItemFlexGrow() {
 // TODO: multi dynamic sticky elments stack with dynamic height (or fixed height)
 // 可以点击按钮设置列表项是否 sticky，可以多个 sticky
 // sticky 时，滚动出范围时，会自动堆叠到下一个 sticky 元素的下面
-function StickyStack() {
-}
+function StickyStack() {}

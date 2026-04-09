@@ -51,17 +51,17 @@ function filterPreferredFontFormat(str: string, { preferredFontFormat }: Options
   return !preferredFontFormat
     ? str
     : str.replace(FONT_SRC_REGEX, (match: string) => {
-      while (true) {
-        const [src, , format] = URL_WITH_FORMAT_REGEX.exec(match) ?? []
-        if (!format) {
-          return ''
-        }
+        while (true) {
+          const [src, , format] = URL_WITH_FORMAT_REGEX.exec(match) ?? []
+          if (!format) {
+            return ''
+          }
 
-        if (format === preferredFontFormat) {
-          return `src: ${src!};`
+          if (format === preferredFontFormat) {
+            return `src: ${src!};`
+          }
         }
-      }
-    })
+      })
 }
 
 export function shouldEmbed(url: string): boolean {

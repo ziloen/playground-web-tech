@@ -1,15 +1,15 @@
 {
   "[javascript]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[javascriptreact]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[typescript]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   // add @apply & @container to css atDirectives
   "css.customData": [

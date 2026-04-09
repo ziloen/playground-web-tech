@@ -40,9 +40,7 @@ type SerializedMentionNode = Spread<
   SerializedLexicalNode
 >
 
-function convertMentionElement(
-  domNode: HTMLElement,
-): DOMConversionOutput | null {
+function convertMentionElement(domNode: HTMLElement): DOMConversionOutput | null {
   // const textContent = domNode.textContent
   const trigger = domNode.dataset.mentionTrigger
   const value = domNode.dataset.mentionValue
@@ -184,7 +182,11 @@ function $createMentionNode(trigger: string, value: string, id: string): Mention
 }
 
 class MentionOptions extends MenuOption {
-  constructor(id: string, public label: string, public avatar?: React.ReactNode) {
+  constructor(
+    id: string,
+    public label: string,
+    public avatar?: React.ReactNode,
+  ) {
     super(id)
   }
 }
@@ -194,9 +196,7 @@ const initialConfig: InitialConfigType = {
   onError(error, editor) {
     console.error(error)
   },
-  nodes: [
-    MentionNode,
-  ],
+  nodes: [MentionNode],
 }
 
 function MentionsMenuItem({
@@ -215,10 +215,7 @@ function MentionsMenuItem({
   return (
     <div
       key={option.key}
-      className={clsx(
-        'whitespace-nowrap',
-        isSelected && 'bg-dark-gray-100 text-white',
-      )}
+      className={clsx('whitespace-nowrap', isSelected && 'bg-dark-gray-100 text-white')}
       // eslint-disable-next-line @typescript-eslint/unbound-method
       ref={option.setRefElement}
       tabIndex={-1}
@@ -284,7 +281,7 @@ class LRUCache<K, V> extends Map<K, V> {
 
 function searchService(text: string) {
   const results = dummyMentionsData.filter((mention) =>
-    mention.toLowerCase().includes(text.toLowerCase())
+    mention.toLowerCase().includes(text.toLowerCase()),
   )
 
   return results
@@ -698,14 +695,19 @@ const dummyMentionsData = [
   'Zuckuss',
 ]
 
-function MentionComponent({ trigger, value, id, nodeKey }: {
+function MentionComponent({
+  trigger,
+  value,
+  id,
+  nodeKey,
+}: {
   trigger: string
   value: string
   id: string
   nodeKey: NodeKey
 }) {
   return (
-    <span className="text-black bg-green-700 px-[4px] rounded-[3px]">
+    <span className="rounded-[3px] bg-green-700 px-[4px] text-black">
       {trigger}
       {value}
     </span>
@@ -740,28 +742,30 @@ export default function Editor() {
     })
   }, [results])
 
-  const onSelectOption = useMemoizedFn((
-    selectedOption: MentionOptions,
-    nodeToReplace: TextNode | null,
-    closeMenu: () => void,
-    matchingString: string,
-  ) => {
-    const editor = editorRef.current
-    if (!editor) return
+  const onSelectOption = useMemoizedFn(
+    (
+      selectedOption: MentionOptions,
+      nodeToReplace: TextNode | null,
+      closeMenu: () => void,
+      matchingString: string,
+    ) => {
+      const editor = editorRef.current
+      if (!editor) return
 
-    editor.update(() => {
-      console.log('onSelectOption', selectedOption, nodeToReplace, closeMenu, matchingString)
+      editor.update(() => {
+        console.log('onSelectOption', selectedOption, nodeToReplace, closeMenu, matchingString)
 
-      const mentionNode = $createMentionNode('@', selectedOption.label, selectedOption.key)
+        const mentionNode = $createMentionNode('@', selectedOption.label, selectedOption.key)
 
-      console.log('nodeToReplace', nodeToReplace)
-      if (nodeToReplace) {
-        nodeToReplace.replace(mentionNode)
-      }
-      // mentionNode.select()
-      closeMenu()
-    })
-  })
+        console.log('nodeToReplace', nodeToReplace)
+        if (nodeToReplace) {
+          nodeToReplace.replace(mentionNode)
+        }
+        // mentionNode.select()
+        closeMenu()
+      })
+    },
+  )
 
   function insertAt() {
     const editor = editorRef.current
@@ -776,16 +780,16 @@ export default function Editor() {
   }
 
   return (
-    <div className="h-full px-[12px] py-[12px] flex flex-col gap-[12px]">
+    <div className="flex h-full flex-col gap-[12px] px-[12px] py-[12px]">
       <div className="relative">
         <LexicalComposer initialConfig={initialConfig}>
           <PlainTextPlugin
             contentEditable={
-              <ContentEditable className="outline outline-transparent z-1 focus:outline-green-600 cursor-text text-[14px] leading-[21px] px-[16px] py-[6px] resize-none transition-[outline-color]" />
+              <ContentEditable className="z-1 cursor-text resize-none px-[16px] py-[6px] text-[14px] leading-[21px] outline outline-transparent transition-[outline-color] focus:outline-green-600" />
             }
             ErrorBoundary={LexicalErrorBoundary}
             placeholder={
-              <div className="absolute text-[#bbbbbe] w-max dark:text-[#5e5e60] select-none pointer-events-none text-[14px] text-ellipsis whitespace-nowrap top-[6px] left-[16px]">
+              <div className="pointer-events-none absolute top-[6px] left-[16px] w-max text-[14px] text-ellipsis whitespace-nowrap text-[#bbbbbe] select-none dark:text-[#5e5e60]">
                 {'Placeholder'}
               </div>
             }
@@ -795,7 +799,7 @@ export default function Editor() {
             menuRenderFn={(anchorElementRef, itemProps, matchingString) => {
               if (!anchorElementRef.current || !results.length) return null
               return createPortal(
-                <div className="bg-dark-gray-700 absolute top-full text-gray-3 max-h-[400px] overflow-y-auto overflow-x-hidden">
+                <div className="text-gray-3 absolute top-full max-h-[400px] overflow-x-hidden overflow-y-auto bg-dark-gray-700">
                   {options.map((option, i) => (
                     <MentionsMenuItem
                       index={i}
@@ -833,8 +837,12 @@ export default function Editor() {
       </div>
 
       <div className="flex gap-[10px]">
-        <button className="btn" onClick={clearEditor}>Clear</button>
-        <button className="btn" onClick={insertAt}>@</button>
+        <button className="btn" onClick={clearEditor}>
+          Clear
+        </button>
+        <button className="btn" onClick={insertAt}>
+          @
+        </button>
       </div>
     </div>
   )

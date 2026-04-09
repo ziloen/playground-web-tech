@@ -67,8 +67,9 @@ function parseCSS(source: string) {
 
   const importRegex = /@import[\s\S]*?url\([^)]*\)[\s\S]*?;/gi
   // to match css & media queries together
-  const combinedCSSRegex = String.raw`((\s*?(?:\/\*[\s\S]*?\*\/)?\s*?@media[\s\S]`
-    + String.raw`*?){([\s\S]*?)}\s*?})|(([\s\S]*?){([\s\S]*?)})`
+  const combinedCSSRegex =
+    String.raw`((\s*?(?:\/\*[\s\S]*?\*\/)?\s*?@media[\s\S]` +
+    String.raw`*?){([\s\S]*?)}\s*?})|(([\s\S]*?){([\s\S]*?)})`
   // unified regex
   const unifiedRegex = new RegExp(combinedCSSRegex, 'gi')
 
@@ -115,9 +116,12 @@ async function getCSSRules(
                       rule.startsWith('@import') ? (importIndex += 1) : sheet.cssRules.length,
                     )
                   } catch (error: unknown) {
-                    console.error('Error inserting rule from remote css', { rule, error })
+                    console.error('Error inserting rule from remote css', {
+                      rule,
+                      error,
+                    })
                   }
-                })
+                }),
               )
               .catch((e: unknown) => {
                 console.error(
@@ -138,7 +142,7 @@ async function getCSSRules(
               .then((cssText) =>
                 parseCSS(cssText).forEach((rule) => {
                   inline.insertRule(rule, inline.cssRules.length)
-                })
+                }),
               )
               .catch((err: unknown) => {
                 console.error('Error loading remote stylesheet', err)
@@ -193,10 +197,7 @@ async function parseWebFontRules(node: HTMLElement, options: Options) {
   return getWebFontRules(cssRules)
 }
 
-export async function getWebFontCSS(
-  node: HTMLElement,
-  options: Options,
-): Promise<string> {
+export async function getWebFontCSS(node: HTMLElement, options: Options): Promise<string> {
   const rules = await parseWebFontRules(node, options)
   const cssTexts = await Promise.all(
     rules.map((rule) => {
@@ -208,12 +209,9 @@ export async function getWebFontCSS(
   return cssTexts.join('\n')
 }
 
-export async function embedWebFonts<T extends HTMLElement>(
-  clonedNode: T,
-  options: Options,
-) {
-  const cssText = options.fontEmbedCSS
-    ?? (options.skipFonts ? null : await getWebFontCSS(clonedNode, options))
+export async function embedWebFonts<T extends HTMLElement>(clonedNode: T, options: Options) {
+  const cssText =
+    options.fontEmbedCSS ?? (options.skipFonts ? null : await getWebFontCSS(clonedNode, options))
 
   if (cssText) {
     const styleNode = document.createElement('style')

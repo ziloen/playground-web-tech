@@ -8,7 +8,7 @@ import { Popover } from '@base-ui/react'
 export default function PopoverPage() {
   return (
     <div className="grid h-full overflow-y-auto">
-      <div className="flex-center w-full h-[90vh]">
+      <div className="flex-center h-[90vh] w-full">
         <Popover.Root>
           <Popover.Trigger>
             <div>123</div>
@@ -21,7 +21,7 @@ export default function PopoverPage() {
               align="start"
               collisionAvoidance={{ fallbackAxisSide: 'none' }}
             >
-              <Popover.Popup className="bg-[canvas] rounded-lg outline outline-dark-gray-100 px-4 py-2 h-[500px] max-h-[calc(var(--available-height)-10px)]">
+              <Popover.Popup className="h-[500px] max-h-[calc(var(--available-height)-10px)] rounded-lg bg-[canvas] px-4 py-2 outline outline-dark-gray-100">
                 <div className="">popover content</div>
               </Popover.Popup>
             </Popover.Positioner>

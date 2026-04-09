@@ -41,10 +41,7 @@ async function cloneIFrameElement(iframe: HTMLIFrameElement) {
   return iframe.cloneNode(false) as HTMLIFrameElement
 }
 
-async function cloneSingleNode(
-  node: HTMLElement,
-  options: Options,
-): Promise<HTMLElement> {
+async function cloneSingleNode(node: HTMLElement, options: Options): Promise<HTMLElement> {
   if (isInstanceOfElement(node, HTMLCanvasElement)) {
     return cloneCanvasElement(node)
   }
@@ -74,8 +71,8 @@ async function cloneChildren<T extends HTMLElement>(
   if (isSlotElement(nativeNode) && nativeNode.assignedNodes) {
     children = toArray<T>(nativeNode.assignedNodes())
   } else if (
-    isInstanceOfElement(nativeNode, HTMLIFrameElement)
-    && nativeNode.contentDocument?.body
+    isInstanceOfElement(nativeNode, HTMLIFrameElement) &&
+    nativeNode.contentDocument?.body
   ) {
     children = toArray<T>(nativeNode.contentDocument.body.childNodes)
   } else {
@@ -115,15 +112,15 @@ function cloneCSSStyle<T extends HTMLElement>(nativeNode: T, clonedNode: T) {
     toArray<string>(sourceStyle).forEach((name) => {
       let value = sourceStyle.getPropertyValue(name)
       if (name === 'font-size' && value.endsWith('px')) {
-        const reducedFont = Math.floor(parseFloat(value.slice(0, Math.max(0, value.length - 2))))
-          - 0.1
+        const reducedFont =
+          Math.floor(parseFloat(value.slice(0, Math.max(0, value.length - 2)))) - 0.1
         value = `${reducedFont}px`
       }
 
       if (
-        isInstanceOfElement(nativeNode, HTMLIFrameElement)
-        && name === 'display'
-        && value === 'inline'
+        isInstanceOfElement(nativeNode, HTMLIFrameElement) &&
+        name === 'display' &&
+        value === 'inline'
       ) {
         value = 'block'
       }

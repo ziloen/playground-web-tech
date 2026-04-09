@@ -17,9 +17,13 @@ export default function EventBubble() {
     ] as (keyof HTMLElementEventMap)[]
 
     enventTypes.forEach((type) => {
-      targetRef.current.addEventListener(type, (e) => {
-        console.log(type, e)
-      }, { signal: controller.signal })
+      targetRef.current.addEventListener(
+        type,
+        (e) => {
+          console.log(type, e)
+        },
+        { signal: controller.signal },
+      )
     })
 
     return () => {
@@ -36,7 +40,9 @@ export default function EventBubble() {
       )}
 
       {targetRef && <div>234</div>}
-      <div className="select-none cursor-col-resize" ref={targetRef}>Click me</div>
+      <div className="cursor-col-resize select-none" ref={targetRef}>
+        Click me
+      </div>
     </div>
   )
 }

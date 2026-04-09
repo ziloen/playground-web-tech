@@ -13,10 +13,7 @@ import {
   nodeToSvgElement,
 } from './util'
 
-export async function toSvg(
-  node: HTMLElement,
-  options: Options = {},
-): Promise<string> {
+export async function toSvg(node: HTMLElement, options: Options = {}): Promise<string> {
   const { width, height } = getImageSize(node, options)
   const clonedNode = (await cloneNode(node, options, true)) as HTMLElement
   if (options.class) {
@@ -29,10 +26,7 @@ export async function toSvg(
   return nodeToDataURL(clonedNode, width, height)
 }
 
-export async function toSvgElement(
-  node: HTMLElement,
-  options: Options = {},
-) {
+export async function toSvgElement(node: HTMLElement, options: Options = {}) {
   const { width, height } = getImageSize(node, options)
   const clonedNode = (await cloneNode(node, options, true)) as HTMLElement
   if (options.class) {
@@ -91,34 +85,22 @@ export async function toPixelData(
   return ctx.getImageData(0, 0, width, height).data
 }
 
-export async function toPng(
-  node: HTMLElement,
-  options: Options = {},
-): Promise<string> {
+export async function toPng(node: HTMLElement, options: Options = {}): Promise<string> {
   const canvas = await toCanvas(node, options)
   return canvas.toDataURL()
 }
 
-export async function toJpeg(
-  node: HTMLElement,
-  options: Options = {},
-): Promise<string> {
+export async function toJpeg(node: HTMLElement, options: Options = {}): Promise<string> {
   const canvas = await toCanvas(node, options)
   return canvas.toDataURL('image/jpeg', options.quality || 1)
 }
 
-export async function toBlob(
-  node: HTMLElement,
-  options: Options = {},
-): Promise<Blob | null> {
+export async function toBlob(node: HTMLElement, options: Options = {}): Promise<Blob | null> {
   const canvas = await toCanvas(node, options)
   const blob = await canvasToBlob(canvas)
   return blob
 }
 
-export function getFontEmbedCSS(
-  node: HTMLElement,
-  options: Options = {},
-): Promise<string> {
+export function getFontEmbedCSS(node: HTMLElement, options: Options = {}): Promise<string> {
   return getWebFontCSS(node, options)
 }

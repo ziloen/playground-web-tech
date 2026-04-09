@@ -4,31 +4,31 @@ import { routes } from '../App'
 
 export default function Index() {
   const flattenedRoutes = useMemo(() => {
-    return flatRoutes(routes)
-      .filter((route) => !['*', '/', ':'].includes(route))
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      .toSorted((new Intl.Collator('en')).compare)
+    return (
+      flatRoutes(routes)
+        .filter((route) => !['*', '/', ':'].includes(route))
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        .toSorted(new Intl.Collator('en').compare)
+    )
   }, [])
 
   return (
     <div className="flex flex-col items-start">
-      {flattenedRoutes.map((route) => <Link to={route} key={route}>{route}</Link>)}
+      {flattenedRoutes.map((route) => (
+        <Link to={route} key={route}>
+          {route}
+        </Link>
+      ))}
     </div>
   )
 }
 
 /*#__NO_SIDE_EFFECTS__*/
-function flatRoutes(
-  routes: RouteObject[],
-  parentPath: string = '',
-): string[] {
-  return routes
-    .flatMap((route) => {
-      if (typeof route.path !== 'string') return []
-      const path = parentPath ? `${parentPath}/${route.path}` : route.path
+function flatRoutes(routes: RouteObject[], parentPath: string = ''): string[] {
+  return routes.flatMap((route) => {
+    if (typeof route.path !== 'string') return []
+    const path = parentPath ? `${parentPath}/${route.path}` : route.path
 
-      return route.children
-        ? flatRoutes(route.children, path)
-        : path
-    })
+    return route.children ? flatRoutes(route.children, path) : path
+  })
 }

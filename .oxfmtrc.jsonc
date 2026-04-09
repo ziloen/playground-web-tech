@@ -6,19 +6,21 @@
   "endOfLine": "lf",
   "htmlWhitespaceSensitivity": "css",
   "ignorePatterns": [
-    "**/*.css",
-    "**/*.scss",
-    "**/*.json",
-    "!src/locales/*.json",
-    "**/*.jsonc",
-    "**/*.html",
-    "**/*.vue",
-    "**/*.yml",
-    "**/*.md",
+    // Directories
     ".github",
     ".vscode",
     "dist",
     "public",
+    // Files
+    "**/*.css",
+    "**/*.html",
+    "**/*.json",
+    "!src/locales/*.json",
+    "**/*.jsonc",
+    "**/*.md",
+    "**/*.scss",
+    "**/*.vue",
+    "**/*.yml",
     "src/types/auto-imports.d.ts"
   ],
   "jsxSingleQuote": false,
@@ -33,15 +35,26 @@
       }
     }
   ],
-  "printWidth": 80,
+  "printWidth": 100,
   "quoteProps": "as-needed",
   "semi": false,
   "singleQuote": true,
   "sortImports": {
+    "customGroups": [
+      {
+        "elementNamePattern": [
+          "**/*.{png,jpg,jpeg,svg,gif,bmp,webp,mp4,mov,avi,mkv,json}"
+        ],
+        "groupName": "assets"
+      }
+    ],
     // prettier-plugin-organize-imports compatible configuration
     "groups": [
       "side_effect",
-      "style",
+      [
+        "style",
+        "assets"
+      ],
       [
         "builtin",
         "external",
