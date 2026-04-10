@@ -7,6 +7,13 @@ type SpecificityResult = {
   error?: string
 }
 
+// TODO: 
+// css cascade/specificity challenge
+// origin/cascade/specificity/inline/important/shadowdom/pseudo-class/pseudo-element/inheritance/animation/:is()/:where()/:has()/:not()
+// What styles will be applied to the element? Why? (multiple choice)
+
+// 类似的，css z-index challenge: Who is on top
+
 export default function CSSSelectorSpecificityPage() {
   const [selector1, setSelector1] = useState('#app main .card:is(.active, .focus)')
   const [selector2, setSelector2] = useState('main .card.active')
