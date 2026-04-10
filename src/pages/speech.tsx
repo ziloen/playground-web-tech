@@ -25,11 +25,11 @@ const defaultZhText = `从零开始学习 Web 开发极具挑战性，该教程�
 
 const defaultEnText = `If you are a complete beginner, web development can be challenging — we will hold your hand and provide enough detail for you to feel comfortable and learn the topics properly. You should feel at home whether you are a student learning web development (on your own or as part of a class), a teacher looking for class materials, a hobbyist, or someone who just wants to understand more about how web technologies work.`
 
-// @ts-expect-error navigator has no type
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const isChrome =
+  // @ts-expect-error userAgentData is not in type definition 
   navigator.userAgentData &&
-  // @ts-expect-error navigator has no type
+  // @ts-expect-error userAgentData is not in type definition
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   navigator.userAgentData.brands.some((brand) => brand.brand === 'Google Chrome')
 

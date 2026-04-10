@@ -70,6 +70,7 @@ const components: Components = {
     return (
       <code className={cn('grid overflow-clip', className)}>
         {/* Header */}
+        {/* Maybe click header to scroll to the top of code block */}
         <div className="gap-2 px-4 py-1 area-[1/1]">
           <span>{language}</span>
         </div>
