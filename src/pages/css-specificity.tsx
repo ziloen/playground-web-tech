@@ -7,7 +7,7 @@ type SpecificityResult = {
   error?: string
 }
 
-// TODO: 
+// TODO:
 // css cascade/specificity challenge
 // origin/cascade/specificity/inline/important/shadowdom/pseudo-class/pseudo-element/inheritance/animation/:is()/:where()/:has()/:not()
 // What styles will be applied to the element? Why? (multiple choice)

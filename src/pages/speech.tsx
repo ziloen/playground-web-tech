@@ -27,7 +27,7 @@ const defaultEnText = `If you are a complete beginner, web development can be ch
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const isChrome =
-  // @ts-expect-error userAgentData is not in type definition 
+  // @ts-expect-error userAgentData is not in type definition
   navigator.userAgentData &&
   // @ts-expect-error userAgentData is not in type definition
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access

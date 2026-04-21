@@ -76,7 +76,8 @@ const components: Components = {
         </div>
 
         {/* 为使 sticky 生效，须要将 sticky 元素提升到 snap 容器的直接子元素 */}
-        <div className="@container-[scroll-state] sticky top-2 bottom-2 justify-self-end bg-inherit area-[1/1]">
+        {/* sticky top 和 bottom 无法同时生效，top 优先级更高 */}
+        <div className="@container-[scroll-state] sticky top-2 justify-self-end bg-inherit area-[1/1]">
           <button
             className="my-1 me-2 flex size-fit rounded-md border-none bg-transparent p-1 @stuck-top:shadow-md"
             title="Copy code"

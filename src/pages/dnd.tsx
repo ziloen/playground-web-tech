@@ -4,7 +4,8 @@ import {
   dropTargetForElements,
   monitorForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
-import { asType } from '@wai-ri/core'
+import { fileOpen } from 'browser-fs-access'
+import { noop } from 'es-toolkit'
 import type { RefCallback } from 'react'
 import { useMemoizedFn } from '~/hooks'
 import CarbonTrashCan from '~icons/carbon/trash-can'
@@ -18,10 +19,12 @@ export default function DND() {
   const [dropFiles, setDropFiles] = useState<File[]>([])
   const [dropTypes, setDropTypes] = useState<string[]>([])
 
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const onDrop = useMemoizedFn((data: DataTransfer | FileList) => {
-    if (data instanceof DataTransfer) {
+  const onDrop = useMemoizedFn((data: DataTransfer | FileList | File | null | undefined) => {
+    if (!data) {
+      setDropFiles([])
+      setDropItems([])
+      setDropTypes([])
+    } else if (data instanceof DataTransfer) {
       const { items, files, types } = logDataTransfer(data)
       setDropItems(items)
       setDropFiles(files)
@@ -31,12 +34,23 @@ export default function DND() {
       setDropFiles(files)
       setDropItems([])
       setDropTypes([])
+    } else if (data instanceof File) {
+      setDropFiles([data])
+      setDropItems([])
+      setDropTypes([])
     }
   })
 
-  const openFilePicker = useMemoizedFn(() => {
-    if (!inputRef.current) return
-    inputRef.current.click()
+  const openFilePicker = useMemoizedFn(async () => {
+    const file = await fileOpen({
+      multiple: false,
+      mimeTypes: [],
+      excludeAcceptAllOption: true,
+    })
+      // Ignore user cancel
+      .catch(noop)
+
+    file && onDrop(file)
   })
 
   const dropZoneRef = useMemoizedFn<RefCallback<HTMLDivElement>>((el) => {
@@ -92,49 +106,29 @@ export default function DND() {
       'paste',
       (e) => {
         console.log('paste', e)
-        const { items, files, types } = logDataTransfer(e.clipboardData)
-
-        setDropItems(items)
-        setDropFiles(files)
-        setDropTypes(types)
-      },
-      { signal },
-    )
-
-    const input = (inputRef.current = document.createElement('input'))
-
-    input.type = 'file'
-    input.accept = '*'
-    input.addEventListener(
-      'change',
-      (e) => {
-        asType<HTMLInputElement>(e.currentTarget)
-        const files = e.currentTarget.files
-
-        if (files) {
-          onDrop(files)
-        }
-
-        // Reset input value to allow re-uploading the same file
-        e.currentTarget.value = ''
+        e.clipboardData && onDrop(e.clipboardData)
       },
       { signal },
     )
 
     return () => {
       ac.abort()
-      inputRef.current = null
     }
   })
 
   return (
     <div className="relative size-full overflow-clip">
-      <div
-        ref={dropZoneRef}
-        tabIndex={0}
-        className="size-[200px] cursor-pointer rounded-[6px] bg-dark-gray-50 focus:outline focus:outline-blue-400"
-        onClick={openFilePicker}
-      ></div>
+      {/* FIXME: Add drag over outline/border */}
+      <div ref={dropZoneRef} className="size-[200px] rounded-[6px] bg-dark-gray-50">
+        {/* FIXME: 由于 dropzone preventDefault，文字无法 drop 到 textarea 内 */}
+        <textarea
+          onPaste={(e) => {
+            onDrop(e.clipboardData)
+          }}
+        />
+
+        <button onClick={openFilePicker}>Open File Picker</button>
+      </div>
 
       <div className="flex flex-col gap-4">
         <div>
