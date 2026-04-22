@@ -8,6 +8,7 @@ import { fileOpen } from 'browser-fs-access'
 import { noop } from 'es-toolkit'
 import type { RefCallback } from 'react'
 import { useMemoizedFn } from '~/hooks'
+import { isInstanceofElement } from '~/utils'
 import CarbonTrashCan from '~icons/carbon/trash-can'
 
 // Grid Drag and Drop
@@ -62,11 +63,15 @@ export default function DND() {
     el.addEventListener(
       'dragenter',
       (e) => {
-        e.preventDefault()
-
-        console.log('dragenter', e)
+        console.log(e.type)
 
         if (!e.dataTransfer) return
+
+        // FIXME: 需要在 MacOS 特殊处理 web image text/uri-list
+        if (e.dataTransfer.types.includes('Files')) {
+          e.preventDefault()
+        }
+
         onDrop(e.dataTransfer)
       },
       { signal },
@@ -75,7 +80,11 @@ export default function DND() {
     el.addEventListener(
       'dragover',
       (e) => {
-        e.preventDefault()
+        if (!e.dataTransfer) return
+
+        if (e.dataTransfer.types.includes('Files')) {
+          e.preventDefault()
+        }
       },
       { signal },
     )
@@ -83,8 +92,14 @@ export default function DND() {
     el.addEventListener(
       'dragleave',
       (e) => {
-        console.log('dragleave', e)
-        setDropItems([])
+        console.log(e.type)
+
+        if (
+          !e.relatedTarget ||
+          !(isInstanceofElement(e.relatedTarget, Element) && el.contains(e.relatedTarget))
+        ) {
+          setDropItems([])
+        }
       },
       { signal },
     )
@@ -92,11 +107,13 @@ export default function DND() {
     el.addEventListener(
       'drop',
       (e) => {
-        e.preventDefault()
-
-        console.log('drop', e)
+        console.log(e.type)
 
         if (!e.dataTransfer) return
+        if (!e.dataTransfer.files.length) return
+
+        e.preventDefault()
+
         onDrop(e.dataTransfer)
       },
       { signal },
@@ -105,7 +122,7 @@ export default function DND() {
     window.addEventListener(
       'paste',
       (e) => {
-        console.log('paste', e)
+        console.log(e.type)
         e.clipboardData && onDrop(e.clipboardData)
       },
       { signal },
@@ -120,7 +137,6 @@ export default function DND() {
     <div className="relative size-full overflow-clip">
       {/* FIXME: Add drag over outline/border */}
       <div ref={dropZoneRef} className="size-[200px] rounded-[6px] bg-dark-gray-50">
-        {/* FIXME: 由于 dropzone preventDefault，文字无法 drop 到 textarea 内 */}
         <textarea
           onPaste={(e) => {
             onDrop(e.clipboardData)

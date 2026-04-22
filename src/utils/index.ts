@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import { extendTailwindMerge } from 'tailwind-merge'
 
 export { LRUCache } from './LRUCache'
+export { isInstanceofElement } from './isInstanceofElement'
 
 const twMerge = /* #__PURE__ */ extendTailwindMerge({
   override: {
