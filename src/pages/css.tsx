@@ -198,7 +198,14 @@ function AspectRatio() {
         {/* viewBox or el.getBBox() */}
         <svg viewBox="0 0 300 200" className="m-auto max-h-full max-w-full">
           <rect x="0" y="0" width="300" height="200" fill="#554d3e" stroke="none" />
-          <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="#fff">
+          <text
+            x="50%"
+            y="50%"
+            dominantBaseline="middle"
+            textAnchor="middle"
+            fill="#fff"
+            fontSize={42}
+          >
             300x200 SVG
           </text>
         </svg>
