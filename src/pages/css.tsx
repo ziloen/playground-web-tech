@@ -197,7 +197,10 @@ function AspectRatio() {
       <div className="flex size-[100px] min-h-[40px] min-w-[40px] resizable bg-dark-gray-600">
         {/* viewBox or el.getBBox() */}
         <svg viewBox="0 0 300 200" className="m-auto max-h-full max-w-full">
-          <image href="https://dummyimage.com/300x200/554d3e/ffffff.png&text=300x200 SVG" />
+          <rect x="0" y="0" width="300" height="200" fill="#554d3e" stroke="none" />
+          <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="#fff">
+            300x200 SVG
+          </text>
         </svg>
       </div>
 
