@@ -56,63 +56,71 @@ export default function SVGOPage() {
           </a>{' '}
           {VERSION}
         </div>
+
         <div className="cursor-pointer px-4 py-3 hover:bg-dark-gray-400">Open SVG</div>
-        <label className="grid cursor-pointer px-4 py-3 hover:bg-dark-gray-400">
-          <textarea
-            className="peer col-[1/1] row-[1/1] h-lh resize-none border-none bg-transparent font-[inherit] text-inherit placeholder:text-inherit focus:outline-none"
-            onInput={(e) => {
-              const value = e.currentTarget.value.trim()
-              e.currentTarget.blur()
-              e.currentTarget.value = ''
 
-              if (!value) {
-                return
+        <textarea
+          className="px-4 py-3 hover:bg-dark-gray-400 resize-none border-none bg-transparent placeholder:text-inherit focus:outline-none w-full focus:placeholder:opacity-40 placeholder:transition-opacity"
+          rows={1}
+          style={{
+            fontSize: 'inherit',
+            lineHeight: 'inherit',
+            fontFamily: 'inherit',
+            color: 'inherit',
+          }}
+          placeholder="Paste markup"
+          onInput={(e) => {
+            const value = e.currentTarget.value.trim()
+            e.currentTarget.blur()
+            e.currentTarget.value = ''
+
+            if (!value) {
+              return
+            }
+
+            if (value.startsWith('{') || value.startsWith('[')) {
+              // JSON input
+              try {
+                const json = JSON5.parse<JsonValue>(value)
+
+                const optimizedJson = optimizeJsonObject(json)
+                console.info('Optimized JSON:', optimizedJson)
+              } catch (error) {
+                console.error('Invalid JSON input:', error)
               }
+            }
 
-              if (value.startsWith('{') || value.startsWith('[')) {
-                // JSON input
-                try {
-                  const json = JSON5.parse<JsonValue>(value)
-
-                  const optimizedJson = optimizeJsonObject(json)
-                  console.info('Optimized JSON:', optimizedJson)
-                } catch (error) {
-                  console.error('Invalid JSON input:', error)
-                }
+            if (value.startsWith('<svg')) {
+              // SVG input
+              try {
+                const { data: optimizedSvg, dimensions } = optimizeSvg(value, { pretty: true })
+                setOriginalSvg(value)
+                setOptimizedSvg(optimizedSvg)
+                setDimensions(dimensions)
+                setSvgUri(optimizeSvgToDataUri(value))
+                transformWrapperRef.current?.resetTransform()
+              } catch (error) {
+                console.error('Invalid SVG input:', error)
               }
-
-              if (value.startsWith('<svg')) {
-                // SVG input
-                try {
-                  const { data: optimizedSvg, dimensions } = optimizeSvg(value, { pretty: true })
-                  setOriginalSvg(value)
-                  setOptimizedSvg(optimizedSvg)
-                  setDimensions(dimensions)
-                  setSvgUri(optimizeSvgToDataUri(value))
-                  transformWrapperRef.current?.resetTransform()
-                } catch (error) {
-                  console.error('Invalid SVG input:', error)
-                }
-              } else if (value.startsWith('data:image/svg+xml,')) {
-                // Data URL input
-                try {
-                  const svgString = decodeURIComponent(value.slice('data:image/svg+xml,'.length))
-                  const { data: optimizedSvg, dimensions } = optimizeSvg(svgString, {
-                    pretty: true,
-                  })
-                  setOriginalSvg(svgString)
-                  setOptimizedSvg(optimizedSvg)
-                  setDimensions(dimensions)
-                  setSvgUri(optimizeSvgToDataUri(svgString))
-                  transformWrapperRef.current?.resetTransform()
-                } catch (error) {
-                  console.error('Invalid SVG data URL input:', error)
-                }
+            } else if (value.startsWith('data:image/svg+xml,')) {
+              // Data URL input
+              try {
+                const svgString = decodeURIComponent(value.slice('data:image/svg+xml,'.length))
+                const { data: optimizedSvg, dimensions } = optimizeSvg(svgString, {
+                  pretty: true,
+                })
+                setOriginalSvg(svgString)
+                setOptimizedSvg(optimizedSvg)
+                setDimensions(dimensions)
+                setSvgUri(optimizeSvgToDataUri(svgString))
+                transformWrapperRef.current?.resetTransform()
+              } catch (error) {
+                console.error('Invalid SVG data URL input:', error)
               }
-            }}
-          />
-          <span className="col-[1/1] row-[1/1] peer-focus:hidden">Paste markup</span>
-        </label>
+            }
+          }}
+        />
+
         <div
           className="cursor-pointer px-4 py-3 hover:bg-dark-gray-400"
           onClick={() => {
@@ -162,8 +170,6 @@ export default function SVGOPage() {
             width: '100%',
             display: 'grid',
             placeItems: 'center',
-            gridTemplateColumns: '1fr auto 1fr',
-            gridTemplateRows: '1fr auto 1fr',
           }}
         >
           {/* TODO: Add text color: white to iframe */}
@@ -174,51 +180,35 @@ export default function SVGOPage() {
             scrolling="no"
             className="pointer-events-none overflow-hidden border-none bg-transparent"
             style={{
+              anchorName: '--a',
               width: dimensions.width ? `${dimensions.width}px` : '100%',
               height: dimensions.height ? `${dimensions.height}px` : '100%',
-              gridColumn: '2 / 3',
-              gridRow: '2 / 3',
             }}
           />
-
-          {showGridLines && (
-            <>
-              {/* top */}
-              <div
-                className="h-px w-full place-self-end bg-blue-200/40"
-                style={{
-                  gridColumn: '1 / -1',
-                  gridRow: '1 / 2',
-                }}
-              />
-              {/* bottom */}
-              <div
-                className="h-px w-full place-self-start bg-blue-200/40"
-                style={{
-                  gridColumn: '1 / -1',
-                  gridRow: '3 / 4',
-                }}
-              />
-              {/* left */}
-              <div
-                className="h-full w-px place-self-end bg-blue-200/40"
-                style={{
-                  gridColumn: '1 / 2',
-                  gridRow: '1 / -1',
-                }}
-              />
-              {/* right */}
-              <div
-                className="h-full w-px place-self-start bg-blue-200/40"
-                style={{
-                  gridColumn: '3 / 4',
-                  gridRow: '1 / -1',
-                }}
-              />
-            </>
-          )}
         </TransformComponent>
       </TransformWrapper>
+
+      {/* FIXME: Firefox 和 Chrome 对待 anchor-position transform 行为不一致 */}
+      {/* Chrome 会跟随 transform，Firefox 不会 */}
+      {/* https://github.com/w3c/csswg-drafts/issues/13782 */}
+      {showGridLines && (
+        <>
+          <div
+            className="absolute border-x border-x-dashed border-blue-200/80 pointer-events-none"
+            style={{
+              insetBlock: 'min(0px, anchor(--a start)) min(0px, anchor(--a end))',
+              insetInline: 'anchor(--a start) anchor(--a end)',
+            }}
+          />
+          <div
+            className="absolute border-y border-y-dashed border-blue-200/80 pointer-events-none"
+            style={{
+              insetBlock: 'anchor(--a start) anchor(--a end)',
+              insetInline: 'min(0px, anchor(--a start)) min(0px, anchor(--a end))',
+            }}
+          />
+        </>
+      )}
 
       {/* Right side menus */}
       <div className={clsx('relative', optimizedSvg ? 'block' : 'hidden')}>

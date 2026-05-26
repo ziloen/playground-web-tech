@@ -783,6 +783,7 @@ function AnchorPositionInScroll() {
           dignissimos repudiandae, et aspernatur porro nihil, veniam reiciendis.
         </p>
       </div>
+
       <div className="h-full overflow-y-auto">
         <p>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse voluptatibus ad doloribus
@@ -862,7 +863,9 @@ function AnchorPositionInScroll() {
         }}
       ></div>
 
-      {/* FIXME: 现仅 Firefox 有效（不稳定），且必须要 proxy 和 positionAnchor */}
+      {/* FIXME: 两个 anchor 都在滚动容器内时，Chrome 不会更新 position-anchor 之外的另一个 anchor */}
+      {/* FIXME: Firefox 在滚动容器 transform 时（例如上下浮动），并没有跟随 transform 之后的值 */}
+      {/* FIXME: Firefox 没有及时更新第二个 anchor 的位置，但是如果有正在跑的 transform 动画则会及时更新 */}
       <div
         className="pointer-events-none absolute size-stretch bg-red/40"
         style={{

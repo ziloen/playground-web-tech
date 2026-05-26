@@ -11,25 +11,28 @@
  * @example
  * ```ts
  * isInstanceofElement(event.target, HTMLElement) && event.target.focus()
- * isInstanceofElement(event.target, HTMLInputElement) && event.target.value // some value
+ * isInstanceofElement(event.target, HTMLInputElement) && event.target.value
  * ```
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function isInstanceofElement<T extends typeof Element>(
+export function isInstanceofElement<T extends typeof Element | typeof Node>(
   element: EventTarget | Node | null | undefined,
   instance: T,
 ): element is T['prototype'] {
+  if (element === null || element === undefined) {
+    return false
+  }
+
   if (element instanceof instance) {
     return true
   }
 
-  const _element = element as Node | null | undefined
+  if (!('ownerDocument' in element)) {
+    return false
+  }
 
   return Boolean(
-    _element?.ownerDocument?.defaultView &&
-    _element instanceof
-      _element.ownerDocument.defaultView[
-        instance.name as keyof typeof globalThis
-      ],
+    element.ownerDocument?.defaultView &&
+    element instanceof element.ownerDocument.defaultView[instance.name as keyof typeof globalThis],
   )
 }
