@@ -3,15 +3,15 @@ import { Markdown } from '~/components/Markdown'
 const testText = [
   // test code block
   `\`\`\`javascript
-// 测试不同参数的浏览器支持情况  
-const supportedTypes = [  
-  'audio/webm;codecs=opus', // 显式指定  
-  'audio/webm',            // 隐式选择  
-  'audio/ogg;codecs=opus'  // 替代方案  
+// 测试不同参数的浏览器支持情况
+const supportedTypes = [
+  'audio/webm;codecs=opus', // 显式指定
+  'audio/webm',            // 隐式选择
+  'audio/ogg;codecs=opus'  // 替代方案
 ];
 
-supportedTypes.forEach(type => {  
-  console.log(\`\${type}: \${MediaRecorder.isTypeSupported(type)}\`);  
+supportedTypes.forEach((type) => {
+  console.log(\`\${type}: \${MediaRecorder.isTypeSupported(type)}\`);
 });
 \`\`\``,
   // test math
@@ -28,6 +28,13 @@ supportedTypes.forEach(type => {
 
   // FIXME: `**"` 和 `"**` 被视为整体导致没有加粗
   '**"色即是空，空即是色"**的佛学思想贯穿全书。',
+  // FIXME: 没有被正确加粗
+  `**混合键合（Hybrid Bonding）**设备`,
+  // 基础 table
+  `| 左对齐 | 居中对齐 | 右对齐 |
+|:-------|:--------:|-------:|
+| 内容   |   内容   |   内容 |
+| 123    |   456    |    789 |`,
 ].join('\n\n')
 
 export default function MarkdownPage() {

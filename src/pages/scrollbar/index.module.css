@@ -93,7 +93,6 @@
   .scrollbar {
     scrollbar-width: thin;
     scrollbar-color: transparent var(--scrollbar-track-bg);
-    scrollbar-arrow-color: red;
 
     transition-property: scrollbar-color;
     transition-duration: 0.2s;

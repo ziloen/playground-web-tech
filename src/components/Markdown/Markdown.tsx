@@ -9,7 +9,6 @@ import type { Nodes as MdastNodes } from 'mdast'
 import { useState } from 'react'
 import type { Components as MarkdownComponents } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
-import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import remarkGfmNoAutoLink from 'remark-gfm-no-autolink'
@@ -22,6 +21,7 @@ import { cn } from '~/utils'
 import CarbonCheckmark from '~icons/carbon/checkmark'
 import CarbonCopy from '~icons/carbon/copy'
 import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
+import { StreamingCodeBlock } from './StreamingCodeBlock'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
 
@@ -35,16 +35,18 @@ import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
 
 export function Markdown({ children }: { children: string }) {
   return (
-    <ReactMarkdown
-      rehypePlugins={rehypePlugins}
-      remarkPlugins={remarkPlugins}
-      components={components as MarkdownComponents}
-      remarkRehypeOptions={{
-        footnoteBackContent: null,
-      }}
-    >
-      {children}
-    </ReactMarkdown>
+    <div className="markdown-body">
+      <ReactMarkdown
+        remarkPlugins={remarkPlugins}
+        rehypePlugins={rehypePlugins}
+        components={components as MarkdownComponents}
+        remarkRehypeOptions={{
+          footnoteBackContent: null,
+        }}
+      >
+        {children}
+      </ReactMarkdown>
+    </div>
   )
 }
 
@@ -96,13 +98,15 @@ const components: Components = {
           </button>
         </div>
 
-        <div className="overflow-x-auto overflow-y-clip px-4 pb-3 scrollbar-thin">{children}</div>
+        <div className="scrollbar-thin overflow-x-auto overflow-y-clip px-4 pb-3">
+          <StreamingCodeBlock code={rawText} language={language ?? 'text'} />
+        </div>
       </code>
     )
   },
   table({ children, node }) {
     return (
-      <div className="overflow-x-auto scrollbar-thin">
+      <div className="scrollbar-thin overflow-x-auto">
         <table className="max-h-full w-max tabular-nums">{children}</table>
       </div>
     )
@@ -159,14 +163,13 @@ const components: Components = {
   },
 }
 
+const remarkPlugins = pluginList([[remarkGfmNoAutoLink, {}], [remarkMath, {}], [remarkPlugin]])
+
 const rehypePlugins = pluginList([
-  [rehypeHighlight, {}],
-  [rehypeKatex, { errorColor: '' }],
+  [rehypeKatex, { errorColor: '', strict: 'ignore' }],
   [rehypePlugin],
   [rehypeRaw],
 ])
-
-const remarkPlugins = pluginList([[remarkGfmNoAutoLink, {}], [remarkMath, {}], [remarkPlugin]])
 
 /*#__NO_SIDE_EFFECTS__*/
 function pluginList<const T extends Plugin<any[], any, any>[]>(plugins: {

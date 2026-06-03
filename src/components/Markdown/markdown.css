@@ -1,1 +1,26 @@
-@import "./code-block.css" layer(components);
+@layer components {
+  @scope (.markdown-body) {
+    :scope {
+      line-height: 1.625;
+      font-family: var(--font-noto-sans-sc);
+      color: light-dark(#24292f, #e5e7eb);
+    }
+
+    table {
+      border-collapse: collapse;
+      font-variant: tabular-nums;
+    }
+
+    th,
+    td {
+      border: 1px solid light-dark(rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.2));
+      padding: 6px 13px;
+    }
+
+    pre code {
+      font-family: var(--font-fira-code);
+      background-color: #16191d;
+      color: #abb2bf;
+    }
+  }
+}
