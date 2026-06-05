@@ -202,7 +202,7 @@ function remarkPlugin(this: Processor) {
   // https://github.com/micromark/micromark/tree/main/packages/micromark-core-commonmark#api
   const data = this.data()
   const list = (data.micromarkExtensions ??= [])
-  list.push({ disable: { null: ['codeIndented'] } })
+  list.push({ disable: { null: ['codeIndented', 'setextUnderline'] } })
 
   return (tree: MdastNodes, file: VFile) => {
     visit(tree, (node, index, parent) => {
