@@ -13,6 +13,7 @@ import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import remarkGfmNoAutoLink from 'remark-gfm-no-autolink'
 import remarkMath from 'remark-math'
+import type { Merge } from 'type-fest'
 import type { PluggableList, Plugin, Processor } from 'unified'
 import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
@@ -21,7 +22,7 @@ import { cn } from '~/utils'
 import CarbonCheckmark from '~icons/carbon/checkmark'
 import CarbonCopy from '~icons/carbon/copy'
 import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
-import { StreamingCodeBlock } from './StreamingCodeBlock'
+import { StreamingCodeHighlighter } from './CodeHighlighter'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
 
@@ -33,9 +34,14 @@ import { StreamingCodeBlock } from './StreamingCodeBlock'
 
 // TODO: stabilize render when streaming input
 
-export function Markdown({ children }: { children: string }) {
+export function Markdown({
+  children,
+  streaming,
+  className,
+  ...props
+}: Merge<ComponentProps<'div'>, { children: string; streaming?: boolean }>) {
   return (
-    <div className="markdown-body">
+    <div className={clsx('markdown-body', className)} {...props}>
       <ReactMarkdown
         remarkPlugins={remarkPlugins}
         rehypePlugins={rehypePlugins}
@@ -59,13 +65,13 @@ type Components = {
 }
 
 const components: Components = {
-  code({ node, className, children }) {
-    const inline = node.properties.inline as 'true' | 'false' | undefined
-    const rawText = node.properties.text as string
-    const language = node.properties.language as string | null
+  code({ node, className, children, ...rest }) {
+    const inline = node.properties.dataBlock !== 'true'
+    const rawText = node.properties.dataText as string
+    const language = node.properties.dataLanguage as string | null
     const [copied, setCopied] = useAutoResetState(false, 2_000)
 
-    if (inline === 'true') {
+    if (inline) {
       return <code className={className}>{children}</code>
     }
 
@@ -99,7 +105,7 @@ const components: Components = {
         </div>
 
         <div className="scrollbar-thin overflow-x-auto overflow-y-clip px-4 pb-3">
-          <StreamingCodeBlock code={rawText} language={language ?? 'text'} />
+          <StreamingCodeHighlighter code={rawText} language={language ?? 'text'} />
         </div>
       </code>
     )
@@ -147,7 +153,7 @@ const components: Components = {
             isOpen ? 'opacity-100' : 'opacity-0',
           )}
         >
-          <div className="mt-2 grid grid-flow-col">
+          <div className="mt-2 grid grid-flow-col justify-start">
             <div
               className="box-content h-full w-0.5 cursor-pointer self-stretch bg-dark-gray-200 bg-clip-content ps-0.5 pe-2"
               onClick={() => {
@@ -163,11 +169,17 @@ const components: Components = {
   },
 }
 
-const remarkPlugins = pluginList([[remarkGfmNoAutoLink, {}], [remarkMath, {}], [remarkPlugin]])
+const remarkPlugins = pluginList([
+  // keep-multiline
+  [remarkGfmNoAutoLink, {}],
+  [remarkMath, {}],
+  [remarkPlugin],
+])
 
 const rehypePlugins = pluginList([
   [rehypeKatex, { errorColor: '', strict: 'ignore' }],
   [rehypePlugin],
+  // FIXME: 设置只额外解析 <think> 标签而不是任意的标签
   [rehypeRaw],
 ])
 
@@ -210,11 +222,9 @@ function remarkPlugin(this: Processor) {
       if (node.type === 'code' || node.type === 'inlineCode') {
         node.data ??= {}
         node.data.hProperties ??= {}
-        // FIXME: this is a hack to make `rehypeRaw` work
-        // `rehypeRaw` will remove `inline` and `text` properties
-        node.data.hProperties.inline = node.type === 'inlineCode' ? 'true' : 'false'
-        node.data.hProperties.text = node.value
-        node.data.hProperties.language = node.type === 'code' ? node.lang : null
+        node.data.hProperties.dataBlock = node.type === 'code' ? 'true' : 'false'
+        node.data.hProperties.dataText = node.value
+        node.data.hProperties.dataLanguage = node.type === 'code' ? node.lang : null
       }
 
       if (node.type === 'table') {

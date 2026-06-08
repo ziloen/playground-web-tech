@@ -8,11 +8,11 @@ import { createHighlighterCore, getTokenStyleObject } from 'shiki/core'
 import { createJavaScriptRawEngine } from 'shiki/engine/javascript'
 import { useMemoizedFn } from '~/hooks'
 
-let highlighter: HighlighterCore | null = null
+let cachedHighlighter: HighlighterCore | null = null
 let initPromise: Promise<HighlighterCore> | null = null
 
 async function initHighlighter() {
-  if (highlighter) return highlighter
+  if (cachedHighlighter) return cachedHighlighter
   if (initPromise) return initPromise
 
   initPromise = createHighlighterCore({
@@ -20,7 +20,7 @@ async function initHighlighter() {
     langs: [],
     engine: createJavaScriptRawEngine(),
   }).then((h) => {
-    highlighter = h
+    cachedHighlighter = h
     initPromise = null
     return h
   })
@@ -46,7 +46,9 @@ async function loadLanguage(highlighter: HighlighterCore, lang: string) {
   return promise
 }
 
-export const StreamingCodeBlock = memo(function StreamingCodeBlock({
+export const CodeHighlighter = memo(function CodeHighlighter() {})
+
+export const StreamingCodeHighlighter = memo(function StreamingCodeBlock({
   code,
   language,
 }: {
@@ -80,7 +82,7 @@ export const StreamingCodeBlock = memo(function StreamingCodeBlock({
     let canceled = false
 
     ;(async () => {
-      const highlighter = await initHighlighter()
+      const highlighter = cachedHighlighter ?? (await initHighlighter())
 
       // FIXME: lang 变化时需要重新触发 load language
       // FIXME: 可能需要 dispose？
