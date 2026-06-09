@@ -7,6 +7,7 @@ import type { HighlighterCore, LanguageRegistration, ThemedToken, ThemeInput } f
 import { createHighlighterCore, getTokenStyleObject } from 'shiki/core'
 import { createJavaScriptRawEngine } from 'shiki/engine/javascript'
 import { useMemoizedFn } from '~/hooks'
+import { intersperse } from '~/utils'
 
 let cachedHighlighter: HighlighterCore | null = null
 let initPromise: Promise<HighlighterCore> | null = null
@@ -28,17 +29,30 @@ async function initHighlighter() {
   return initPromise
 }
 
-const loadingLanguages = new Map<string, Promise<void>>()
+function getLanguageLoadedHighlighter(lang: string): HighlighterCore | Promise<HighlighterCore> {
+  if (cachedHighlighter) {
+    if (cachedHighlighter.getLoadedLanguages().includes(lang)) {
+      return cachedHighlighter
+    }
 
-async function loadLanguage(highlighter: HighlighterCore, lang: string) {
-  if (highlighter.getLoadedLanguages().includes(lang)) return
+    return loadLanguage(cachedHighlighter, lang)
+  }
 
+  return initHighlighter().then((h) => loadLanguage(h, lang))
+}
+
+const loadingLanguages = new Map<string, Promise<HighlighterCore>>()
+
+async function loadLanguage(highlighter: HighlighterCore, lang: string): Promise<HighlighterCore> {
   if (loadingLanguages.has(lang)) {
     return loadingLanguages.get(lang)!
   }
 
+  if (highlighter.getLoadedLanguages().includes(lang)) return highlighter
+
   const promise = import(`../../../node_modules/@shikijs/langs-precompiled/dist/${lang}.mjs`)
     .then((langModule: LanguageRegistration) => highlighter.loadLanguage(langModule))
+    .then(() => highlighter)
     .finally(() => loadingLanguages.delete(lang))
 
   loadingLanguages.set(lang, promise)
@@ -46,9 +60,63 @@ async function loadLanguage(highlighter: HighlighterCore, lang: string) {
   return promise
 }
 
-export const CodeHighlighter = memo(function CodeHighlighter() {})
+export const CodeHighlighter = memo(function CodeHighlighter({
+  code,
+  language,
+}: {
+  code: string
+  language: string | null
+}) {
+  const lang = useMemo(() => {
+    if (!language) return null
+    if (languageNames.includes(language) || languageAliasNames.includes(language)) {
+      return language
+    } else {
+      return null
+    }
+  }, [language])
 
-export const StreamingCodeHighlighter = memo(function StreamingCodeBlock({
+  const [highlighter, setHighlighter] = useState<HighlighterCore | null>(() => {
+    if (!lang) return null
+    const loadedHighlighter = getLanguageLoadedHighlighter(lang)
+
+    if (loadedHighlighter instanceof Promise) {
+      return null
+    }
+
+    return loadedHighlighter
+  })
+
+  useEffect(() => {
+    if (lang) {
+      ;(async () => {
+        setHighlighter(await getLanguageLoadedHighlighter(lang))
+      })()
+    }
+  }, [lang])
+
+  return useMemo(() => {
+    if (!highlighter) return code
+
+    return intersperse(
+      highlighter
+        .codeToTokens(code, {
+          theme: 'One Dark Pro',
+          lang: lang ?? 'text',
+        })
+        .tokens.map((tokens, i) =>
+          tokens.map((token, j) => (
+            <span key={`${i}-${j}`} style={token.htmlStyle ?? getTokenStyleObject(token)}>
+              {token.content}
+            </span>
+          )),
+        ),
+      '\n',
+    )
+  }, [highlighter, code, lang])
+})
+
+export const StreamingCodeHighlighter = memo(function StreamingCodeHighlighter({
   code,
   language,
 }: {
@@ -84,7 +152,6 @@ export const StreamingCodeHighlighter = memo(function StreamingCodeBlock({
     ;(async () => {
       const highlighter = cachedHighlighter ?? (await initHighlighter())
 
-      // FIXME: lang 变化时需要重新触发 load language
       // FIXME: 可能需要 dispose？
       // FIXME: auto detect language
 

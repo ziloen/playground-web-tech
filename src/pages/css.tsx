@@ -9,7 +9,7 @@ const testString = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fus
 
 export default function CSSPage() {
   return (
-    <div className="grid max-h-full grid-cols-1 gap-4 overflow-y-auto scrollbar-gutter-stable">
+    <div className="grid max-h-full scrollbar-gutter-stable grid-cols-1 gap-4 overflow-y-auto">
       <div className="w-[800px] max-w-full resizable-x text-sm">
         <EllipsisMiddle text={testString} />
       </div>
@@ -19,7 +19,7 @@ export default function CSSPage() {
 
       <Subgrid />
 
-      <HolyGrail />
+      <CenterItem />
 
       <AspectRatio />
 
@@ -115,17 +115,17 @@ function Subgrid() {
   )
 }
 
-function HolyGrail() {
+function CenterItem() {
   return (
     <div
-      className="grid max-w-[600px] bg-dark-gray-600"
+      className="grid w-[600px] resizable-x bg-dark-gray-600"
       style={{ gridTemplateColumns: '1fr auto 1fr' }}
     >
-      <div className="me-auto bg-green-600/15">Looooooooooooong text</div>
+      <div className="me-3 justify-self-start bg-green-600/15">Looooooooooooong text</div>
 
-      <div className="mx-auto bg-violet-300/30">Center Title</div>
+      <div className="bg-violet-300/30">Center Title</div>
 
-      <div className="ms-auto flex bg-red-700/15">Short text</div>
+      <div className="justify-self-end bg-red-700/15">Short text</div>
     </div>
   )
 }

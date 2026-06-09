@@ -33,3 +33,33 @@ export function formatBytes(bytes: number): string {
 
   return `${bytes.toFixed(2)}${labels[n]}`
 }
+
+/**
+ * Inserts a separator between each element of the provided array.
+ *
+ * @param array - The source array whose elements will be interspersed.
+ * @param separator - The value to insert between consecutive elements of `array`.
+ * @returns A new array with `separator` placed between every two elements of `array`.
+ *          When the separator type is assignable to the element type, the return type
+ *          is narrowed to the element type array; otherwise it is a union array.
+ *
+ * @example
+ * ```ts
+ * intersperse([1, 2, 3], 0)
+ * // => [1, 0, 2, 0, 3]
+ *
+ * intersperse(['a', 'b'], ', ')
+ * // => ['a', ', ', 'b']
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function intersperse<T, K>(array: T[], separator: K) {
+  return array.reduce<(T | K)[]>((acc, item, index) => {
+    if (index > 0) {
+      acc.push(separator, item)
+    } else {
+      acc.push(item)
+    }
+    return acc
+  }, []) as K extends T ? T[] : (T | K)[]
+}

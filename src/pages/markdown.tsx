@@ -26,9 +26,10 @@ supportedTypes.forEach((type) => {
   '    test ~~indented code~~ *abc* `are you ok` [some link](https://example.com)',
   'https://test/auto/link1234   www.abc.com/abc  abc@abc.abc',
 
-  // FIXME: `**"` 和 `"**` 被视为整体导致没有加粗
-  '**"色即是空，空即是色"**的佛学思想贯穿全书。',
-  // FIXME: 没有被正确加粗
+  // 加粗和中文标点的问题
+  // https://github.com/commonmark/commonmark-spec/issues/650
+  '**"任意字符"**中文字符',
+  `**“任意字符”**中文字符`,
   `**混合键合（Hybrid Bonding）**设备`,
   // 基础 table
   `| 左对齐 | 居中对齐 | 右对齐 |

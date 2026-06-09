@@ -11,6 +11,7 @@ import type { Components as MarkdownComponents } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
+import remarkCjkFriendly from 'remark-cjk-friendly'
 import remarkGfmNoAutoLink from 'remark-gfm-no-autolink'
 import remarkMath from 'remark-math'
 import type { Merge } from 'type-fest'
@@ -173,6 +174,7 @@ const remarkPlugins = pluginList([
   // keep-multiline
   [remarkGfmNoAutoLink, {}],
   [remarkMath, {}],
+  [remarkCjkFriendly],
   [remarkPlugin],
 ])
 
