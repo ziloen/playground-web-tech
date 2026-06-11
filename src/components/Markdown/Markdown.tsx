@@ -6,7 +6,7 @@ import './markdown.css'
 import clsx from 'clsx/lite'
 import type { Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { Nodes as MdastNodes } from 'mdast'
-import { useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 import type { Components as MarkdownComponents } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
@@ -23,7 +23,7 @@ import { cn } from '~/utils'
 import CarbonCheckmark from '~icons/carbon/checkmark'
 import CarbonCopy from '~icons/carbon/copy'
 import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
-import { StreamingCodeHighlighter } from './CodeHighlighter'
+import { CodeHighlighter, StreamingCodeHighlighter } from './CodeHighlighter'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
 
@@ -33,7 +33,9 @@ import { StreamingCodeHighlighter } from './CodeHighlighter'
 
 // TODO: custom footnote style [^1](https://example.com)
 
-// TODO: stabilize render when streaming input
+const MarkdownContext = createContext<{
+  streaming?: boolean | undefined | null
+}>({})
 
 export function Markdown({
   children,
@@ -41,18 +43,22 @@ export function Markdown({
   className,
   ...props
 }: Merge<ComponentProps<'div'>, { children: string; streaming?: boolean }>) {
+  const ctxValue = useMemo(() => ({ streaming }), [streaming])
+
   return (
     <div className={clsx('markdown-body', className)} {...props}>
-      <ReactMarkdown
-        remarkPlugins={remarkPlugins}
-        rehypePlugins={rehypePlugins}
-        components={components as MarkdownComponents}
-        remarkRehypeOptions={{
-          footnoteBackContent: null,
-        }}
-      >
-        {children}
-      </ReactMarkdown>
+      <MarkdownContext value={ctxValue}>
+        <ReactMarkdown
+          remarkPlugins={remarkPlugins}
+          rehypePlugins={rehypePlugins}
+          components={components as MarkdownComponents}
+          remarkRehypeOptions={{
+            footnoteBackContent: null,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </MarkdownContext>
     </div>
   )
 }
@@ -70,7 +76,11 @@ const components: Components = {
     const inline = node.properties.dataBlock !== 'true'
     const rawText = node.properties.dataText as string
     const language = node.properties.dataLanguage as string | null
+    const complete = node.properties.dataComplete === 'true'
+
     const [copied, setCopied] = useAutoResetState(false, 2_000)
+
+    const { streaming } = useContext(MarkdownContext)
 
     if (inline) {
       return <code className={className}>{children}</code>
@@ -106,7 +116,11 @@ const components: Components = {
         </div>
 
         <div className="scrollbar-thin overflow-x-auto overflow-y-clip px-4 pb-3">
-          <StreamingCodeHighlighter code={rawText} language={language ?? 'text'} />
+          {streaming === null ? (
+            <CodeHighlighter code={rawText} language={language} />
+          ) : (
+            <StreamingCodeHighlighter code={rawText} language={language} />
+          )}
         </div>
       </code>
     )
@@ -219,17 +233,27 @@ function remarkPlugin(this: Processor) {
   list.push({ disable: { null: ['codeIndented', 'setextUnderline'] } })
 
   return (tree: MdastNodes, file: VFile) => {
+    let lastNode: MdastNodes = tree
+    while ('children' in lastNode && lastNode.children && lastNode.children.length > 0) {
+      lastNode = lastNode.children.at(-1)!
+    }
+
     visit(tree, (node, index, parent) => {
       // Add `iniline` / `text` / `language` to code node
       if (node.type === 'code' || node.type === 'inlineCode') {
+        const isBlock = node.type === 'code'
+
         node.data ??= {}
         node.data.hProperties ??= {}
-        node.data.hProperties.dataBlock = node.type === 'code' ? 'true' : 'false'
-        node.data.hProperties.dataText = node.value
-        node.data.hProperties.dataLanguage = node.type === 'code' ? node.lang : null
-      }
+        node.data.hProperties.dataBlock = isBlock ? 'true' : 'false'
 
-      if (node.type === 'table') {
+        if (isBlock) {
+          node.data.hProperties.dataText = node.value
+          node.data.hProperties.dataLanguage = node.lang
+
+          const isLastNode = node === lastNode
+          node.data.hProperties.dataComplete = isLastNode ? 'false' : 'true'
+        }
       }
     })
   }

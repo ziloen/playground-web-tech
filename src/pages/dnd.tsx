@@ -1,19 +1,11 @@
-import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine'
-import {
-  draggable,
-  dropTargetForElements,
-  monitorForElements,
-} from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { fileOpen } from 'browser-fs-access'
 import { noop } from 'es-toolkit'
 import type { RefCallback } from 'react'
 import { useMemoizedFn } from '~/hooks'
 import { isInstanceofElement } from '~/utils'
-import CarbonTrashCan from '~icons/carbon/trash-can'
-
-// Grid Drag and Drop
-// Swapping items when drag over another item
-// Change order when drag over between items
+import CarbonCamera from '~icons/carbon/camera'
+import CarbonSkipBack from '~icons/carbon/skip-back'
+import CarbonSkipForward from '~icons/carbon/skip-forward'
 
 export default function DND() {
   const [dropItems, setDropItems] = useState<{ kind: string; type: string }[]>([])
@@ -146,96 +138,220 @@ export default function DND() {
         <button onClick={openFilePicker}>Open File Picker</button>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <div>
-          <span>items:</span>
-          {dropItems.map(({ kind, type }, i) => (
-            <div key={i}>
-              {kind} - {type}
+      {dropFiles.length > 0 && dropFiles[0].type.startsWith('video/') ? (
+        <VideoPlayer file={dropFiles[0]} />
+      ) : (
+        <>
+          <div className="flex flex-col gap-4">
+            <div>
+              <span>items:</span>
+              {dropItems.map(({ kind, type }, i) => (
+                <div key={i}>
+                  {kind} - {type}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div>
-          <span>files:</span>
-          {dropFiles.map((file, i) => (
-            <div key={i}>
-              {file.name} - {file.type}
-              {file.size ? <span>- {file.size} bytes</span> : null}
+            <div>
+              <span>files:</span>
+              {dropFiles.map((file, i) => (
+                <div key={i}>
+                  {file.name} - {file.type}
+                  {file.size ? <span>- {file.size} bytes</span> : null}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div>
-          <span>types:</span>
-          {dropTypes.map((type, i) => (
-            <div key={i}>{type}</div>
-          ))}
-        </div>
+            <div>
+              <span>types:</span>
+              {dropTypes.map((type, i) => (
+                <div key={i}>{type}</div>
+              ))}
+            </div>
 
-        <div>
-          <button
-            onClick={() => {
-              if (!dropFiles.length) return
-              const file = dropFiles[0]
-              const url = URL.createObjectURL(file)
-              const a = document.createElement('a')
-              a.href = url
-              a.download = file.name
-              a.click()
-              URL.revokeObjectURL(url)
-            }}
-          >
-            Download
-          </button>
-        </div>
-      </div>
-
-      <Grid />
-
-      <DeleteDropZone />
+            <div>
+              <button
+                onClick={() => {
+                  if (!dropFiles.length) return
+                  const file = dropFiles[0]
+                  const url = URL.createObjectURL(file)
+                  const a = document.createElement('a')
+                  a.href = url
+                  a.download = file.name
+                  a.click()
+                  URL.revokeObjectURL(url)
+                }}
+              >
+                Download
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
 
-function DeleteDropZone() {
-  const [isDragging, setIsDragging] = useState(false)
+function VideoPlayer({ file }: { file: File }) {
+  const videoRef = useRef<HTMLVideoElement>(null!)
+  const canvasRef = useRef<HTMLCanvasElement>(null!)
+  const [videoUrl, setVideoUrl] = useState<string | null>(null)
+  const [currentTime, setCurrentTime] = useState(0)
+  // approximate frame interval in seconds, default 1/30
+  const frameIntervalRef = useRef(1 / 30)
 
+  // Create and revoke blob URL
   useEffect(() => {
-    return monitorForElements({
-      onDragStart() {
-        setIsDragging(true)
-      },
-      onDrop: () => setIsDragging(false),
-    })
-  }, [])
+    const url = URL.createObjectURL(file)
+    setVideoUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file])
+
+  // Detect frame rate from video metadata
+  const detectFrameRate = useMemoizedFn(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    // requestVideoFrameCallback is an experimental API not yet in TS dom types
+    interface VideoWithRfc extends HTMLVideoElement {
+      requestVideoFrameCallback(cb: VideoFrameRequestCallback): number
+      cancelVideoFrameCallback(id: number): void
+    }
+
+    if (typeof (video as VideoWithRfc).requestVideoFrameCallback === 'function') {
+      const v = video as VideoWithRfc
+      let lastTime = 0
+      let frameCount = 0
+      let detected = false
+      let handle = 0
+
+      const callback: VideoFrameRequestCallback = (_now, metadata) => {
+        if (detected) return
+        if (lastTime !== 0 && metadata.mediaTime !== lastTime) {
+          frameCount++
+          if (frameCount >= 10) {
+            const avgInterval = metadata.mediaTime / frameCount
+            if (avgInterval > 0 && avgInterval < 1) {
+              frameIntervalRef.current = Math.max(avgInterval, 1 / 120)
+            }
+            detected = true
+            v.cancelVideoFrameCallback(handle)
+            return
+          }
+        }
+        lastTime = metadata.mediaTime
+        handle = v.requestVideoFrameCallback(callback)
+      }
+
+      handle = v.requestVideoFrameCallback(callback)
+
+      // Fallback timeout
+      setTimeout(() => {
+        if (!detected) {
+          detected = true
+          v.cancelVideoFrameCallback(handle)
+        }
+      }, 2000)
+    }
+  })
+
+  const captureAndDownload = useMemoizedFn(() => {
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    if (!video || !canvas) return
+
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+    const dataUrl = canvas.toDataURL('image/png')
+
+    const a = document.createElement('a')
+    a.href = dataUrl
+    const timestamp = formatTime(currentTime)
+    const baseName = file.name.replace(/\.[^.]+$/, '')
+    a.download = `${baseName}_${timestamp}.png`
+    a.click()
+  })
+
+  const stepFrame = useMemoizedFn((direction: -1 | 1) => {
+    const video = videoRef.current
+    if (!video) return
+
+    video.pause()
+
+    const step = frameIntervalRef.current * direction
+    const newTime = Math.max(0, Math.min(video.duration || 0, video.currentTime + step))
+    video.currentTime = newTime
+    setCurrentTime(newTime)
+  })
+
+  const onTimeUpdate = useMemoizedFn(() => {
+    setCurrentTime(videoRef.current.currentTime)
+  })
+
+  const onLoadedMetadata = useMemoizedFn(() => {
+    detectFrameRate()
+  })
+
+  if (!videoUrl) return null
 
   return (
-    <div className="absolute right-0 bottom-0">
-      <AnimatePresence>
-        {isDragging && (
-          <motion.div
-            className={clsx('flex size-[100px] items-end justify-end bg-red-700/45 p-4')}
-            initial={{ x: '100%', y: '100%' }}
-            animate={{ x: 0, y: 0 }}
-            exit={{
-              x: '100%',
-              y: '100%',
-              transition: { delay: 0.3, duration: 0.4 },
-            }}
-            style={{
-              clipPath: 'polygon(0 100%,100% 0,100% 100%)',
-              shapeOutside: 'polygon(0 100%,100% 0,100% 100%)',
-              cursor: 'pointer',
-            }}
-            transition={{ type: 'tween' }}
-          >
-            <CarbonTrashCan className="text-[28px]" />
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="flex flex-col gap-4">
+      <div className="text-sm text-dark-gray-400">{file.name}</div>
+
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        controls
+        className="max-h-[400px] max-w-full"
+        onTimeUpdate={onTimeUpdate}
+        onLoadedMetadata={onLoadedMetadata}
+      />
+
+      {/* Frame nav & capture buttons */}
+      <div className="flex items-center gap-3">
+        <button
+          className="flex-center size-9"
+          onClick={() => stepFrame(-1)}
+          aria-label="上一帧"
+          title="上一帧"
+        >
+          <CarbonSkipBack />
+        </button>
+
+        <button
+          className="flex-center size-9"
+          onClick={() => stepFrame(1)}
+          aria-label="下一帧"
+          title="下一帧"
+        >
+          <CarbonSkipForward />
+        </button>
+
+        <button
+          className="flex-center size-9"
+          onClick={captureAndDownload}
+          aria-label="截取并下载当前帧"
+          title="截取并下载当前帧"
+        >
+          <CarbonCamera />
+        </button>
+      </div>
+
+      {/* Hidden canvas for frame capture */}
+      <canvas ref={canvasRef} className="hidden" />
     </div>
   )
+}
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = Math.floor(seconds % 60)
+  const ms = Math.floor((seconds % 1) * 100)
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(2, '0')}`
 }
 
 function logDataTransfer(dataTransfer: DataTransfer | null) {
@@ -281,94 +397,6 @@ function logDataTransfer(dataTransfer: DataTransfer | null) {
   )
 
   return { files, items, types }
-}
-
-function getInitItems() {
-  return ['1', '2', '3', '4', '5', '6']
-}
-
-function Grid() {
-  const [items, setItems] = useState(getInitItems)
-
-  useEffect(() => {
-    return monitorForElements({
-      onDrop({ location, source }) {
-        const destination = location.current.dropTargets[0]
-        if (!destination) return
-
-        const destinationItem = destination.data.value
-        const souceItem = source.data.value
-
-        if (typeof destinationItem !== 'string' || typeof souceItem !== 'string') return
-
-        const destinationIndex = items.indexOf(destinationItem)
-        const sourceIndex = items.indexOf(souceItem)
-
-        const newItems = [...items]
-        newItems[destinationIndex] = souceItem
-        newItems[sourceIndex] = destinationItem
-        setItems(newItems)
-      },
-    })
-  }, [items])
-
-  return (
-    <div
-      className="grid resizable"
-      style={{
-        gridTemplateColumns: 'repeat(auto-fit, 100px)',
-        gridAutoRows: '100px',
-        justifyItems: 'center',
-        alignItems: 'center',
-      }}
-    >
-      {items.map((item, i) => (
-        <Item key={item} items={items} value={item} />
-      ))}
-    </div>
-  )
-}
-
-function Item({ value, items }: { value: string; items: string[] }) {
-  const ref = useRef<HTMLDivElement>(null!)
-  const [state, setState] = useState<'idle' | 'dragging' | 'drag-over'>('idle')
-
-  useEffect(() => {
-    return combine(
-      draggable({
-        element: ref.current,
-        getInitialData: () => ({ value }),
-        onDragStart: () => setState('dragging'),
-        onDrop: () => setState('idle'),
-      }),
-      dropTargetForElements({
-        element: ref.current,
-        canDrop({ element, input, source }) {
-          return source.data.value !== value
-        },
-        getData: () => ({ value }),
-        onDragEnter: () => setState('drag-over'),
-        onDragLeave: () => setState('idle'),
-        onDrop: () => setState('idle'),
-      }),
-    )
-  }, [value])
-
-  return (
-    <motion.div
-      layout
-      layoutDependency={items}
-      ref={ref}
-      className={clsx(
-        'flex-center size-20 rounded-full',
-        state === 'idle' && 'bg-dark-gray-200',
-        state === 'dragging' && 'bg-dark-gray-200 opacity-50',
-        state === 'drag-over' && 'bg-dark-gray-400',
-      )}
-    >
-      {value}
-    </motion.div>
-  )
 }
 
 type Folder = {

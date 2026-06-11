@@ -4,6 +4,10 @@
       line-height: 1.625;
       font-family: var(--font-noto-sans-sc);
       /* color: light-dark(#24292f, #e5e7eb); */
+
+      > :first-child {
+        margin-top: 0;
+      }
     }
 
     table {
