@@ -133,7 +133,7 @@ function LanguageSelect({
       </SelectTrigger>
 
       <SelectContent
-        className="max-h-[300px] w-fit scrollbar-gutter-stable scrollbar-thin"
+        className="max-h-[300px] w-fit scrollbar-thin scrollbar-gutter-stable"
         align="end"
       >
         {cachedItems ?? items}

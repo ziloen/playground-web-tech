@@ -28,7 +28,7 @@
   ],
   "eslint.format.enable": false,
   "js/ts.preferences.autoImportSpecifierExcludeRegexes": [
-    "^mermaid/dist*",
+    "^mermaid/dist",
     "^typescript$",
   ],
   "tailwindCSS.experimental.configFile": "src/styles/main.css"

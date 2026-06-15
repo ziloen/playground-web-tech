@@ -60,7 +60,7 @@ export default function SVGOPage() {
         <div className="cursor-pointer px-4 py-3 hover:bg-dark-gray-400">Open SVG</div>
 
         <textarea
-          className="px-4 py-3 hover:bg-dark-gray-400 resize-none border-none bg-transparent placeholder:text-inherit focus:outline-none w-full focus:placeholder:opacity-40 placeholder:transition-opacity"
+          className="w-full resize-none border-none bg-transparent px-4 py-3 placeholder:text-inherit placeholder:transition-opacity hover:bg-dark-gray-400 focus:outline-none focus:placeholder:opacity-40"
           rows={1}
           style={{
             fontSize: 'inherit',
@@ -194,14 +194,14 @@ export default function SVGOPage() {
       {showGridLines && (
         <>
           <div
-            className="absolute border-x border-x-dashed border-blue-200/80 pointer-events-none"
+            className="pointer-events-none absolute border-x border-x-dashed border-blue-200/80"
             style={{
               insetBlock: 'min(0px, anchor(--a start)) min(0px, anchor(--a end))',
               insetInline: 'anchor(--a start) anchor(--a end)',
             }}
           />
           <div
-            className="absolute border-y border-y-dashed border-blue-200/80 pointer-events-none"
+            className="pointer-events-none absolute border-y border-y-dashed border-blue-200/80"
             style={{
               insetBlock: 'anchor(--a start) anchor(--a end)',
               insetInline: 'min(0px, anchor(--a start)) min(0px, anchor(--a end))',
