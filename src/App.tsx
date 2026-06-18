@@ -21,14 +21,14 @@ export const routes = Object.entries(
     handle?: unknown
     HydrateFallback?: ComponentType
     ErrorBoundary?: ComponentType
-  }>('./**/*.tsx', { base: './pages' }),
+  }>(['./**/*.tsx', '!./**/*.test.tsx'], { base: './pages' }),
 ).map<RouteObject>(([path, request]) => {
   // `./concerts.$id.tsx` -> `concerts.$id`
   const filePath = path.slice(2, -4)
 
   const index = filePath.endsWith('_index')
 
-  // https://reactrouter.com/how-to/file-route-conventions#file-route-conventions
+  // https://reactrouter.com/how-to/file-route-conventions
   const normalizedPath = filePath
     // Index Route: `_index.tsx` -> `/`
     .replaceAll('_index', '')

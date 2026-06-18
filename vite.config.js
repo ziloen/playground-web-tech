@@ -1,7 +1,8 @@
-/// <reference types="vitest" />
+/// <reference types="vitest/config" />
 
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { playwright } from '@vitest/browser-playwright'
 import browserslistToEsbuild from 'browserslist-to-esbuild'
 import { Features } from 'lightningcss'
 import { resolve as r } from 'node:path'
@@ -118,6 +119,26 @@ export default defineConfig(({ command, mode }) => {
       headers: {
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Embedder-Policy': 'require-corp',
+      },
+    },
+
+    test: {
+      setupFiles: ['./src/styles/main.css'],
+      typecheck: {
+        enabled: true,
+      },
+      browser: {
+        enabled: true,
+        headless: true,
+        provider: playwright({
+          contextOptions: {
+            colorScheme: 'light',
+            viewport: { width: 1920, height: 1080 },
+            deviceScaleFactor: 2,
+          },
+        }),
+        instances: [{ browser: 'chromium' }],
+        viewport: { width: 1920, height: 1080 },
       },
     },
   }

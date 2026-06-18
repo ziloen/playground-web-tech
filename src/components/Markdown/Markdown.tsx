@@ -6,7 +6,7 @@ import './markdown.css'
 import clsx from 'clsx/lite'
 import type { Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { Nodes as MdastNodes } from 'mdast'
-import { createContext, useContext, useState } from 'react'
+import { createContext, use, useState } from 'react'
 import type { Components as MarkdownComponents } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
@@ -80,7 +80,7 @@ const components: Components = {
 
     const [copied, setCopied] = useAutoResetState(false, 2_000)
 
-    const { streaming } = useContext(MarkdownContext)
+    const { streaming } = use(MarkdownContext)
 
     if (inline) {
       return <code className={className}>{children}</code>
