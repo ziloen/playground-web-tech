@@ -4,8 +4,9 @@ import styles from './scrollbar/index.module.css'
 
 import { range } from 'es-toolkit'
 import type { RefCallback } from 'react'
+import CarbonChevronDown from '~icons/carbon/chevron-down'
 
-const testString = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vel rhoncus nisl. Nunc accumsan ornare augue, et efficitur orci. Ut. `
+const testString = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vel rhoncus nisl. Nunc accumsan ornare augue, et efficitur orci. Ut.`
 
 export default function CSSPage() {
   return (
@@ -13,8 +14,13 @@ export default function CSSPage() {
       <div className="w-[800px] max-w-full resizable-x text-sm">
         <EllipsisMiddle text={testString} />
       </div>
+
       <div className="w-[750px] max-w-full resizable-x text-sm">
         <ShowMore text={testString} />
+      </div>
+
+      <div className="w-[750px] max-w-full resizable-x p-2 text-sm">
+        <MultiLineShowMore text={testString.slice(-120).concat('\n').repeat(3)} />
       </div>
 
       <Subgrid />
@@ -96,7 +102,6 @@ function Subgrid() {
     <div
       className="grid w-max min-w-[400px] gap-x-2 gap-y-2"
       style={{
-        // main-start[1fr] icon[20px] text[max-content] main-end[1fr]
         gridTemplateColumns:
           '[main-start] 1fr [icon-start] 20px [icon-end text-start] max-content [text-end] 1fr [main-end]',
       }}
@@ -106,7 +111,7 @@ function Subgrid() {
           key={i}
           className="col-[main] grid grid-cols-subgrid border border-solid border-green-600"
         >
-          <div className="col-[icon] size-[20px] rounded-full bg-blue-500"></div>
+          <div className="col-[icon] size-[20px] bg-blue-500"></div>
 
           <div className="col-[text]">{'A'.repeat(i + 1)}</div>
         </div>
@@ -270,6 +275,61 @@ function ShowMore({ text }: { text: string }) {
           Show more
         </div>
       </div>
+    </div>
+  )
+}
+
+function MultiLineShowMore({ text }: { text: string }) {
+  const [isShowMore, setIsShowMore] = useState(false)
+
+  const MAX_CONTENT_HEIGHT = '100px'
+
+  const btn = (
+    <button
+      type="button"
+      className="pointer-events-auto flex-center cursor-pointer gap-1.5 justify-self-start border-none bg-transparent p-0 text-light-gray-700"
+      onClick={() => {
+        setIsShowMore((prev) => !prev)
+      }}
+    >
+      {isShowMore ? 'Show less' : 'Show more'}{' '}
+      <CarbonChevronDown className={clsx('inline-block', isShowMore ? '-rotate-180' : '')} />
+    </button>
+  )
+
+  return (
+    <div className="grid gap-y-2 rounded-2xl bg-dark-gray-500 p-4">
+      <p
+        className={clsx('m-0 overflow-clip whitespace-pre-wrap area-[1/1]')}
+        style={{
+          maxHeight: isShowMore ? undefined : MAX_CONTENT_HEIGHT,
+        }}
+      >
+        {text}
+      </p>
+
+      {isShowMore ? (
+        // TODO: hide "Show less" when text back to 3 lines
+        btn
+      ) : (
+        <div
+          className="pointer-events-none flex flex-col flex-wrap overflow-clip contain-strict area-[1/1]"
+          style={{
+            '--mask-height': '40px',
+          }}
+        >
+          <div
+            className="w-full"
+            style={{
+              height: `calc(${MAX_CONTENT_HEIGHT} - var(--mask-height))`,
+            }}
+          ></div>
+
+          <div className="via-darkgry-500 flex h-(--mask-height) items-end bg-linear-to-t from-dark-gray-500 via-dark-gray-500 via-[18px] to-transparent">
+            {btn}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -450,17 +510,16 @@ function DynamicMultiLineClamp() {
   return (
     <div
       // TODO: fit initial height to content instead of fixed height
-      className="h-[120px] w-[200px] resizable-y bg-dark-gray-600"
-      style={{ containerType: 'size' }}
+      className="@container-size h-[120px] w-[200px] resizable-y bg-dark-gray-600"
     >
       <div
         className={clsx(
           'line-clamp-(--line-clamp) max-h-full',
           // debug text
-          'relative before:absolute before:top-0 before:left-0 before:bg-white before:text-lg before:font-extrabold before:text-red before:content-[counter(v)] before:[counter-reset:v_var(--line-clamp)]',
+          'relative before:absolute before:top-0 before:left-0 before:bg-white before:px-2 before:py-0.5 before:text-lg before:font-extrabold before:text-black before:content-[counter(v)] before:[counter-reset:v_var(--line-clamp)]',
         )}
         style={{
-          // line-clamp = round(height / line-height)
+          // line-clamp = round(down, height / line-height)
           '--dividend': '100cqb',
           '--divisor': '1lh',
           '--line-clamp': 'round(down, tan(atan2(var(--dividend), var(--divisor))), 1)',
@@ -572,13 +631,13 @@ function GridItemFlexGrow() {
         className="overflow-auto bg-blue-700"
         style={{
           containerType: 'size',
-          // 非常大的内在高度，确保撑满容器哦
+          // 非常大的内在高度，确保撑满容器
           containIntrinsicBlockSize: '99999px',
         }}
       >
         <div>Flex item</div>
 
-        {state && <div className="h-[300px] min-h-0">999</div>}
+        {state && <div className="h-[300px]">999</div>}
       </div>
 
       <div className="bg-green-800">3</div>
@@ -702,7 +761,7 @@ function TextFitToWidth() {
       >
         <div
           // https://github.com/w3c/csswg-drafts/issues/2528
-          // Chrome 145+ 可以使用 text-grow
+          // Chrome 150+ 可以使用 text-fit
           // 在 Firefox 上 ratio 计算可能不精确导致 1em * ratio 后略大于 available-space，从而导致换行，手动不换行
           className="@[>0px]:whitespace-nowrap"
           style={{
