@@ -22,6 +22,10 @@
     'monospace';
 }
 
+@utility content-visibility-* {
+  content-visibility: --value('auto', 'hidden', 'visible');
+}
+
 @layer base {
 
   html,

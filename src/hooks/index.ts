@@ -2,7 +2,7 @@ export { useAutoResetState } from './useAutoResetState'
 export { useGetState } from './useGetState'
 export { useLatest } from './useLatest'
 export { useMemoizedFn } from './useMemoizedFn'
-export { useNextEffect } from './useNextEffect'
+export { useNextEffect, useNextLayoutEffect } from './useNextEffect'
 
 /**
  * @example

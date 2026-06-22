@@ -2,7 +2,15 @@ import OneDarkPro from './OneDark-Pro-night-flat.json'
 
 import { languageAliasNames, languageNames } from '@shikijs/langs-precompiled'
 import { CodeToTokenTransformStream } from '@shikijs/stream'
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  memo,
+  startTransition,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import type { HighlighterCore, LanguageRegistration, ThemedToken, ThemeInput } from 'shiki/core'
 import { createHighlighterCore, getTokenStyleObject } from 'shiki/core'
 import { createJavaScriptRawEngine } from 'shiki/engine/javascript'
@@ -29,16 +37,10 @@ async function initHighlighter() {
   return initPromise
 }
 
-function getLanguageLoadedHighlighter(lang: string): HighlighterCore | Promise<HighlighterCore> {
-  if (cachedHighlighter) {
-    if (cachedHighlighter.getLoadedLanguages().includes(lang)) {
-      return cachedHighlighter
-    }
+async function getLanguageLoadedHighlighter(lang: string): Promise<HighlighterCore> {
+  const highlighter = await initHighlighter()
 
-    return loadLanguage(cachedHighlighter, lang)
-  }
-
-  return initHighlighter().then((h) => loadLanguage(h, lang))
+  return loadLanguage(highlighter, lang)
 }
 
 const loadingLanguages = new Map<string, Promise<HighlighterCore>>()
@@ -51,7 +53,7 @@ async function loadLanguage(highlighter: HighlighterCore, lang: string): Promise
   if (highlighter.getLoadedLanguages().includes(lang)) return highlighter
 
   const promise = import(`../../../node_modules/@shikijs/langs-precompiled/dist/${lang}.mjs`)
-    .then((langModule: LanguageRegistration) => highlighter.loadLanguage(langModule))
+    .then((langMod: LanguageRegistration) => highlighter.loadLanguage(langMod))
     .then(() => highlighter)
     .finally(() => loadingLanguages.delete(lang))
 
@@ -76,31 +78,26 @@ export const CodeHighlighter = memo(function CodeHighlighter({
     }
   }, [language])
 
-  const [highlighter, setHighlighter] = useState<HighlighterCore | null>(() => {
-    if (!lang) return null
-    const loadedHighlighter = getLanguageLoadedHighlighter(lang)
-
-    if (loadedHighlighter instanceof Promise) {
-      return null
-    }
-
-    return loadedHighlighter
-  })
+  const [highlighter, setHighlighter] = useState<HighlighterCore | null>(null)
 
   useEffect(() => {
     if (lang) {
-      ;(async () => {
-        setHighlighter(await getLanguageLoadedHighlighter(lang))
-      })()
+      getLanguageLoadedHighlighter(lang).then((highlighter) => {
+        startTransition(() => {
+          setHighlighter(highlighter)
+        })
+      })
     }
   }, [lang])
 
+  const deferredCode = useDeferredValue(code)
+
   return useMemo(() => {
-    if (!highlighter) return code
+    if (!highlighter) return deferredCode
 
     return intersperse(
       highlighter
-        .codeToTokens(code, {
+        .codeToTokens(deferredCode, {
           theme: 'One Dark Pro',
           lang: lang ?? 'text',
         })
@@ -113,7 +110,7 @@ export const CodeHighlighter = memo(function CodeHighlighter({
         ),
       '\n',
     )
-  }, [highlighter, code, lang])
+  }, [highlighter, deferredCode, lang])
 })
 
 export const StreamingCodeHighlighter = memo(function StreamingCodeHighlighter({
@@ -180,11 +177,13 @@ export const StreamingCodeHighlighter = memo(function StreamingCodeHighlighter({
         .pipeTo(
           new WritableStream({
             write(token) {
-              if ('recall' in token) {
-                setTokens((tokens) => tokens.slice(0, -token.recall))
-              } else {
-                setTokens((tokens) => [...tokens, token])
-              }
+              startTransition(() => {
+                if ('recall' in token) {
+                  setTokens((tokens) => tokens.slice(0, -token.recall))
+                } else {
+                  setTokens((tokens) => [...tokens, token])
+                }
+              })
             },
           }),
         )

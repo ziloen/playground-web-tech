@@ -1,4 +1,5 @@
 import { Markdown } from '~/components/Markdown'
+import { useMemoizedFn } from '~/hooks'
 
 type MessageRole = 'user' | 'assistant'
 type DisplayMode = 'top' | 'bottom'
@@ -10,250 +11,83 @@ type MessageNode = {
   children: MessageNode[]
 }
 
-const PAGE_SIZE = 20
-const NEAR_EDGE_PX = 420
-
 const rootMessage = createMockTree()
 
 export default function MarkdownPage() {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const topBoundaryRef = useRef<HTMLDivElement>(null)
-  const bottomBoundaryRef = useRef<HTMLDivElement>(null)
-  const messageRefs = useRef(new Map<string, HTMLElement>())
-  const commandRef = useRef<Promise<void>>(Promise.resolve())
-  const edgeRevealPendingRef = useRef(false)
-  const prependAnchorRef = useRef<{ height: number; top: number } | null>(null)
   const [mode, setMode] = useState<DisplayMode>('bottom')
   const [selectedChildByParentId, setSelectedChildByParentId] = useState<Record<string, string>>({})
-  const [range, setRange] = useState(() => getInitialRange(resolvePath(rootMessage, {}), 'bottom'))
   const [jumpValue, setJumpValue] = useState('120')
 
   const path = useMemo(
     () => resolvePath(rootMessage, selectedChildByParentId),
     [selectedChildByParentId],
   )
-  const renderedMessages = path.slice(range.start, range.end)
-  const isComplete = range.start === 0 && range.end === path.length
 
   useLayoutEffect(() => {
-    const anchor = prependAnchorRef.current
-    const scrollEl = scrollRef.current
-    if (!anchor || !scrollEl) return
-
-    prependAnchorRef.current = null
-    scrollEl.scrollTop = anchor.top + (scrollEl.scrollHeight - anchor.height)
-  }, [range.start])
-
-  useEffect(() => {
-    setRange((prev) => clampRange(prev, path.length, mode))
-  }, [mode, path.length])
-
-  useEffect(() => {
     if (mode !== 'bottom') return
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
   }, [mode])
 
-  const expandUp = useCallback(() => {
-    if (range.start === 0) return
-    const scrollEl = scrollRef.current
-    if (scrollEl) {
-      prependAnchorRef.current = {
-        height: scrollEl.scrollHeight,
-        top: scrollEl.scrollTop,
-      }
-    }
-    setRange((prev) => ({ ...prev, start: Math.max(0, prev.start - PAGE_SIZE) }))
-  }, [range.start])
-
-  const expandDown = useCallback(() => {
-    if (range.end === path.length) return
-    setRange((prev) => ({ ...prev, end: Math.min(path.length, prev.end + PAGE_SIZE) }))
-  }, [path.length, range.end])
-
-  useEffect(() => {
+  const scrollToEdge = useMemoizedFn((edge: 'top' | 'bottom') => {
     const scrollEl = scrollRef.current
     if (!scrollEl) return
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (edgeRevealPendingRef.current) return
+    scrollEl.scrollTo({
+      top: edge === 'top' ? 0 : scrollEl.scrollHeight,
+      behavior: 'smooth',
+    })
+  })
 
-        const intersectingEntry = entries.find((entry) => entry.isIntersecting)
-        if (!intersectingEntry) return
-
-        edgeRevealPendingRef.current = true
-        if (intersectingEntry.target === topBoundaryRef.current) {
-          expandUp()
-        } else if (intersectingEntry.target === bottomBoundaryRef.current) {
-          expandDown()
-        }
-
-        requestAnimationFrame(() => {
-          edgeRevealPendingRef.current = false
-        })
-      },
-      {
-        root: scrollEl,
-        rootMargin: `${NEAR_EDGE_PX}px 0px`,
-        threshold: 0,
-      },
-    )
-
-    const topBoundary = topBoundaryRef.current
-    const bottomBoundary = bottomBoundaryRef.current
-    if (topBoundary) observer.observe(topBoundary)
-    if (bottomBoundary) observer.observe(bottomBoundary)
-
-    return () => observer.disconnect()
-  }, [expandDown, expandUp, range.end, range.start])
-
-  const queueCommand = useCallback((command: () => Promise<void>) => {
-    commandRef.current = commandRef.current.then(command, command)
-  }, [])
-
-  const scrollToEdge = useCallback(
-    (edge: 'top' | 'bottom') => {
-      queueCommand(async () => {
-        if (edge === 'top') {
-          await revealUntil(
-            (current) => current.start === 0,
-            () => {
-              expandWindow('up')
-            },
-          )
-          scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
-          return
-        }
-
-        await revealUntil(
-          (current) => current.end === path.length,
-          () => {
-            expandWindow('down', path.length)
-          },
-        )
-        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-      })
-    },
-    [path.length, queueCommand],
-  )
-
-  const scrollToMessage = useCallback(() => {
-    const raw = jumpValue.trim()
-    const targetIndex = Number(raw)
+  const scrollToMessage = useMemoizedFn(() => {
+    const rawValue = jumpValue.trim()
+    const targetIndex = Number(rawValue)
     const index =
       Number.isInteger(targetIndex) && targetIndex >= 1
         ? targetIndex - 1
-        : path.findIndex((message) => message.id === raw)
+        : path.findIndex((message) => message.id === rawValue)
 
     if (index < 0 || index >= path.length) return
 
-    queueCommand(async () => {
-      await revealUntil(
-        (current) => current.start <= index && index < current.end,
-        () => {
-          setRange((current) => {
-            if (index < current.start) {
-              const scrollEl = scrollRef.current
-              if (scrollEl) {
-                prependAnchorRef.current = {
-                  height: scrollEl.scrollHeight,
-                  top: scrollEl.scrollTop,
-                }
-              }
-              return { ...current, start: Math.max(0, current.start - PAGE_SIZE) }
-            }
-
-            return { ...current, end: Math.min(path.length, current.end + PAGE_SIZE) }
-          })
-        },
-      )
-
-      await nextFrame()
-      messageRefs.current.get(path[index].id)?.scrollIntoView({
-        block: 'center',
-        behavior: 'smooth',
-      })
+    document.querySelector(`[data-message-id="${CSS.escape(path[index].id)}"]`)?.scrollIntoView({
+      block: 'center',
+      behavior: 'smooth',
     })
-  }, [jumpValue, path, queueCommand])
+  })
 
-  const selectBranch = useCallback((parent: MessageNode, child: MessageNode, pathIndex: number) => {
-    setSelectedChildByParentId((current) => {
-      const next = { ...current, [parent.id]: child.id }
-      const nextPath = resolvePath(rootMessage, next)
-      const nextEnd = Math.min(nextPath.length, pathIndex + 1 + PAGE_SIZE)
-      setRange((prev) => ({
-        start: Math.min(prev.start, pathIndex),
-        end: Math.max(pathIndex + 1, nextEnd),
-      }))
-      return next
-    })
-  }, [])
-
-  const resetMode = useCallback(
-    (nextMode: DisplayMode) => {
-      const nextPath = resolvePath(rootMessage, selectedChildByParentId)
-      setMode(nextMode)
-      setRange(getInitialRange(nextPath, nextMode))
-
-      requestAnimationFrame(() => {
-        const scrollEl = scrollRef.current
-        if (!scrollEl) return
-        scrollEl.scrollTo({ top: nextMode === 'top' ? 0 : scrollEl.scrollHeight })
+  const selectBranch = useMemoizedFn(
+    (parent: MessageNode, child: MessageNode, pathIndex: number) => {
+      setSelectedChildByParentId((current) => {
+        return { ...current, [parent.id]: child.id }
       })
     },
-    [selectedChildByParentId],
   )
 
-  const resetConversation = useCallback(() => {
-    const nextPath = resolvePath(rootMessage, {})
-    edgeRevealPendingRef.current = true
-    setSelectedChildByParentId({})
-    setRange(getInitialRange(nextPath, mode))
+  const resetMode = useMemoizedFn((nextMode: DisplayMode) => {
+    setMode(nextMode)
 
     requestAnimationFrame(() => {
       const scrollEl = scrollRef.current
-      if (scrollEl) {
-        scrollEl.scrollTo({ top: mode === 'top' ? 0 : scrollEl.scrollHeight })
-      }
-      requestAnimationFrame(() => {
-        edgeRevealPendingRef.current = false
+      if (!scrollEl) return
+
+      scrollEl.scrollTo({
+        top: nextMode === 'top' ? 0 : scrollEl.scrollHeight,
       })
     })
-  }, [mode])
+  })
 
-  function expandWindow(direction: 'up' | 'down', pathLength = path.length) {
-    setRange((current) => {
-      if (direction === 'up') {
-        const scrollEl = scrollRef.current
-        if (scrollEl) {
-          prependAnchorRef.current = {
-            height: scrollEl.scrollHeight,
-            top: scrollEl.scrollTop,
-          }
-        }
-        return { ...current, start: Math.max(0, current.start - PAGE_SIZE) }
-      }
+  const resetConversation = useMemoizedFn(() => {
+    setSelectedChildByParentId({})
 
-      return { ...current, end: Math.min(pathLength, current.end + PAGE_SIZE) }
-    })
-  }
+    requestAnimationFrame(() => {
+      const scrollEl = scrollRef.current
+      if (!scrollEl) return
 
-  async function revealUntil(
-    done: (current: { start: number; end: number }) => boolean,
-    reveal: () => void,
-  ) {
-    for (let guard = 0; guard < 20; guard += 1) {
-      let complete = false
-      setRange((current) => {
-        complete = done(current)
-        return current
+      scrollEl.scrollTo({
+        top: mode === 'top' ? 0 : scrollEl.scrollHeight,
       })
-      await nextFrame()
-      if (complete) return
-      reveal()
-      await nextFrame()
-    }
-  }
+    })
+  })
 
   return (
     <main className="grid h-full grid-rows-[auto_1fr] bg-[#f4f0e8] text-[#191712] scheme-light">
@@ -261,11 +95,7 @@ export default function MarkdownPage() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3">
           <div className="me-auto">
             <h1 className="m-0 text-xl font-semibold tracking-normal">Markdown message tree</h1>
-            <p className="m-0 mt-1 text-sm text-[#695f4d]">
-              rendered {range.end - range.start} / {path.length} messages, window {range.start + 1}-
-              {range.end}
-              {isComplete ? ' complete' : ''}
-            </p>
+            <p className="m-0 mt-1 text-sm text-[#695f4d]">rendered {path.length} messages</p>
           </div>
 
           <div className="flex rounded-lg border border-[#2f2a1f]/15 bg-white p-1">
@@ -310,7 +140,7 @@ export default function MarkdownPage() {
               className="h-9 w-24 rounded-md border border-[#2f2a1f]/20 bg-white px-3 text-sm text-[#201a10] outline-none focus:border-[#b8482b]"
               aria-label="Message index or id"
               value={jumpValue}
-              onChange={(event) => setJumpValue(event.target.value)}
+              onChange={(event) => setJumpValue(event.currentTarget.value)}
             />
             <button className={toolbarButtonClass} type="submit">
               Go
@@ -325,14 +155,7 @@ export default function MarkdownPage() {
         aria-label="Message list"
       >
         <div className="mx-auto grid max-w-4xl gap-4">
-          {range.start > 0 && (
-            <div ref={topBoundaryRef} className="grid">
-              <RenderBoundary count={range.start} label="above" onClick={expandUp} />
-            </div>
-          )}
-
-          {renderedMessages.map((message, offset) => {
-            const pathIndex = range.start + offset
+          {path.map((message, pathIndex) => {
             const parent = path[pathIndex - 1]
             const siblings = parent?.children ?? []
 
@@ -348,13 +171,6 @@ export default function MarkdownPage() {
                 data-message-index={pathIndex + 1}
                 data-role={message.role}
                 key={message.id}
-                ref={(element) => {
-                  if (element) {
-                    messageRefs.current.set(message.id, element)
-                  } else {
-                    messageRefs.current.delete(message.id)
-                  }
-                }}
               >
                 <div className="flex flex-wrap items-center gap-2 text-xs text-[#6e624e]">
                   <strong className="text-[#201a10]">
@@ -375,7 +191,7 @@ export default function MarkdownPage() {
                           key={sibling.id}
                           title={`Switch to branch ${siblingIndex + 1}`}
                           aria-label={`Switch to branch ${siblingIndex + 1}`}
-                          onClick={() => selectBranch(parent, sibling, pathIndex - 1)}
+                          onClick={() => selectBranch(parent, sibling, pathIndex)}
                         >
                           {siblingIndex + 1}
                         </button>
@@ -394,35 +210,9 @@ export default function MarkdownPage() {
               </article>
             )
           })}
-
-          {range.end < path.length && (
-            <div ref={bottomBoundaryRef} className="grid">
-              <RenderBoundary count={path.length - range.end} label="below" onClick={expandDown} />
-            </div>
-          )}
         </div>
       </section>
     </main>
-  )
-}
-
-function RenderBoundary({
-  count,
-  label,
-  onClick,
-}: {
-  count: number
-  label: 'above' | 'below'
-  onClick: () => void
-}) {
-  return (
-    <button
-      className="mx-auto w-fit rounded-full border border-dashed border-[#7d7059]/40 bg-[#fffdf8] px-4 py-2 text-sm text-[#6b604e] shadow-sm hover:border-[#b8482b] hover:text-[#b8482b]"
-      type="button"
-      onClick={onClick}
-    >
-      Render {Math.min(PAGE_SIZE, count)} more {label} ({count} waiting)
-    </button>
   )
 }
 
@@ -438,29 +228,6 @@ function resolvePath(root: MessageNode, selectedChildByParentId: Record<string, 
   }
 
   return path
-}
-
-function getInitialRange(path: MessageNode[], mode: DisplayMode) {
-  if (mode === 'top') {
-    return { start: 0, end: Math.min(path.length, PAGE_SIZE) }
-  }
-
-  return { start: Math.max(0, path.length - PAGE_SIZE), end: path.length }
-}
-
-function clampRange(range: { start: number; end: number }, length: number, mode: DisplayMode) {
-  if (range.start >= length || range.end > length || range.start >= range.end) {
-    return getInitialRange(Array.from({ length }) as MessageNode[], mode)
-  }
-
-  return {
-    start: Math.max(0, range.start),
-    end: Math.min(length, Math.max(range.start + 1, range.end)),
-  }
-}
-
-function nextFrame() {
-  return new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
 }
 
 function modeButtonClass(active: boolean) {
@@ -553,7 +320,7 @@ function createAssistantMessage(index: number, branch: string, branchOffset: num
 
 - 只对 AI 消息渲染 markdown
 - 用户消息保持原始文本
-- 边缘滚动时追加窗口
+- 当前路径中的消息一次性完整渲染
 
 ${details}
 
@@ -575,7 +342,7 @@ function revealWindow(range: WindowRange) {
 console.table(revealWindow({ start: ${Math.max(0, index - 20)}, end: ${index} }))
 \`\`\`
 
-代码块会显著改变高度，适合验证补齐后滚动位置是否稳定。
+代码块会显著改变高度，适合验证完整列表中的滚动定位是否稳定。
 
 ${details}`,
     `### 数学与表格 ${index}
@@ -601,9 +368,9 @@ ${details}`,
 
 1. 第一项包含 **加粗中文**
 2. 第二项包含 \`inline token\`
-3. 第三项包含长链接：[search](https://www.google.com/search?q=markdown%20lazy%20rendering%20tree%20branch)
+3. 第三项包含长链接：[search](https://www.google.com/search?q=markdown%20message%20tree%20branch)
 
-滚动到指定消息时，如果目标还没有渲染，需要先 20 条一批补齐。
+滚动到指定消息时，目标消息应直接出现在完整渲染列表中。
 
 ${details}`,
   ]
@@ -614,7 +381,7 @@ ${details}`,
 function hashText(text: string) {
   let hash = 0
   for (const char of text) {
-    hash = (hash * 31 + char.charCodeAt(0)) % 1_000_003
+    hash = (hash * 31 + char.codePointAt(0)!) % 1_000_003
   }
   return hash
 }

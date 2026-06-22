@@ -6,7 +6,7 @@ import './markdown.css'
 import clsx from 'clsx/lite'
 import type { Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { Nodes as MdastNodes } from 'mdast'
-import { createContext, use, useState } from 'react'
+import { createContext, memo, use, useState } from 'react'
 import type { Components as MarkdownComponents } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
@@ -48,20 +48,26 @@ export function Markdown({
   return (
     <div className={clsx('markdown-body', className)} {...props}>
       <MarkdownContext value={ctxValue}>
-        <ReactMarkdown
-          remarkPlugins={remarkPlugins}
-          rehypePlugins={rehypePlugins}
-          components={components as MarkdownComponents}
-          remarkRehypeOptions={{
-            footnoteBackContent: null,
-          }}
-        >
-          {children}
-        </ReactMarkdown>
+        <MemoReactMarkdown>{children}</MemoReactMarkdown>
       </MarkdownContext>
     </div>
   )
 }
+
+const MemoReactMarkdown = memo(function MemoReactMarkdown({ children }: { children: string }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={remarkPlugins}
+      rehypePlugins={rehypePlugins}
+      components={components as MarkdownComponents}
+      remarkRehypeOptions={{
+        footnoteBackContent: null,
+      }}
+    >
+      {children}
+    </ReactMarkdown>
+  )
+})
 
 type Components = {
   [Key in keyof React.JSX.IntrinsicElements]?:
@@ -116,7 +122,7 @@ const components: Components = {
         </div>
 
         <div className="scrollbar-thin overflow-x-auto overflow-y-clip px-4 pb-3">
-          {streaming === null ? (
+          {streaming === null || streaming === undefined ? (
             <CodeHighlighter code={rawText} language={language} />
           ) : (
             <StreamingCodeHighlighter code={rawText} language={language} />
