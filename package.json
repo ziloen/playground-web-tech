@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "fmt": "oxfmt",
     "typecheck": "tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest",
+    "test:browser:update": "vitest --update"
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "1.8.1",
