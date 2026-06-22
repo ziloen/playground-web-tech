@@ -54,7 +54,7 @@ jobs:
         run: npm run build
 
       - name: Install Playwright Browsers
-        run: npx vitest init browser
+        run: npx playwright install --with-deps chromium
 
       - name: Test
         run: npm run test
