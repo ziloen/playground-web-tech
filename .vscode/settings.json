@@ -28,6 +28,7 @@
   ],
   "eslint.format.enable": false,
   "js/ts.preferences.autoImportSpecifierExcludeRegexes": [
+    "^@base-ui/react/internals",
     "^mermaid/dist",
     "^typescript$",
   ],
