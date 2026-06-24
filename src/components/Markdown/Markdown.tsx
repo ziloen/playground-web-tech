@@ -12,7 +12,7 @@ import ReactMarkdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import remarkCjkFriendly from 'remark-cjk-friendly'
-import remarkGfmNoAutoLink from 'remark-gfm-no-autolink'
+import remarkGfm from 'remark-gfm-configurable'
 import remarkMath from 'remark-math'
 import type { Merge } from 'type-fest'
 import type { PluggableList, Plugin, Processor } from 'unified'
@@ -134,8 +134,8 @@ const components: Components = {
   },
   table({ children, node }) {
     return (
-      <div className="scrollbar-thin overflow-x-auto">
-        <table className="max-h-full w-max tabular-nums">{children}</table>
+      <div className="scrollbar-thin overflow-x-auto overflow-y-clip">
+        <table className="w-max tabular-nums">{children}</table>
       </div>
     )
   },
@@ -193,7 +193,15 @@ const components: Components = {
 
 const remarkPlugins = pluginList([
   // keep-multiline
-  [remarkGfmNoAutoLink, {}],
+  [
+    remarkGfm,
+    {
+      plugins: {
+        autolinkLiteral: false,
+        footnote: false,
+      },
+    },
+  ],
   [remarkMath, {}],
   [remarkCjkFriendly],
   [remarkPlugin],

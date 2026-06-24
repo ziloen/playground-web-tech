@@ -5,6 +5,7 @@
       font-family: var(--font-noto-sans-sc);
       overflow-wrap: break-word;
       word-break: auto-phrase;
+      min-width: 0;
       /* color: light-dark(#24292f, #e5e7eb); */
 
       > :first-child {

@@ -13,8 +13,8 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@atlaskit/pragmatic-drag-and-drop": "2.0.0",
-    "@base-ui/react": "1.5.0",
+    "@atlaskit/pragmatic-drag-and-drop": "2.0.1",
+    "@base-ui/react": "1.6.0",
     "@csstools/selector-specificity": "6.0.0",
     "@ffmpeg/core-mt": "0.12.10",
     "@ffmpeg/ffmpeg": "0.12.15",
@@ -53,9 +53,9 @@
     "react-zoom-pan-pinch": "4.0.3",
     "rehype-katex": "7.0.1",
     "rehype-raw": "7.0.0",
-    "remark-cjk-friendly": "2.1.0",
+    "remark-cjk-friendly": "2.2.0",
     "remark-gfm": "4.0.1",
-    "remark-gfm-no-autolink": "2.1.5",
+    "remark-gfm-configurable": "1.0.0",
     "remark-math": "6.0.0",
     "shiki": "4.2.0",
     "svgo": "4.0.1",
@@ -81,7 +81,7 @@
     "browserslist-to-esbuild": "2.1.1",
     "eslint": "10.5.0",
     "lightningcss": "1.32.0",
-    "oxfmt": "0.55.0",
+    "oxfmt": "0.56.0",
     "patch-package": "8.0.1",
     "tailwindcss": "4.3.1",
     "ts-lib-enhance": "1.0.24",
@@ -89,7 +89,7 @@
     "typescript": "6.0.3",
     "unplugin-auto-import": "21.0.0",
     "unplugin-icons": "23.0.1",
-    "vite": "8.0.16",
+    "vite": "8.1.0",
     "vitest": "4.1.9",
     "vitest-browser-react": "2.2.0"
   }

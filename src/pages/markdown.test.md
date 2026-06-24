@@ -32,11 +32,11 @@
 
 ## Table
 
-| Left | Center | Right |
-|:-----|:------:|------:|
-| a | b | c |
-| long text | **bold cell** | `code cell` |
-| escaped \| pipe | aligned | 123 |
+| Left            |    Center     |       Right |
+| :-------------- | :-----------: | ----------: |
+| a               |       b       |           c |
+| long text       | **bold cell** | `code cell` |
+| escaped \| pipe |    aligned    |         123 |
 
 ---
 
