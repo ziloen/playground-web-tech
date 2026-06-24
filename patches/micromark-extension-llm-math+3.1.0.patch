@@ -1,0 +1,150 @@
+diff --git a/node_modules/micromark-extension-llm-math/dev/lib/math-tex-flow.js b/node_modules/micromark-extension-llm-math/dev/lib/math-tex-flow.js
+index 622b881..9be4877 100644
+--- a/node_modules/micromark-extension-llm-math/dev/lib/math-tex-flow.js
++++ b/node_modules/micromark-extension-llm-math/dev/lib/math-tex-flow.js
+@@ -286,12 +286,32 @@ function tokenizeMathFenced(effects, ok, nok) {
+     function beforeSequenceClose(code) {
+       effects.enter('mathFlowFence')
+       effects.enter('mathFlowFenceSequence')
++      return sequenceClose(code)
++    }
++
++    /**
++     * In closing fence sequence, at backslash.
++     *
++     * ```markdown
++     *   | \[
++     *   | \frac{1}{2}
++     * > | \]
++     *     ^
++     * ```
++     *
++     * @type {State}
++     */
++    function sequenceClose(code) {
++      if (code !== codes.backslash) {
++        return nok(code)
++      }
++
+       effects.consume(code)
+-      return sequenceClose
++      return sequenceCloseBracket
+     }
+ 
+     /**
+-     * In closing fence sequence.
++     * In closing fence sequence, at right bracket.
+      *
+      * ```markdown
+      *   | \[
+@@ -302,7 +322,7 @@ function tokenizeMathFenced(effects, ok, nok) {
+      *
+      * @type {State}
+      */
+-    function sequenceClose(code) {
++    function sequenceCloseBracket(code) {
+       if (code !== codes.rightSquareBracket) {
+         return nok(code)
+       }
+@@ -330,7 +350,26 @@ function tokenizeMathFenced(effects, ok, nok) {
+         return ok(code)
+       }
+ 
+-      return nok(code)
++      return afterSequenceCloseTail(code)
++    }
++
++    /**
++     * Consume trailing same-line content silently (not valid LaTeX after \]).
++     * Keeps the flow construct ending at EOL to satisfy micromark.
++     *
++     * @type {State}
++     */
++    function afterSequenceCloseTail(code) {
++      if (code === codes.eof || markdownLineEnding(code)) {
++        effects.exit('mathFlowFence')
++        return ok(code)
++      }
++
++      // Wrap each char in a silent token so consume() has an open event.
++      effects.enter('mathFlowFenceSequence')
++      effects.consume(code)
++      effects.exit('mathFlowFenceSequence')
++      return afterSequenceCloseTail
+     }
+   }
+ }
+diff --git a/node_modules/micromark-extension-llm-math/lib/math-tex-flow.js b/node_modules/micromark-extension-llm-math/lib/math-tex-flow.js
+index f56f35d..1302fa5 100644
+--- a/node_modules/micromark-extension-llm-math/lib/math-tex-flow.js
++++ b/node_modules/micromark-extension-llm-math/lib/math-tex-flow.js
+@@ -238,12 +238,31 @@ function tokenizeMathFenced(effects, ok, nok) {
+     function beforeSequenceClose(code) {
+       effects.enter('mathFlowFence');
+       effects.enter('mathFlowFenceSequence');
++      return sequenceClose(code);
++    }
++
++    /**
++     * In closing fence sequence, at backslash.
++     *
++     * ```markdown
++     *   | \[
++     *   | \frac{1}{2}
++     * > | \]
++     *     ^
++     * ```
++     *
++     * @type {State}
++     */
++    function sequenceClose(code) {
++      if (code !== 92) {
++        return nok(code);
++      }
+       effects.consume(code);
+-      return sequenceClose;
++      return sequenceCloseBracket;
+     }
+ 
+     /**
+-     * In closing fence sequence.
++     * In closing fence sequence, at right bracket.
+      *
+      * ```markdown
+      *   | \[
+@@ -254,7 +273,7 @@ function tokenizeMathFenced(effects, ok, nok) {
+      *
+      * @type {State}
+      */
+-    function sequenceClose(code) {
++    function sequenceCloseBracket(code) {
+       if (code !== 93) {
+         return nok(code);
+       }
+@@ -280,7 +299,25 @@ function tokenizeMathFenced(effects, ok, nok) {
+         effects.exit('mathFlowFence');
+         return ok(code);
+       }
+-      return nok(code);
++      return afterSequenceCloseTail(code);
++    }
++
++    /**
++     * Consume trailing same-line content silently (not valid LaTeX after \]).
++     * Keeps the flow construct ending at EOL to satisfy micromark.
++     *
++     * @type {State}
++     */
++    function afterSequenceCloseTail(code) {
++      if (code === null || markdownLineEnding(code)) {
++        effects.exit('mathFlowFence');
++        return ok(code);
++      }
++      // Wrap each char in a silent token so consume() has an open event.
++      effects.enter('mathFlowFenceSequence');
++      effects.consume(code);
++      effects.exit('mathFlowFenceSequence');
++      return afterSequenceCloseTail;
+     }
+   }
+ }

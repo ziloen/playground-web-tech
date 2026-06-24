@@ -9,10 +9,11 @@
     "fmt": "oxfmt",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
-    "test:browser:update": "vitest --update"
+    "test:browser:update": "vitest --update",
+    "postinstall": "patch-package"
   },
   "dependencies": {
-    "@atlaskit/pragmatic-drag-and-drop": "1.8.1",
+    "@atlaskit/pragmatic-drag-and-drop": "2.0.0",
     "@base-ui/react": "1.5.0",
     "@csstools/selector-specificity": "6.0.0",
     "@ffmpeg/core-mt": "0.12.10",
@@ -30,7 +31,7 @@
     "browser-fs-access": "0.38.0",
     "clsx": "2.1.1",
     "colorjs.io": "0.6.1",
-    "dexie": "4.4.3",
+    "dexie": "4.4.4",
     "dexie-react-hooks": "4.4.0",
     "es-toolkit": "1.47.1",
     "exifreader": "4.41.0",
@@ -47,7 +48,7 @@
     "react-dom": "19.2.7",
     "react-i18next": "17.0.8",
     "react-markdown": "10.1.0",
-    "react-router": "7.17.0",
+    "react-router": "7.18.0",
     "react-textarea-autosize": "8.5.9",
     "react-zoom-pan-pinch": "4.0.3",
     "rehype-katex": "7.0.1",
@@ -65,7 +66,7 @@
     "uuid": "14.0.0"
   },
   "devDependencies": {
-    "@iconify/json": "2.2.486",
+    "@iconify/json": "2.2.487",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@tailwindcss/vite": "4.3.1",
@@ -81,6 +82,7 @@
     "eslint": "10.5.0",
     "lightningcss": "1.32.0",
     "oxfmt": "0.55.0",
+    "patch-package": "8.0.1",
     "tailwindcss": "4.3.1",
     "ts-lib-enhance": "1.0.24",
     "type-fest": "5.7.0",

@@ -1,10 +1,10 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Markdown } from '~/components/Markdown'
 import { useMemoizedFn, useNextEffect } from '~/hooks'
-import { useProgressiveList } from '~/hooks/useProgressiveList'
-import { cn } from '~/utils'
+import { cn, propsEqualWith } from '~/utils'
 import CarbonDownToBottom from '~icons/carbon/down-to-bottom'
 import CarbonUpToTop from '~icons/carbon/up-to-top'
+import testMd from './markdown.test.md?raw'
 
 type MessageRole = 'user' | 'assistant'
 type DisplayMode = 'top' | 'bottom'
@@ -18,7 +18,7 @@ type MessageNode = {
   children: MessageNode[]
 }
 
-const STREAM_TOKEN_INTERVAL_MS = 50
+const STREAM_TOKEN_INTERVAL_MS = 16
 
 export default function MarkdownPage() {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -28,9 +28,9 @@ export default function MarkdownPage() {
   const [rootMessage, setRootMessage] = useState(() => createMockTree(seed))
 
   const nextEffect = useNextEffect()
-  const scrollRequestIdRef = useRef(0)
   const streamingTimersRef = useRef(new Map<string, number>())
   const [isStreaming, setIsStreaming] = useState(false)
+  const [assistantContent, setAssistantContent] = useState('')
   const sentMessageIndexRef = useRef(1)
 
   const refreshData = useMemoizedFn(async () => {
@@ -43,22 +43,13 @@ export default function MarkdownPage() {
     sentMessageIndexRef.current = 1
 
     await nextEffect()
-    scrollImmediately(mode)
+    scrollTo(mode)
   })
 
   const path = useMemo(
     () => resolvePath(rootMessage, selectedChildByParentId),
     [rootMessage, selectedChildByParentId],
   )
-
-  // const progressivePath = useProgressiveList({
-  //   items: path,
-  //   getKey: (item) => item.id,
-  //   direction: mode === 'bottom' ? 'tail' : 'head',
-  //   resetKey: seed,
-  //   debugLabel: import.meta.env.DEV ? 'markdown-path' : undefined,
-  //   initialBatch: 20,
-  // })
 
   const stopAllStreaming = useMemoizedFn(() => {
     for (const timerId of streamingTimersRef.current.values()) {
@@ -75,15 +66,12 @@ export default function MarkdownPage() {
     }
   }, [])
 
-  // const progressiveDoneRef = useRef<Promise<void>>(progressivePath.donePromise)
-  // progressiveDoneRef.current = progressivePath.donePromise
-
   useLayoutEffect(() => {
     if (mode !== 'bottom') return
-    scrollImmediately('bottom')
+    scrollTo('bottom')
   }, [mode])
 
-  const scrollImmediately = useMemoizedFn(
+  const scrollTo = useMemoizedFn(
     (to: 'top' | 'bottom' | number, behavior: ScrollBehavior = 'instant') => {
       const scrollEl = scrollRef.current
       if (!scrollEl) return
@@ -103,18 +91,6 @@ export default function MarkdownPage() {
     },
   )
 
-  const scrollAfterRendered = useMemoizedFn(
-    async (to: 'top' | 'bottom' | number, behavior: ScrollBehavior = 'instant') => {
-      const requestId = ++scrollRequestIdRef.current
-
-      // await progressiveDoneRef.current
-
-      if (requestId !== scrollRequestIdRef.current) return
-
-      scrollImmediately(to, behavior)
-    },
-  )
-
   const selectBranch = useMemoizedFn((parent: MessageNode, child: MessageNode) => {
     setSelectedChildByParentId((current) => {
       return { ...current, [parent.id]: child.id }
@@ -122,7 +98,7 @@ export default function MarkdownPage() {
   })
 
   const startAssistantStream = useMemoizedFn((assistantId: string, sentIndex: number) => {
-    const tokens = createAssistantStreamTokens(sentIndex)
+    const tokens = createAssistantStreamTokens()
     let nextTokenIndex = 0
     let content = ''
 
@@ -158,9 +134,15 @@ export default function MarkdownPage() {
       seed,
       'user',
       userBranchPath,
-      `发送消息 ${sentIndex}\n\n这是一条立即加入对话的 user 消息。`,
+      createDefaultRuntimeUserContent(sentIndex),
     )
-    const assistantMessage = createRuntimeMessage(seed, 'assistant', assistantBranchPath, '')
+    const customAssistantContent = assistantContent.trim() ? assistantContent : ''
+    const assistantMessage = createRuntimeMessage(
+      seed,
+      'assistant',
+      assistantBranchPath,
+      customAssistantContent,
+    )
 
     userMessage.children.push(assistantMessage)
 
@@ -170,11 +152,21 @@ export default function MarkdownPage() {
       [parent.id]: userMessage.id,
       [userMessage.id]: assistantMessage.id,
     }))
-    startAssistantStream(assistantMessage.id, sentIndex)
+    setAssistantContent('')
+
+    if (!customAssistantContent) {
+      const immediate = true
+
+      if (immediate) {
+        setRootMessage((current) => updateMessageContent(current, assistantMessage.id, testMd))
+      } else {
+        startAssistantStream(assistantMessage.id, sentIndex)
+      }
+    }
 
     await nextEffect()
     if (mode === 'bottom') {
-      scrollImmediately('bottom')
+      scrollTo('bottom')
     }
   })
 
@@ -182,14 +174,14 @@ export default function MarkdownPage() {
     setMode(nextMode)
 
     await nextEffect()
-    scrollImmediately(nextMode)
+    scrollTo(nextMode)
   })
 
   const resetConversation = useMemoizedFn(async () => {
     setSelectedChildByParentId({})
 
     await nextEffect()
-    scrollImmediately(mode)
+    scrollTo(mode)
   })
 
   return (
@@ -221,7 +213,7 @@ export default function MarkdownPage() {
           <button
             className={cn(toolbarButtonClass, 'flex-center')}
             type="button"
-            onClick={() => scrollAfterRendered('top', 'smooth')}
+            onClick={() => scrollTo('top', 'smooth')}
             title="Scroll to top"
           >
             <CarbonUpToTop width={16} height={16} />
@@ -233,7 +225,7 @@ export default function MarkdownPage() {
               event.preventDefault()
 
               const formData = new FormData(event.currentTarget)
-              scrollAfterRendered(Number(formData.get('jumpTo')), 'smooth')
+              scrollTo(Number(formData.get('jumpTo')), 'smooth')
             }}
           >
             <input
@@ -248,7 +240,7 @@ export default function MarkdownPage() {
           <button
             className={cn(toolbarButtonClass, 'flex-center')}
             type="button"
-            onClick={() => scrollAfterRendered('bottom', 'smooth')}
+            onClick={() => scrollTo('bottom', 'smooth')}
             title="Scroll to bottom"
           >
             <CarbonDownToBottom width={16} height={16} />
@@ -257,6 +249,19 @@ export default function MarkdownPage() {
           <button className={toolbarButtonClass} type="button" onClick={resetConversation}>
             Reset
           </button>
+          <textarea
+            className="h-8 w-64 min-w-0 resize-none rounded-md border border-[#2f2a1f]/20 bg-white px-2 text-sm text-[#201a10] outline-none placeholder:text-[#8a806f] focus:border-[#b8482b]"
+            rows={1}
+            value={assistantContent}
+            onChange={(event) => setAssistantContent(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' || isStreaming) return
+              event.preventDefault()
+              sendMessage()
+            }}
+            placeholder="Assistant content"
+            aria-label="Assistant content"
+          />
           <button
             className={toolbarButtonClass}
             type="button"
@@ -290,14 +295,23 @@ export default function MarkdownPage() {
   )
 }
 
-const MessageArticle = memo(function MessageArticle({
-  message,
-  selectBranch,
-  parent,
-}: {
+type MessageArticleProps = {
   message: MessageNode
   parent?: MessageNode
   selectBranch: (parent: MessageNode, child: MessageNode) => void
+}
+
+const propsAreEqual = propsEqualWith<MessageArticleProps>({
+  message: propsEqualWith({
+    children: (a, b) => a.length === b.length && a.every((v, i) => v.id === b[i].id),
+  }),
+  parent: (a, b) => a?.id === b?.id,
+})
+
+const MessageArticle = memo<MessageArticleProps>(function MessageArticle({
+  message,
+  selectBranch,
+  parent,
 }) {
   const siblings = parent?.children ?? []
 
@@ -354,7 +368,7 @@ const MessageArticle = memo(function MessageArticle({
       )}
     </article>
   )
-})
+}, propsAreEqual)
 
 function resolvePath(root: MessageNode, selectedChildByParentId: Record<string, string>) {
   const path: MessageNode[] = []
@@ -417,6 +431,10 @@ function createRuntimeMessage(
   }
 }
 
+function createDefaultRuntimeUserContent(sentIndex: number) {
+  return `发送消息 ${sentIndex}\n\n这是一条立即加入对话的 user 消息。`
+}
+
 function appendChildToMessage(
   root: MessageNode,
   parentId: string,
@@ -459,34 +477,8 @@ function updateMessageContent(root: MessageNode, messageId: string, content: str
   return { ...root, children: nextChildren }
 }
 
-function createAssistantStreamTokens(sentIndex: number) {
-  const sections = Array.from({ length: 5 }, (_, index) => {
-    const step = index + 1
-
-    return [
-      `### 段落 ${step}\n\n`,
-      `这是第 ${sentIndex} 次发送消息后的流式回复片段。`,
-      '它会持续追加较长内容，用来观察 Markdown 渲染、高度变化、滚动位置和 progressive list 的协作行为。',
-      '当前段落包含中文、English words、数字 12345，以及一些行内 `code`，确保不同文本形态都会参与更新。',
-      '\n\n',
-      '- 第一项会检查消息树末尾追加后的路径选择。\n',
-      '- 第二项会检查 assistant 内容不断增长时 DOM 是否稳定。\n',
-      '- 第三项会检查用户主动滚动按钮仍然等待完整 progressive render。\n\n',
-      `> streaming block ${step}: 输出速度已经调快，长回复会更明显地推动内容区域增长。\n\n`,
-    ].join(' ')
-  })
-
-  const content = [
-    `## 流式回复 ${sentIndex}\n\n`,
-    '这是一条较长的 assistant 消息，会以更快速度持续输出。',
-    '它不是一次性替换整段文本，而是按 token 逐步追加，从而模拟真实的 streaming response。',
-    '\n\n',
-    ...sections,
-    '## 总结\n\n',
-    '流式输出完成后，这条消息会保留完整 Markdown 内容，并继续作为普通 assistant 消息参与分支和滚动测试。',
-  ].join(' ')
-
-  return content.match(/\S+\s*/g) ?? []
+function createAssistantStreamTokens() {
+  return testMd.match(/\S+\s*/g) ?? []
 }
 
 function createMockTree(seed: string): MessageNode {

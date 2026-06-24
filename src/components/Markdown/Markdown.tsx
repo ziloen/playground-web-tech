@@ -199,7 +199,7 @@ const remarkPlugins = pluginList([
 ])
 
 const rehypePlugins = pluginList([
-  [rehypeKatex, { errorColor: '', strict: 'ignore' }],
+  [rehypeKatex, { errorColor: undefined, strict: 'ignore' }],
   [rehypePlugin],
   // FIXME: 设置只额外解析 <think> 标签而不是任意的标签
   [rehypeRaw],

@@ -1,9 +1,8 @@
+/* eslint-disable unicorn/prefer-string-raw */
 import { describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-react'
 import { page } from 'vitest/browser'
 import { Markdown } from './Markdown'
-
-// ── Helper ──
 
 function TestWrapper({ children, testId }: { children: React.ReactNode; testId: string }) {
   return (
@@ -17,8 +16,6 @@ function TestWrapper({ children, testId }: { children: React.ReactNode; testId: 
     </div>
   )
 }
-
-// ── Visual Regression Tests ──
 
 describe('Markdown', () => {
   it('should render code block', async () => {
@@ -52,6 +49,75 @@ supportedTypes.forEach((type) => {
       </TestWrapper>,
     )
     await expect.element(page.getByTestId('markdown-math')).toMatchScreenshot('markdown-math')
+  })
+
+  it('should handle `\\[\\]` on same line without crash', async () => {
+    // Trailing text after \] on same line is consumed by the fence
+    // (micromark flow construct constraint). Key: no crash, no .katex-error.
+    const sameLineMath = `\\[\\] text consumed by fence`
+
+    await render(
+      <TestWrapper testId="markdown-math-sameline">
+        <Markdown>{sameLineMath}</Markdown>
+      </TestWrapper>,
+    )
+
+    // Verify no KaTeX error — the element renders without crash
+    const text = page.getByTestId('markdown-math-sameline').element().textContent
+    expect(text).not.toContain('katex-error')
+  })
+
+  it('should not crash on unclosed `\\[` (EOF safety)', async () => {
+    const unclosedMath = `\\[\nE = mc^2`
+
+    await render(
+      <TestWrapper testId="markdown-math-unclosed">
+        <Markdown>{unclosedMath}</Markdown>
+      </TestWrapper>,
+    )
+    // Should not throw — the parser handles EOF gracefully inside math blocks
+    await expect
+      .element(page.getByTestId('markdown-math-unclosed'))
+      .toMatchScreenshot('markdown-math-unclosed')
+  })
+
+  it('should render complex LaTeX math block', async () => {
+    const complexMath = `\\[\n\\begin{aligned}\nE &= \\frac{1}{2}mv^2 \\\\\nm &= \\rho \\cdot \\frac{4}{3}\\pi r^3\n\\end{aligned}\n\\]`
+
+    await render(
+      <TestWrapper testId="markdown-math-complex">
+        <Markdown>{complexMath}</Markdown>
+      </TestWrapper>,
+    )
+    await expect
+      .element(page.getByTestId('markdown-math-complex'))
+      .toMatchScreenshot('markdown-math-complex')
+  })
+
+  it('should render single-line `\\[ ... \\]` display math', async () => {
+    const singleLineMath = `\\[ E = mc^2 \\]`
+
+    await render(
+      <TestWrapper testId="markdown-math-singleline">
+        <Markdown>{singleLineMath}</Markdown>
+      </TestWrapper>,
+    )
+    await expect
+      .element(page.getByTestId('markdown-math-singleline'))
+      .toMatchScreenshot('markdown-math-singleline')
+  })
+
+  it('should render `\\(\\)` inline math with trailing text on same line', async () => {
+    const inlineMath = `\\(x^2\\) and more text`
+
+    await render(
+      <TestWrapper testId="markdown-math-inline">
+        <Markdown>{inlineMath}</Markdown>
+      </TestWrapper>,
+    )
+    await expect
+      .element(page.getByTestId('markdown-math-inline'))
+      .toMatchScreenshot('markdown-math-inline')
   })
 
   it('should render link with spaces in URL', async () => {

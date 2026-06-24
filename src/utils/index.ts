@@ -63,3 +63,45 @@ export function intersperse<T, K>(array: T[], separator: K) {
     return acc
   }, []) as K extends T ? T[] : (T | K)[]
 }
+
+/**
+ * Creates a custom props comparison function for use with `React.memo`.
+ * Each key in `comparers` can override the default `Object.is` equality check.
+ *
+ * @example
+ * ```ts
+ * const areEqual = propsEqualWith<{ items: string[]; config: Config }>({
+ *   items: (a, b) => a.length === b.length && a.every((v, i) => v === b[i]),
+ * })
+ * export default React.memo(MyComponent, areEqual)
+ * ```
+ */
+/*#__NO_SIDE_EFFECTS__*/
+export function propsEqualWith<P extends Record<string, any>>(
+  comparers: NoInfer<{
+    [K in keyof P]?: (prevValue: P[K], nextValue: P[K]) => boolean
+  }>,
+): (prevProps: P, nextProps: P) => boolean {
+  return function arePropsEqual(prevProps, nextProps) {
+    const prevKeys = Object.keys(prevProps)
+    const nextKeys = Object.keys(nextProps)
+
+    if (prevKeys.length !== nextKeys.length) {
+      return false
+    }
+
+    for (const key of prevKeys) {
+      if (!Object.hasOwn(nextProps, key)) {
+        return false
+      }
+
+      const comparer = comparers[key] ?? Object.is
+
+      if (!comparer(prevProps[key], nextProps[key])) {
+        return false
+      }
+    }
+
+    return true
+  }
+}
