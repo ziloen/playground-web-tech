@@ -61,6 +61,7 @@ const MemoReactMarkdown = memo(function MemoReactMarkdown({ children }: { childr
       rehypePlugins={rehypePlugins}
       components={components as MarkdownComponents}
       remarkRehypeOptions={{
+        // FIXME: Disable footnote back link
         footnoteBackContent: null,
       }}
     >
