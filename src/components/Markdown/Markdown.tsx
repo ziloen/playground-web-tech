@@ -4,8 +4,12 @@ import 'katex/dist/katex.css'
 import './markdown.css'
 
 import clsx from 'clsx/lite'
-import type { Element as HastElement, Nodes as HastNodes } from 'hast'
-import type { Nodes as MdastNodes } from 'mdast'
+import type { ElementContent, Element as HastElement, Nodes as HastNodes } from 'hast'
+import type { Root as HastRoot } from 'hast'
+import type { FootnoteDefinition, Link, Nodes as MdastNodes, Root, RootContent } from 'mdast'
+import { toHast } from 'mdast-util-to-hast'
+import { toMarkdown } from 'mdast-util-to-markdown'
+import { toString } from 'mdast-util-to-string'
 import { createContext, memo, use, useState } from 'react'
 import type { Components as MarkdownComponents } from 'react-markdown'
 import ReactMarkdown from 'react-markdown'
@@ -60,10 +64,6 @@ const MemoReactMarkdown = memo(function MemoReactMarkdown({ children }: { childr
       remarkPlugins={remarkPlugins}
       rehypePlugins={rehypePlugins}
       components={components as MarkdownComponents}
-      remarkRehypeOptions={{
-        // FIXME: Disable footnote back link
-        footnoteBackContent: null,
-      }}
     >
       {children}
     </ReactMarkdown>
@@ -198,7 +198,6 @@ const remarkPlugins = pluginList([
     {
       plugins: {
         autolinkLiteral: false,
-        footnote: false,
       },
     },
   ],
@@ -238,6 +237,33 @@ function rehypePlugin(this: Processor) {
   }
 }
 
+function isFootnoteDefinition(node: RootContent): node is FootnoteDefinition {
+  return node.type === 'footnoteDefinition'
+}
+
+type FootnoteMapValue = {
+  identifier: string
+  label?: string
+  text: string
+  markdown: string
+  node: FootnoteDefinition
+}
+
+function serializeFootnoteDefinition(def: FootnoteDefinition): FootnoteMapValue {
+  const root: Root = {
+    type: 'root',
+    children: def.children as RootContent[],
+  }
+
+  return {
+    node: def,
+    identifier: def.identifier,
+    label: def.label ?? '',
+    text: toString(root).trim(),
+    markdown: toMarkdown(root).trim(),
+  }
+}
+
 function remarkPlugin(this: Processor) {
   // disable `indentedCode` in micromark
   // https://github.com/micromark/micromark#case-turn-off-constructs
@@ -253,7 +279,48 @@ function remarkPlugin(this: Processor) {
       lastNode = lastNode.children.at(-1)!
     }
 
+    const footnotes = new Map<string, FootnoteMapValue>()
+
+    if ('children' in tree) {
+      for (const child of tree.children) {
+        if (!isFootnoteDefinition(child)) continue
+
+        footnotes.set(child.identifier, serializeFootnoteDefinition(child))
+      }
+    }
+
     visit(tree, (node, index, parent) => {
+      // Remove footnotes
+      if (parent && typeof index === 'number') {
+        if (node.type === 'footnoteDefinition') {
+          parent.children = parent.children.toSpliced(index, 1)
+        }
+
+        if (node.type === 'footnoteReference' && footnotes.has(node.identifier)) {
+          const def = footnotes.get(node.identifier)!
+
+          const link: Link = {
+            type: 'link',
+            children: [
+              {
+                type: 'text',
+                value: node.label || node.identifier,
+              },
+            ],
+            url: '#',
+            title: null,
+            data: {
+              hProperties: {
+                dataFootnoteMd: def.markdown,
+                dataFootnoteText: def.text,
+              },
+            },
+          }
+
+          parent.children[index] = link
+        }
+      }
+
       // Add `iniline` / `text` / `language` to code node
       if (node.type === 'code' || node.type === 'inlineCode') {
         const isBlock = node.type === 'code'
