@@ -1,9 +1,9 @@
-import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
+import { Leva, button, buttonGroup, useControls } from 'leva'
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Markdown } from '~/components/Markdown'
-import { useMemoizedFn, useNextEffect } from '~/hooks'
-import { cn, propsEqualWith } from '~/utils'
-import CarbonDownToBottom from '~icons/carbon/down-to-bottom'
-import CarbonUpToTop from '~icons/carbon/up-to-top'
+import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
+import { propsEqualWith } from '~/utils'
 import testMd from './markdown.test.md?raw'
 
 type MessageRole = 'user' | 'assistant'
@@ -22,16 +22,45 @@ const STREAM_TOKEN_INTERVAL_MS = 16
 
 export default function MarkdownPage() {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [mode, setMode] = useState<DisplayMode>('bottom')
   const [selectedChildByParentId, setSelectedChildByParentId] = useState<Record<string, string>>({})
   const [seed, setSeed] = useState(createSeed)
   const [rootMessage, setRootMessage] = useState(() => createMockTree(seed))
 
   const nextEffect = useNextEffect()
   const streamingTimersRef = useRef(new Map<string, number>())
-  const [isStreaming, setIsStreaming] = useState(false)
-  const [assistantContent, setAssistantContent] = useState('')
+  const [isStreaming, setIsStreaming, getIsStreaming] = useGetState(false)
   const sentMessageIndexRef = useRef(1)
+
+  const [{ displayMode, assistantContent, immediateMode, renderedMessages }, setDebug] =
+    useControls(() => ({
+      renderedMessages: { value: '', disabled: true, label: 'visible range' },
+      displayMode: { value: 'bottom' as DisplayMode, options: ['top', 'bottom'] as const },
+      navigation: buttonGroup({
+        label: null,
+        opts: {
+          scrollToTop: () => scrollTo('top', 'smooth'),
+          scrollToBottom: () => scrollTo('bottom', 'smooth'),
+        },
+      }),
+      // scrollToTop: button(() => scrollTo('top', 'smooth')),
+      jumpToIndex: { value: 0, min: 0, step: 1 },
+      jump: button((get) => {
+        const idx = get('jumpToIndex') as number
+        if (idx > 0) scrollTo(idx, 'smooth')
+      }),
+      // scrollToBottom: button(() => scrollTo('bottom', 'smooth')),
+      resetConversation: button(() => resetConversation()),
+      assistantContent: '',
+      sendOrStop: button(() => {
+        if (getIsStreaming()) {
+          stopAllStreaming()
+        } else {
+          sendMessage()
+        }
+      }),
+      refreshData: button(() => refreshData()),
+      immediateMode: { value: true, label: 'immediate (no stream)' },
+    }))
 
   const refreshData = useMemoizedFn(async () => {
     stopAllStreaming()
@@ -43,13 +72,42 @@ export default function MarkdownPage() {
     sentMessageIndexRef.current = 1
 
     await nextEffect()
-    scrollTo(mode)
+    scrollTo(displayMode)
   })
 
   const path = useMemo(
     () => resolvePath(rootMessage, selectedChildByParentId),
     [rootMessage, selectedChildByParentId],
   )
+
+  const getItemKey = useCallback((index: number) => path[index]?.id ?? index, [path])
+
+  const virtualizer = useVirtualizer({
+    count: path.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 180,
+    getItemKey,
+    anchorTo: displayMode === 'bottom' ? 'end' : 'start',
+    followOnAppend: 'smooth',
+    scrollEndThreshold: 20,
+    overscan: 5,
+  })
+
+  const virtualItems = virtualizer.getVirtualItems()
+  const virtualIndexes = virtualizer.getVirtualIndexes()
+
+  useEffect(() => {
+    if (virtualIndexes.length === 0) {
+      setDebug({ renderedMessages: '0 / 0' })
+      return
+    }
+
+    const start = virtualIndexes[0] + 1
+    const end = virtualIndexes.at(-1)! + 1
+    setDebug({
+      renderedMessages: `${start} – ${end} ( ${virtualIndexes.length} / ${path.length} )`,
+    })
+  }, [virtualIndexes])
 
   const stopAllStreaming = useMemoizedFn(() => {
     for (const timerId of streamingTimersRef.current.values()) {
@@ -67,26 +125,21 @@ export default function MarkdownPage() {
   }, [])
 
   useLayoutEffect(() => {
-    if (mode !== 'bottom') return
-    scrollTo('bottom')
-  }, [mode])
+    if (displayMode === 'bottom') {
+      virtualizer.scrollToEnd()
+    } else {
+      virtualizer.scrollToOffset(0)
+    }
+  }, [displayMode])
 
   const scrollTo = useMemoizedFn(
     (to: 'top' | 'bottom' | number, behavior: ScrollBehavior = 'instant') => {
-      const scrollEl = scrollRef.current
-      if (!scrollEl) return
-
-      if (to === 'top' || to === 'bottom') {
-        scrollEl.scrollTo({
-          top: to === 'top' ? 0 : Number.MAX_SAFE_INTEGER,
-          behavior,
-        })
-      } else {
-        const target = document.querySelector(`[data-message-index="${to}"]`)
-        target?.scrollIntoView({
-          block: 'center',
-          behavior,
-        })
+      if (to === 'top') {
+        virtualizer.scrollToOffset(0, { behavior })
+      } else if (to === 'bottom') {
+        virtualizer.scrollToEnd({ behavior })
+      } else if (to > 0) {
+        virtualizer.scrollToIndex(to - 1, { align: 'center', behavior })
       }
     },
   )
@@ -152,144 +205,85 @@ export default function MarkdownPage() {
       [parent.id]: userMessage.id,
       [userMessage.id]: assistantMessage.id,
     }))
-    setAssistantContent('')
+    setDebug({ assistantContent: '' })
 
     if (!customAssistantContent) {
-      const immediate = true
-
-      if (immediate) {
+      if (immediateMode) {
         setRootMessage((current) => updateMessageContent(current, assistantMessage.id, testMd))
       } else {
         startAssistantStream(assistantMessage.id, sentIndex)
       }
     }
-
-    await nextEffect()
-    if (mode === 'bottom') {
-      scrollTo('bottom')
-    }
-  })
-
-  const resetMode = useMemoizedFn(async (nextMode: DisplayMode) => {
-    setMode(nextMode)
-
-    await nextEffect()
-    scrollTo(nextMode)
   })
 
   const resetConversation = useMemoizedFn(async () => {
     setSelectedChildByParentId({})
 
     await nextEffect()
-    scrollTo(mode)
+    scrollTo(displayMode)
   })
 
   return (
-    <main className="grid h-full grid-rows-[auto_1fr] bg-[#f4f0e8] text-[#191712] scheme-light">
-      <header className="z-10 border-b border-[#2f2a1f]/15 bg-[#f8f4ec]/95 px-5 py-4 shadow-[0_18px_50px_rgba(32,26,16,0.10)] backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2">
-          <div className="me-auto">
-            <h1 className="m-0 text-xl font-semibold tracking-normal">Markdown message tree</h1>
-            <p className="m-0 mt-1 text-sm text-[#695f4d]">rendered {path.length} messages</p>
-          </div>
-
-          <div className="flex rounded-lg border border-[#2f2a1f]/15 bg-white p-1">
-            <button
-              className={modeButtonClass(mode === 'top')}
-              type="button"
-              onClick={() => resetMode('top')}
-            >
-              Top
-            </button>
-            <button
-              className={modeButtonClass(mode === 'bottom')}
-              type="button"
-              onClick={() => resetMode('bottom')}
-            >
-              Bottom
-            </button>
-          </div>
-
-          <button
-            className={cn(toolbarButtonClass, 'flex-center')}
-            type="button"
-            onClick={() => scrollTo('top', 'smooth')}
-            title="Scroll to top"
-          >
-            <CarbonUpToTop width={16} height={16} />
-          </button>
-
-          <form
-            className=""
-            onSubmit={(event) => {
-              event.preventDefault()
-
-              const formData = new FormData(event.currentTarget)
-              scrollTo(Number(formData.get('jumpTo')), 'smooth')
-            }}
-          >
-            <input
-              type="number"
-              name="jumpTo"
-              className="h-8 w-12 rounded-md border border-[#2f2a1f]/20 bg-white px-2 text-sm text-[#201a10] outline-none [-moz-appearance:textfield] focus:border-[#b8482b] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-              aria-label="Message index"
-              defaultValue={9}
-            />
-          </form>
-
-          <button
-            className={cn(toolbarButtonClass, 'flex-center')}
-            type="button"
-            onClick={() => scrollTo('bottom', 'smooth')}
-            title="Scroll to bottom"
-          >
-            <CarbonDownToBottom width={16} height={16} />
-          </button>
-
-          <button className={toolbarButtonClass} type="button" onClick={resetConversation}>
-            Reset
-          </button>
-          <textarea
-            className="h-8 w-64 min-w-0 resize-none rounded-md border border-[#2f2a1f]/20 bg-white px-2 text-sm text-[#201a10] outline-none placeholder:text-[#8a806f] focus:border-[#b8482b]"
-            rows={1}
-            value={assistantContent}
-            onChange={(event) => setAssistantContent(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key !== 'Enter' || isStreaming) return
-              event.preventDefault()
-              sendMessage()
-            }}
-            placeholder="Assistant content"
-            aria-label="Assistant content"
-          />
-          <button
-            className={toolbarButtonClass}
-            type="button"
-            onClick={isStreaming ? stopAllStreaming : sendMessage}
-          >
-            {isStreaming ? 'Stop' : 'Send Message'}
-          </button>
-          <button className={toolbarButtonClass} type="button" onClick={refreshData}>
-            Refresh Data
-          </button>
-        </div>
-      </header>
+    <main className="grid h-full bg-[#f4f0e8] text-[#191712] scheme-light">
+      <Leva
+        titleBar={{ title: 'Markdown Debug' }}
+        theme={{
+          colors: {
+            elevation1: '#14181c',
+            elevation2: '#1c2126',
+            elevation3: '#252a30',
+            accent1: '#7a9ec4',
+            accent2: '#475769',
+            accent3: '#a3bedb',
+            highlight1: '#eef2f7',
+            highlight2: '#b8c4d0',
+            highlight3: '#fff',
+            vivid1: '#d4a830',
+          },
+        }}
+      />
 
       <section
         ref={scrollRef}
         className="scrollbar-thin overflow-y-auto px-4 py-6"
         aria-label="Message list"
       >
-        <div className="mx-auto grid max-w-4xl gap-4">
-          {path.map((message, i) => (
-            <MessageArticle
-              key={message.id}
-              message={message}
-              parent={i > 0 ? path[i - 1] : undefined}
-              selectBranch={selectBranch}
-            />
-          ))}
+        <div className="mb-4 h-30 bg-green"></div>
+
+        <div
+          style={{
+            height: virtualizer.getTotalSize(),
+            position: 'relative',
+            width: '100%',
+          }}
+        >
+          {virtualItems.map((virtualItem) => {
+            const message = path[virtualItem.index]!
+            return (
+              <div
+                key={virtualItem.key}
+                ref={virtualizer.measureElement}
+                data-index={virtualItem.index}
+                className="pb-4"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                <MessageArticle
+                  message={message}
+                  parent={virtualItem.index > 0 ? path[virtualItem.index - 1] : undefined}
+                  selectBranch={selectBranch}
+                />
+              </div>
+            )
+          })}
         </div>
+
+        <div className="h-20 bg-red"></div>
       </section>
     </main>
   )
@@ -383,16 +377,6 @@ function resolvePath(root: MessageNode, selectedChildByParentId: Record<string, 
 
   return path
 }
-
-function modeButtonClass(active: boolean) {
-  return clsx(
-    'h-6 rounded-md border-none px-2 text-sm transition',
-    active ? 'bg-[#201a10] text-white' : 'bg-transparent text-[#6b604e] hover:bg-[#f4ead7]',
-  )
-}
-
-const toolbarButtonClass =
-  'h-8 rounded-md border border-[#2f2a1f]/15 bg-white px-2 text-sm text-[#201a10] shadow-sm transition hover:border-[#b8482b] hover:text-[#b8482b]'
 
 function createSeed(): string {
   return Math.floor(Math.random() * 36 ** 4)
@@ -504,23 +488,23 @@ function createMockTree(seed: string): MessageNode {
   }
 
   const pickContent = (role: MessageRole, i: number): string => {
-    const userSamples = [
-      '请比较这两种方案，保留边界条件和失败模式。',
-      '这里的 **markdown**、`inline code` 和 [link](https://example.com) 应该按普通文本展示。',
-      '把结果整理成可以直接执行的步骤，不要省略滚动行为。',
-      '如果分支发生变化，上面的上下文需要保持稳定。',
-      '继续补充复杂一点的数据，包含中文、English words 和 12345。',
-    ]
+    if (role === 'user') {
+      const userSamples = [
+        '请比较这两种方案，保留边界条件和失败模式。',
+        '这里的 **markdown**、`inline code` 和 [link](https://example.com) 应该按普通文本展示。',
+        '把结果整理成可以直接执行的步骤，不要省略滚动行为。',
+        '如果分支发生变化，上面的上下文需要保持稳定。',
+        '继续补充复杂一点的数据，包含中文、English words 和 12345。',
+      ]
+
+      return `${userSamples[i % userSamples.length]}\n\nmessage=${i}`
+    }
 
     const aiSamples = [
       `## 渲染批次 ${i}\n\n- 只对 AI 消息渲染 markdown\n- 用户消息保持原始文本\n\n> 观察 Markdown 排版和滚动高度变化。`,
       `### 代码路径 ${i}\n\n\`\`\`tsx\nconst seed = '${seed}'\nconst index = ${i}\nconsole.log({ seed, index })\n\`\`\`\n\n代码块会显著改变高度。`,
       `### 数学与表格 ${i}\n\n行内公式 \\(E = mc^2\\)\n\n| 指标 | 值 |\n|:--|--:|\n| seed | ${seed} |\n| index | ${i} |`,
     ]
-
-    if (role === 'user') {
-      return `${userSamples[i % userSamples.length]}\n\nmessage=${i}`
-    }
 
     return aiSamples[i % aiSamples.length]
   }

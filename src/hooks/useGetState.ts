@@ -1,15 +1,31 @@
-import { useMemoizedFn } from './useMemoizedFn'
+import { useRef, useState } from 'react'
 
-export function useGetState<T>(initialState: T | (() => T)) {
+/**
+ * Provides a getState function alongside state and setState, allowing access to the latest state value.
+ *
+ * Note: The setState function here does not support functional updates, use `setState(getState() + 1)` instead.
+ *
+ * @example
+ * const [state, setState, getState] = useGetState(0)
+ *
+ * function increment() {
+ *   const current = getState() // 0
+ *   setState(current + 1)
+ *   const next = getState() // 1
+ * }
+ */
+export function useGetState<T>(
+  initialState: T | (() => T),
+): [state: T, setState: (value: T) => void, getState: () => T] {
   const [state, _setState] = useState<T>(initialState)
   const stateRef = useRef(state)
 
-  const getState = useMemoizedFn(() => stateRef.current)
+  const getState = useRef(() => stateRef.current).current
 
-  const setState = useMemoizedFn((value: T) => {
+  const setState = useRef((value: T) => {
     stateRef.current = value
     _setState(value)
-  })
+  }).current
 
-  return [state, setState, getState] as const
+  return [state, setState, getState]
 }
