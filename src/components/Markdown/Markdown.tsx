@@ -1,7 +1,7 @@
 import '@fontsource-variable/fira-code/index.css'
 import '@fontsource-variable/noto-sans-sc/index.css'
 import 'katex/dist/katex.css'
-import './markdown.css'
+import './Markdown.css'
 
 import clsx from 'clsx/lite'
 import type { ElementContent, Element as HastElement, Nodes as HastNodes } from 'hast'
@@ -36,6 +36,7 @@ import { CodeHighlighter, StreamingCodeHighlighter } from './CodeHighlighter'
 // TODO: make `\(` and `\)` work for inline math
 
 // TODO: custom footnote style [^1](https://example.com)
+// TODO: 类似 ChatGPT 的 table 可以出血显示到屏幕宽度
 
 const MarkdownContext = createContext<{
   streaming?: boolean | undefined | null

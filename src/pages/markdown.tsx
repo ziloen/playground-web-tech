@@ -19,9 +19,11 @@ type MessageNode = {
 }
 
 const STREAM_TOKEN_INTERVAL_MS = 16
+const ESTIMATE_SIZE = 250
 
 export default function MarkdownPage() {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
   const [selectedChildByParentId, setSelectedChildByParentId] = useState<Record<string, string>>({})
   const [seed, setSeed] = useState(createSeed)
   const [rootMessage, setRootMessage] = useState(() => createMockTree(seed))
@@ -30,6 +32,7 @@ export default function MarkdownPage() {
   const streamingTimersRef = useRef(new Map<string, number>())
   const [isStreaming, setIsStreaming, getIsStreaming] = useGetState(false)
   const sentMessageIndexRef = useRef(1)
+  const [scrollMargin, setScrollMargin] = useState(0)
 
   const [{ displayMode, assistantContent, immediateMode, renderedMessages }, setDebug] =
     useControls(() => ({
@@ -46,7 +49,7 @@ export default function MarkdownPage() {
       jumpToIndex: { value: 0, min: 0, step: 1 },
       jump: button((get) => {
         const idx = get('jumpToIndex') as number
-        if (idx > 0) scrollTo(idx, 'smooth')
+        scrollTo(idx, 'smooth')
       }),
       // scrollToBottom: button(() => scrollTo('bottom', 'smooth')),
       resetConversation: button(() => resetConversation()),
@@ -85,12 +88,14 @@ export default function MarkdownPage() {
   const virtualizer = useVirtualizer({
     count: path.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => 180,
+    estimateSize: () => ESTIMATE_SIZE,
     getItemKey,
-    anchorTo: displayMode === 'bottom' ? 'end' : 'start',
-    followOnAppend: 'smooth',
     scrollEndThreshold: 20,
-    overscan: 5,
+    scrollMargin: scrollMargin,
+    useScrollendEvent: true,
+    overscan: 0,
+    gap: 8,
+    initialOffset: ESTIMATE_SIZE * path.length,
   })
 
   const virtualItems = virtualizer.getVirtualItems()
@@ -138,8 +143,8 @@ export default function MarkdownPage() {
         virtualizer.scrollToOffset(0, { behavior })
       } else if (to === 'bottom') {
         virtualizer.scrollToEnd({ behavior })
-      } else if (to > 0) {
-        virtualizer.scrollToIndex(to - 1, { align: 'center', behavior })
+      } else {
+        virtualizer.scrollToIndex(to, { align: 'center', behavior })
       }
     },
   )
@@ -223,6 +228,24 @@ export default function MarkdownPage() {
     scrollTo(displayMode)
   })
 
+  useLayoutEffect(() => {
+    const scrollEl = scrollRef.current
+    const listEl = listRef.current
+    if (!scrollEl || !listEl) return
+
+    const updatePadding = () => {
+      // FIXME: How to observe offsetTop?
+      setScrollMargin(listEl.offsetTop)
+    }
+
+    updatePadding()
+
+    const ro = new ResizeObserver(updatePadding)
+    ro.observe(scrollEl)
+
+    return () => ro.disconnect()
+  }, [])
+
   return (
     <main className="grid h-full bg-[#f4f0e8] text-[#191712] scheme-light">
       <Leva
@@ -248,9 +271,10 @@ export default function MarkdownPage() {
         className="scrollbar-thin overflow-y-auto px-4 py-6"
         aria-label="Message list"
       >
-        <div className="mb-4 h-30 bg-green"></div>
+        <div className="mb-4 h-[calc(50vh+100px)] bg-green"></div>
 
         <div
+          ref={listRef}
           style={{
             height: virtualizer.getTotalSize(),
             position: 'relative',
@@ -264,13 +288,9 @@ export default function MarkdownPage() {
                 key={virtualItem.key}
                 ref={virtualizer.measureElement}
                 data-index={virtualItem.index}
-                className="pb-4"
+                className="absolute top-0 left-0 w-full"
                 style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  transform: `translateY(${virtualItem.start}px)`,
+                  transform: `translateY(${virtualItem.start - virtualizer.options.scrollMargin}px)`,
                 }}
               >
                 <MessageArticle
@@ -283,8 +303,12 @@ export default function MarkdownPage() {
           })}
         </div>
 
-        <div className="h-20 bg-red"></div>
+        <div className="mt-4 h-[calc(40vh)] bg-green"></div>
       </section>
+
+      <div className="pointer-events-none fixed inset-0 my-auto h-px w-full bg-current text-red">
+        Center
+      </div>
     </main>
   )
 }
@@ -309,7 +333,7 @@ const MessageArticle = memo<MessageArticleProps>(function MessageArticle({
 }) {
   const siblings = parent?.children ?? []
 
-  console.log('render message', message.id)
+  console.log('msg', message.id)
 
   return (
     <article
