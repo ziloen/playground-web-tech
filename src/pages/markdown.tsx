@@ -20,6 +20,7 @@ type MessageNode = {
 
 const STREAM_TOKEN_INTERVAL_MS = 16
 const ESTIMATE_SIZE = 250
+const VIRTUAL_OVERSCAN = 1
 
 export default function MarkdownPage() {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -85,6 +86,7 @@ export default function MarkdownPage() {
 
   const getItemKey = useCallback((index: number) => path[index]?.id ?? index, [path])
 
+  // FIXME: 在使用鼠标中键进行向上滚动时，消息会出现跳动
   const virtualizer = useVirtualizer({
     count: path.length,
     getScrollElement: () => scrollRef.current,
@@ -93,8 +95,9 @@ export default function MarkdownPage() {
     scrollEndThreshold: 20,
     scrollMargin: scrollMargin,
     useScrollendEvent: true,
-    overscan: 0,
+    overscan: VIRTUAL_OVERSCAN,
     gap: 8,
+    // 首次挂载时直接定位到估算的列表底部，避免先渲染 index 0 附近的项，然后再跳转到底部。
     initialOffset: ESTIMATE_SIZE * path.length,
   })
 
