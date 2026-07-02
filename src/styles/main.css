@@ -85,14 +85,20 @@ html {
 }
 
 /* 用于给百分比数值做动画 */
-@property --animatable-percent-1 {
+@property --percentage-1 {
   syntax: "<percentage>";
   initial-value: 100%;
   inherits: false;
 }
 
-@property --animatable-number-1 {
+@property --number-1 {
   syntax: "<number>";
   initial-value: 0;
   inherits: false;
+}
+
+@property --inherits-length-1 {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: true;
 }

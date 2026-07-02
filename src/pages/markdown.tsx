@@ -1,9 +1,9 @@
-import { useVirtualizer } from '@tanstack/react-virtual'
+import { useVirtualizer, defaultRangeExtractor } from '@tanstack/react-virtual'
 import { Leva, button, buttonGroup, useControls } from 'leva'
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Markdown } from '~/components/Markdown'
 import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
-import { propsEqualWith } from '~/utils'
+import { cn, propsEqualWith } from '~/utils'
 import testMd from './markdown.test.md?raw'
 
 type MessageRole = 'user' | 'assistant'
@@ -34,6 +34,8 @@ export default function MarkdownPage() {
   const [isStreaming, setIsStreaming, getIsStreaming] = useGetState(false)
   const sentMessageIndexRef = useRef(1)
   const [scrollMargin, setScrollMargin] = useState(0)
+
+  const seenMessageIndexSet = useRef(new Set<number>())
 
   const [{ displayMode, assistantContent, immediateMode, renderedMessages }, setDebug] =
     useControls(() => ({
@@ -73,6 +75,7 @@ export default function MarkdownPage() {
     setSeed(nextSeed)
     setRootMessage(createMockTree(nextSeed))
     setSelectedChildByParentId({})
+    seenMessageIndexSet.current.clear()
     sentMessageIndexRef.current = 1
 
     await nextEffect()
@@ -87,7 +90,7 @@ export default function MarkdownPage() {
   const getItemKey = useCallback((index: number) => path[index]?.id ?? index, [path])
 
   // FIXME: 在使用鼠标中键进行向上滚动时，消息会出现跳动
-  const virtualizer = useVirtualizer({
+  const virtualizer = useVirtualizer<HTMLElement, Element>({
     count: path.length,
     getScrollElement: () => scrollRef.current,
     estimateSize: () => ESTIMATE_SIZE,
@@ -99,6 +102,18 @@ export default function MarkdownPage() {
     gap: 8,
     // 首次挂载时直接定位到估算的列表底部，避免先渲染 index 0 附近的项，然后再跳转到底部。
     initialOffset: ESTIMATE_SIZE * path.length,
+    rangeExtractor: useMemoizedFn((range) => {
+      const current = defaultRangeExtractor(range)
+
+      const next = new Set([...seenMessageIndexSet.current, ...current])
+
+      return [...next].sort((a, b) => a - b)
+    }),
+    onChange: useMemoizedFn((instance, sync) => {
+      for (const idx of instance.getVirtualIndexes()) {
+        seenMessageIndexSet.current.add(idx)
+      }
+    }),
   })
 
   const virtualItems = virtualizer.getVirtualItems()
@@ -153,6 +168,7 @@ export default function MarkdownPage() {
   )
 
   const selectBranch = useMemoizedFn((parent: MessageNode, child: MessageNode) => {
+    seenMessageIndexSet.current.clear()
     setSelectedChildByParentId((current) => {
       return { ...current, [parent.id]: child.id }
     })
@@ -271,17 +287,41 @@ export default function MarkdownPage() {
 
       <section
         ref={scrollRef}
-        className="scrollbar-thin overflow-y-auto px-4 py-6"
+        className="scrollbar-thin overflow-y-auto pb-6"
         aria-label="Message list"
       >
+        {/* Header */}
+        <div className={clsx('@container sticky top-0 isolate z-1 flex')}>
+          <div
+            className="@container -z-1 flex-1"
+            style={{
+              '--inherits-length-1': '100cqi',
+              '--available-space': 'var(--inherits-length-1)',
+            }}
+          >
+            <div
+              className="@container mx-auto h-full"
+              style={{ '--computed-with': 'calc(200cqi - var(--available-space))' }}
+            >
+              <div
+                className="h-full @style-[--computed-with_<=_800px]:bg-black/30 @style-[--computed-with_<=_800px]:backdrop-blur-[20px]"
+                style={{
+                  width: 'var(--available-space)',
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="ms-auto h-20 w-30 bg-red"></div>
+        </div>
+
         <div className="mb-4 h-[calc(50vh+100px)] bg-green"></div>
 
         <div
           ref={listRef}
+          className="relative mx-auto w-full max-w-[800px]"
           style={{
             height: virtualizer.getTotalSize(),
-            position: 'relative',
-            width: '100%',
           }}
         >
           {virtualItems.map((virtualItem) => {

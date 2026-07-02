@@ -15,9 +15,9 @@ import { useRef } from 'react'
  * useEffect(() => {
  *   memoizedFn();
  * }, []);
- * // ^ No need to add memoizedFn to dependencies as it never changes
+ * // ^ Never add memoizedFn to dependencies as it never changes
  */
-export function useMemoizedFn<T extends (this: any, ...args: any[]) => any>(fn: T): T {
+export function useMemoizedFn<T extends (this: any, ...args: any[]) => unknown>(fn: T): T {
   const fnRef = useRef(fn)
   const memoizedFn = useRef<T | undefined>(undefined)
 
@@ -26,7 +26,6 @@ export function useMemoizedFn<T extends (this: any, ...args: any[]) => any>(fn: 
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   if (!memoizedFn.current) {
     memoizedFn.current = function (this, ...args) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return fnRef.current.apply(this, args)
     } as T
   }

@@ -86,7 +86,11 @@ export default defineConfig(({ command, mode }) => {
     ],
 
     css: {
-      transformer: 'lightningcss',
+      // lightningcss 有 bug
+      // https://github.com/parcel-bundler/lightningcss/issues/1069
+      // https://github.com/parcel-bundler/lightningcss/issues/1073
+      // https://github.com/parcel-bundler/lightningcss/issues/777
+      transformer: 'postcss',
       lightningcss: {
         // https://lightningcss.dev/transpilation.html#feature-flags
         include: Features.Colors | Features.Nesting | Features.MediaRangeSyntax,
