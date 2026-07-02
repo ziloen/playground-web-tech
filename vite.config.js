@@ -76,7 +76,7 @@ export default defineConfig(({ command, mode }) => {
         dts: 'src/types/auto-imports.d.ts',
       }),
 
-      tailwindcss(),
+      tailwindcss({ optimize: false }),
 
       unpluginIcons({
         compiler: 'jsx',
@@ -107,7 +107,7 @@ export default defineConfig(({ command, mode }) => {
     },
 
     build: {
-      cssMinify: 'lightningcss',
+      cssMinify: false,
       target: browserslistToEsbuild(target),
       reportCompressedSize: false,
       minify: 'oxc',
