@@ -1,9 +1,11 @@
-import { useVirtualizer, defaultRangeExtractor } from '@tanstack/react-virtual'
-import { Leva, button, buttonGroup, useControls } from 'leva'
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import type { ScrollToOptions } from '@tanstack/react-virtual'
+import { useVirtualizer } from '@tanstack/react-virtual'
+import { button, buttonGroup, Leva, useControls, LevaPanel } from 'leva'
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import type { LiteralUnion } from 'type-fest'
 import { Markdown } from '~/components/Markdown'
 import { useGetState, useMemoizedFn, useNextEffect } from '~/hooks'
-import { cn, propsEqualWith } from '~/utils'
+import { propsEqualWith } from '~/utils'
 import testMd from './markdown.test.md?raw'
 
 type MessageRole = 'user' | 'assistant'
@@ -25,17 +27,19 @@ const VIRTUAL_OVERSCAN = 1
 export default function MarkdownPage() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const streamingTimersRef = useRef(new Map<string, number>())
+  const sentMessageIndexRef = useRef(1)
+  const seenMessageIndexSet = useRef(new Set<number>())
+
   const [selectedChildByParentId, setSelectedChildByParentId] = useState<Record<string, string>>({})
   const [seed, setSeed] = useState(createSeed)
   const [rootMessage, setRootMessage] = useState(() => createMockTree(seed))
+  const [isStreaming, setIsStreaming, getIsStreaming] = useGetState(false)
+  const [scrollMargin, setScrollMargin] = useState(0)
+  const [scrollElementHeight, setScrollElementHeight] = useState(0)
+  const [streamingUserMessageId, setStreamingUserMessageId] = useState<string | null>(null)
 
   const nextEffect = useNextEffect()
-  const streamingTimersRef = useRef(new Map<string, number>())
-  const [isStreaming, setIsStreaming, getIsStreaming] = useGetState(false)
-  const sentMessageIndexRef = useRef(1)
-  const [scrollMargin, setScrollMargin] = useState(0)
-
-  const seenMessageIndexSet = useRef(new Set<number>())
 
   const [{ displayMode, assistantContent, immediateMode, renderedMessages }, setDebug] =
     useControls(() => ({
@@ -44,17 +48,15 @@ export default function MarkdownPage() {
       navigation: buttonGroup({
         label: null,
         opts: {
-          scrollToTop: () => scrollTo('top', 'smooth'),
-          scrollToBottom: () => scrollTo('bottom', 'smooth'),
+          scrollToTop: () => scrollTo('top', { behavior: 'smooth' }),
+          scrollToBottom: () => scrollTo('bottom', { behavior: 'smooth' }),
         },
       }),
-      // scrollToTop: button(() => scrollTo('top', 'smooth')),
       jumpToIndex: { value: 0, min: 0, step: 1 },
       jump: button((get) => {
         const idx = get('jumpToIndex') as number
-        scrollTo(idx, 'smooth')
+        scrollTo(idx, { behavior: 'smooth' })
       }),
-      // scrollToBottom: button(() => scrollTo('bottom', 'smooth')),
       resetConversation: button(() => resetConversation()),
       assistantContent: '',
       sendOrStop: button(() => {
@@ -68,26 +70,12 @@ export default function MarkdownPage() {
       immediateMode: { value: true, label: 'immediate (no stream)' },
     }))
 
-  const refreshData = useMemoizedFn(async () => {
-    stopAllStreaming()
-
-    const nextSeed = createSeed()
-    setSeed(nextSeed)
-    setRootMessage(createMockTree(nextSeed))
-    setSelectedChildByParentId({})
-    seenMessageIndexSet.current.clear()
-    sentMessageIndexRef.current = 1
-
-    await nextEffect()
-    scrollTo(displayMode)
-  })
-
   const path = useMemo(
     () => resolvePath(rootMessage, selectedChildByParentId),
     [rootMessage, selectedChildByParentId],
   )
 
-  const getItemKey = useCallback((index: number) => path[index]?.id ?? index, [path])
+  const getItemKey = useMemoizedFn((index: number) => path[index]?.id ?? index)
 
   // FIXME: 在使用鼠标中键进行向上滚动时，消息会出现跳动
   const virtualizer = useVirtualizer<HTMLElement, Element>({
@@ -97,40 +85,28 @@ export default function MarkdownPage() {
     getItemKey,
     scrollEndThreshold: 20,
     scrollMargin: scrollMargin,
+    scrollPaddingStart: 16,
     useScrollendEvent: true,
     overscan: VIRTUAL_OVERSCAN,
     gap: 8,
     // 首次挂载时直接定位到估算的列表底部，避免先渲染 index 0 附近的项，然后再跳转到底部。
     initialOffset: ESTIMATE_SIZE * path.length,
-    rangeExtractor: useMemoizedFn((range) => {
-      const current = defaultRangeExtractor(range)
+    // rangeExtractor: useMemoizedFn((range) => {
+    //   const current = defaultRangeExtractor(range)
 
-      const next = new Set([...seenMessageIndexSet.current, ...current])
+    //   const next = new Set([...seenMessageIndexSet.current, ...current])
 
-      return [...next].sort((a, b) => a - b)
-    }),
-    onChange: useMemoizedFn((instance, sync) => {
-      for (const idx of instance.getVirtualIndexes()) {
-        seenMessageIndexSet.current.add(idx)
-      }
-    }),
+    //   return [...next].sort((a, b) => a - b)
+    // }),
+    // onChange: useMemoizedFn((instance, sync) => {
+    //   for (const idx of instance.getVirtualIndexes()) {
+    //     seenMessageIndexSet.current.add(idx)
+    //   }
+    // }),
   })
 
   const virtualItems = virtualizer.getVirtualItems()
   const virtualIndexes = virtualizer.getVirtualIndexes()
-
-  useEffect(() => {
-    if (virtualIndexes.length === 0) {
-      setDebug({ renderedMessages: '0 / 0' })
-      return
-    }
-
-    const start = virtualIndexes[0] + 1
-    const end = virtualIndexes.at(-1)! + 1
-    setDebug({
-      renderedMessages: `${start} – ${end} ( ${virtualIndexes.length} / ${path.length} )`,
-    })
-  }, [virtualIndexes])
 
   const stopAllStreaming = useMemoizedFn(() => {
     for (const timerId of streamingTimersRef.current.values()) {
@@ -141,28 +117,19 @@ export default function MarkdownPage() {
     setIsStreaming(false)
   })
 
-  useEffect(() => {
-    return () => {
-      stopAllStreaming()
-    }
-  }, [])
-
-  useLayoutEffect(() => {
-    if (displayMode === 'bottom') {
-      virtualizer.scrollToEnd()
-    } else {
-      virtualizer.scrollToOffset(0)
-    }
-  }, [displayMode])
-
   const scrollTo = useMemoizedFn(
-    (to: 'top' | 'bottom' | number, behavior: ScrollBehavior = 'instant') => {
+    (to: LiteralUnion<'top' | 'bottom', string> | number, options?: ScrollToOptions) => {
+      const { behavior = 'instant' } = options ?? {}
+
       if (to === 'top') {
         virtualizer.scrollToOffset(0, { behavior })
       } else if (to === 'bottom') {
         virtualizer.scrollToEnd({ behavior })
-      } else {
-        virtualizer.scrollToIndex(to, { align: 'center', behavior })
+      } else if (typeof to === 'number') {
+        virtualizer.scrollToIndex(to, { align: options?.align ?? 'center', behavior })
+      } else if (typeof to === 'string') {
+        const index = path.findIndex((item) => item.id === to)
+        virtualizer.scrollToIndex(index, { align: options?.align ?? 'center', behavior })
       }
     },
   )
@@ -238,6 +205,11 @@ export default function MarkdownPage() {
         startAssistantStream(assistantMessage.id, sentIndex)
       }
     }
+
+    setStreamingUserMessageId(userMessage.id)
+    nextEffect(() => {
+      scrollTo(userMessage.id, { behavior: 'smooth', align: 'start' })
+    })
   })
 
   const resetConversation = useMemoizedFn(async () => {
@@ -247,27 +219,97 @@ export default function MarkdownPage() {
     scrollTo(displayMode)
   })
 
+  const refreshData = useMemoizedFn(async () => {
+    stopAllStreaming()
+
+    const nextSeed = createSeed()
+    setSeed(nextSeed)
+    setRootMessage(createMockTree(nextSeed))
+    setSelectedChildByParentId({})
+    seenMessageIndexSet.current.clear()
+    sentMessageIndexRef.current = 1
+
+    await nextEffect()
+    scrollTo(displayMode)
+  })
+
+  useEffect(() => {
+    if (virtualIndexes.length === 0) {
+      setDebug({ renderedMessages: '0 / 0' })
+      return
+    }
+
+    const start = virtualIndexes[0] + 1
+    const end = virtualIndexes.at(-1)! + 1
+    setDebug({
+      renderedMessages: `${start} – ${end} ( ${virtualIndexes.length} / ${path.length} )`,
+    })
+  }, [virtualIndexes])
+
+  useEffect(() => {
+    return () => {
+      stopAllStreaming()
+    }
+  }, [])
+
+  useLayoutEffect(() => {
+    if (displayMode === 'bottom') {
+      virtualizer.scrollToEnd()
+    } else {
+      virtualizer.scrollToOffset(0)
+    }
+  }, [displayMode])
+
+  virtualizer.shouldAdjustScrollPositionOnItemSizeChange = useMemoizedFn(
+    (item, delta, instance) => {
+      if (item.index >= path.length - 2) {
+        return false
+      } else {
+        // tanstack virtual default behavior
+        return (
+          // @ts-expect-error private property
+          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-unsafe-call
+          item.start < instance.getScrollOffset() + instance.scrollAdjustments &&
+          (!instance.itemSizeCache.has(item.key) || instance.scrollDirection !== 'backward')
+        )
+      }
+    },
+  )
+
   useLayoutEffect(() => {
     const scrollEl = scrollRef.current
     const listEl = listRef.current
     if (!scrollEl || !listEl) return
 
-    const updatePadding = () => {
+    const updatePadding: ResizeObserverCallback = ([entry]) => {
       // FIXME: How to observe offsetTop?
       setScrollMargin(listEl.offsetTop)
+      setScrollElementHeight(entry.borderBoxSize[0].blockSize)
     }
 
-    updatePadding()
-
     const ro = new ResizeObserver(updatePadding)
-    ro.observe(scrollEl)
+    ro.observe(scrollEl, { box: 'border-box' })
 
     return () => ro.disconnect()
   }, [])
 
+  const listHeight = virtualizer.getTotalSize()
+
+  const computedListHeight = useMemo(() => {
+    if (!streamingUserMessageId) return listHeight
+
+    const virtualItem = virtualizer.getVirtualItems().find((v) => v.key === streamingUserMessageId)
+
+    if (!virtualItem) return listHeight
+
+    return Math.max(virtualItem.start + scrollElementHeight - 24, listHeight)
+  }, [streamingUserMessageId, scrollElementHeight, listHeight])
+
   return (
     <main className="grid h-full bg-[#f4f0e8] text-[#191712] scheme-light">
       <Leva
+        flat
+        collapsed
         titleBar={{ title: 'Markdown Debug' }}
         theme={{
           colors: {
@@ -289,6 +331,11 @@ export default function MarkdownPage() {
         ref={scrollRef}
         className="scrollbar-thin overflow-y-auto pb-6"
         aria-label="Message list"
+        style={{
+          backgroundImage: 'repeating-conic-gradient(#5d5d5d 0% 25%, #333333 25% 50%)',
+          backgroundSize: '30px 30px',
+          backgroundAttachment: 'local',
+        }}
       >
         {/* Header */}
         <div className={clsx('@container sticky top-0 isolate z-1 flex')}>
@@ -319,9 +366,9 @@ export default function MarkdownPage() {
 
         <div
           ref={listRef}
-          className="relative mx-auto w-full max-w-[800px]"
+          className="relative mx-auto w-full max-w-[800px] overflow-clip"
           style={{
-            height: virtualizer.getTotalSize(),
+            height: computedListHeight,
           }}
         >
           {virtualItems.map((virtualItem) => {
@@ -346,10 +393,10 @@ export default function MarkdownPage() {
           })}
         </div>
 
-        <div className="mt-4 h-[calc(40vh)] bg-green"></div>
+        {/* <div className="mt-4 h-[calc(40vh)] bg-green"></div> */}
       </section>
 
-      <div className="pointer-events-none fixed inset-0 my-auto h-px w-full bg-current text-red">
+      <div className="pointer-events-none fixed inset-0 my-auto h-px w-full bg-current px-4 text-red text-shadow-lg">
         Center
       </div>
     </main>
