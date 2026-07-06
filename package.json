@@ -8,8 +8,8 @@
     "lint": "eslint .",
     "fmt": "oxfmt",
     "typecheck": "tsc --noEmit",
-    "test": "vitest --update=new",
-    "test:browser:update": "vitest --update=new",
+    "test": "vitest",
+    "test:browser:update": "vitest --update",
     "postinstall": "patch-package"
   },
   "dependencies": {
