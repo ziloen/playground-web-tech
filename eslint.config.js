@@ -8,6 +8,7 @@ export default defineConfig([
     rules: {
       // 和 oxfmt 自动小写冲突
       'unicorn/number-literal-case': 'off',
+      'unicorn/prefer-string-raw': 'off',
     },
   },
 ])

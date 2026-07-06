@@ -28,6 +28,7 @@ import CarbonCheckmark from '~icons/carbon/checkmark'
 import CarbonCopy from '~icons/carbon/copy'
 import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
 import { CodeHighlighter, StreamingCodeHighlighter } from './CodeHighlighter'
+import { escapeInvalidDollars } from './escapeInvalidDollars'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
 
@@ -49,6 +50,8 @@ export function Markdown({
   ...props
 }: Merge<ComponentProps<'div'>, { children: string; streaming?: boolean }>) {
   const ctxValue = useMemo(() => ({ streaming }), [streaming])
+
+  children = escapeInvalidDollars(children)
 
   return (
     <div className={clsx('markdown-body', className)} {...props}>
@@ -92,6 +95,10 @@ const components: Components = {
 
     if (inline) {
       return <code className={className}>{children}</code>
+    }
+
+    if (!rawText.trim()) {
+      return null
     }
 
     return (

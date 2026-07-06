@@ -233,4 +233,30 @@ supportedTypes.forEach((type) => {
       .element(page.getByTestId('markdown-blockquote-math'))
       .toMatchScreenshot('markdown-blockquote-math')
   })
+
+  it('should render inline math with comma and ellipsis', async () => {
+    const mathWithComma = `$0, 1, 2...$`
+
+    await render(
+      <TestWrapper testId="markdown-math-comma">
+        <Markdown>{mathWithComma}</Markdown>
+      </TestWrapper>,
+    )
+    await expect
+      .element(page.getByTestId('markdown-math-comma'))
+      .toMatchScreenshot('markdown-math-comma')
+  })
+
+  it('should render inline math with decimal', async () => {
+    const mathDecimal = `$0.9$`
+
+    await render(
+      <TestWrapper testId="markdown-math-decimal">
+        <Markdown>{mathDecimal}</Markdown>
+      </TestWrapper>,
+    )
+    await expect
+      .element(page.getByTestId('markdown-math-decimal'))
+      .toMatchScreenshot('markdown-math-decimal')
+  })
 })
