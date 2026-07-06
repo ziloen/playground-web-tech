@@ -119,12 +119,12 @@ export default defineConfig(({ command, mode }) => {
       },
     },
 
-    server: {
-      headers: {
-        'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Embedder-Policy': 'require-corp',
-      },
-    },
+    // server: {
+    //   headers: {
+    //     'Cross-Origin-Opener-Policy': 'same-origin',
+    //     'Cross-Origin-Embedder-Policy': 'require-corp',
+    //   },
+    // },
 
     test: {
       setupFiles: ['./src/styles/main.css'],
