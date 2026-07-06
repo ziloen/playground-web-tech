@@ -6,12 +6,7 @@ import { Markdown } from './Markdown'
 
 function TestWrapper({ children, testId }: { children: React.ReactNode; testId: string }) {
   return (
-    <div
-      data-testid={testId}
-      style={{
-        width: 'fit-content',
-      }}
-    >
+    <div data-testid={testId} style={{ width: 'fit-content' }}>
       {children}
     </div>
   )
@@ -224,5 +219,18 @@ supportedTypes.forEach((type) => {
       </TestWrapper>,
     )
     await expect.element(page.getByTestId('markdown-table')).toMatchScreenshot('markdown-table')
+  })
+
+  it('should render blockquote with inline math', async () => {
+    const blockquoteMath = `$0.\\dot{9}$ 等于 $1$，不是数学计算问题，而是"名字"问题。`
+
+    await render(
+      <TestWrapper testId="markdown-blockquote-math">
+        <Markdown>{blockquoteMath}</Markdown>
+      </TestWrapper>,
+    )
+    await expect
+      .element(page.getByTestId('markdown-blockquote-math'))
+      .toMatchScreenshot('markdown-blockquote-math')
   })
 })
