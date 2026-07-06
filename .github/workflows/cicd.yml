@@ -48,16 +48,16 @@ jobs:
         run: npm run lint
 
       - name: TypeCheck
-        run: npm run typecheck
+        run: node --run typecheck
 
       - name: Build
-        run: npm run build
+        run: node --run build
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
       - name: Test
-        run: npm run test
+        run: node --run test
 
       - name: Setup Pages
         uses: actions/configure-pages@v6
