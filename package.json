@@ -43,7 +43,6 @@
     "leva": "0.10.1",
     "lexical": "0.46.0",
     "mermaid": "11.16.0",
-    "micromark-extension-llm-math": "3.1.0",
     "motion": "12.42.0",
     "rampensau": "2.4.0",
     "react": "19.2.7",
@@ -94,5 +93,8 @@
     "vite": "8.1.2",
     "vitest": "4.1.9",
     "vitest-browser-react": "2.2.0"
+  },
+  "overrides": {
+    "micromark-extension-math": "github:ziloen/micromark-extension-math#4442b373b365af06cc01c571a5719f0f3217b352"
   }
 }

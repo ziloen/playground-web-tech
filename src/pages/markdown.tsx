@@ -67,7 +67,7 @@ export default function MarkdownPage() {
         }
       }),
       refreshData: button(() => refreshData()),
-      immediateMode: { value: true, label: 'immediate (no stream)' },
+      immediateMode: { value: false, label: 'immediate (no stream)' },
     }))
 
   const path = useMemo(
@@ -309,7 +309,6 @@ export default function MarkdownPage() {
     <main className="grid h-full bg-[#f4f0e8] text-[#191712] scheme-light">
       <Leva
         flat
-        collapsed
         titleBar={{ title: 'Markdown Debug' }}
         theme={{
           colors: {
