@@ -162,10 +162,7 @@ const components: Components = {
         }}
       >
         <div
-          className={clsx(
-            'flex w-fit cursor-pointer items-center gap-1 select-none',
-            isOpen ? 'text-light-gray-300' : 'text-light-gray-900 hover:text-light-gray-300',
-          )}
+          className="flex w-fit cursor-pointer items-center gap-1 select-none"
           onClick={() => {
             setIsOpen((prev) => !prev)
           }}
