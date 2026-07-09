@@ -3,7 +3,7 @@ import { trackPointerMove, useMemoizedFn } from '~/hooks'
 
 export default function PaintPage() {
   return (
-    <div className="relative grid size-full grid-cols-[minmax(0,max-content)] grid-rows-[minmax(0,max-content)] place-content-center">
+    <div className="relative grid size-full place-content-center">
       <img
         src="https://dummyjson.com/image/960x540/333/fff?text=960x540"
         alt="960x540"

@@ -31,10 +31,6 @@ import { CodeHighlighter, StreamingCodeHighlighter } from './CodeHighlighter'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
 
-// https://github.com/remarkjs/remark-math/issues/39
-// TODO: make `\[` and `\]` work for block math
-// TODO: make `\(` and `\)` work for inline math
-
 // TODO: custom footnote style [^1](https://example.com)
 // TODO: 类似 ChatGPT 的 table 可以出血显示到屏幕宽度
 

@@ -20,7 +20,6 @@ type MessageNode = {
   children: MessageNode[]
 }
 
-const STREAM_TOKEN_INTERVAL_MS = 16
 const ESTIMATE_SIZE = 250
 const VIRTUAL_OVERSCAN = 1
 
@@ -109,8 +108,8 @@ export default function MarkdownPage() {
   const virtualIndexes = virtualizer.getVirtualIndexes()
 
   const stopAllStreaming = useMemoizedFn(() => {
-    for (const timerId of streamingTimersRef.current.values()) {
-      window.clearInterval(timerId)
+    for (const rafId of streamingTimersRef.current.values()) {
+      cancelAnimationFrame(rafId)
     }
 
     streamingTimersRef.current.clear()
@@ -141,28 +140,31 @@ export default function MarkdownPage() {
     })
   })
 
-  const startAssistantStream = useMemoizedFn((assistantId: string, sentIndex: number) => {
-    const tokens = createAssistantStreamTokens()
+  const startAssistantStream = useMemoizedFn((assistantId: string) => {
+    const tokens = testMd.split('')
     let nextTokenIndex = 0
     let content = ''
 
-    window.clearInterval(streamingTimersRef.current.get(assistantId))
+    cancelAnimationFrame(streamingTimersRef.current.get(assistantId) ?? 0)
     setIsStreaming(true)
+    setStreamingUserMessageId(assistantId)
 
-    const timerId = window.setInterval(() => {
+    const step = () => {
       content += tokens[nextTokenIndex]
       nextTokenIndex++
 
       setRootMessage((current) => updateMessageContent(current, assistantId, content))
 
       if (nextTokenIndex >= tokens.length) {
-        window.clearInterval(timerId)
         streamingTimersRef.current.delete(assistantId)
         setIsStreaming(false)
+        setStreamingUserMessageId(null)
+      } else {
+        streamingTimersRef.current.set(assistantId, requestAnimationFrame(step))
       }
-    }, STREAM_TOKEN_INTERVAL_MS)
+    }
 
-    streamingTimersRef.current.set(assistantId, timerId)
+    streamingTimersRef.current.set(assistantId, requestAnimationFrame(step))
   })
 
   const sendMessage = useMemoizedFn(async () => {
@@ -200,13 +202,13 @@ export default function MarkdownPage() {
 
     if (!customAssistantContent) {
       if (immediateMode) {
+        setStreamingUserMessageId(null)
         setRootMessage((current) => updateMessageContent(current, assistantMessage.id, testMd))
       } else {
-        startAssistantStream(assistantMessage.id, sentIndex)
+        startAssistantStream(assistantMessage.id)
       }
     }
 
-    setStreamingUserMessageId(userMessage.id)
     nextEffect(() => {
       scrollTo(userMessage.id, { behavior: 'smooth', align: 'start' })
     })
@@ -386,6 +388,7 @@ export default function MarkdownPage() {
                   message={message}
                   parent={virtualItem.index > 0 ? path[virtualItem.index - 1] : undefined}
                   selectBranch={selectBranch}
+                  streaming={streamingUserMessageId === message.id}
                 />
               </div>
             )
@@ -405,6 +408,7 @@ export default function MarkdownPage() {
 type MessageArticleProps = {
   message: MessageNode
   parent?: MessageNode
+  streaming: boolean
   selectBranch: (parent: MessageNode, child: MessageNode) => void
 }
 
@@ -419,6 +423,7 @@ const MessageArticle = memo<MessageArticleProps>(function MessageArticle({
   message,
   selectBranch,
   parent,
+  streaming,
 }) {
   const siblings = parent?.children ?? []
 
@@ -471,7 +476,9 @@ const MessageArticle = memo<MessageArticleProps>(function MessageArticle({
           {message.content}
         </p>
       ) : (
-        <Markdown className="text-[15px] leading-7">{message.content}</Markdown>
+        <Markdown className="text-[15px] leading-7" streaming={streaming}>
+          {message.content}
+        </Markdown>
       )}
     </article>
   )
@@ -572,10 +579,6 @@ function updateMessageContent(root: MessageNode, messageId: string, content: str
   if (!changed) return root
 
   return { ...root, children: nextChildren }
-}
-
-function createAssistantStreamTokens() {
-  return testMd.match(/\S+\s*/g) ?? []
 }
 
 function createMockTree(seed: string): MessageNode {

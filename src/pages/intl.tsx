@@ -6,49 +6,59 @@ import {
   SelectTrigger,
 } from '~/components/Select'
 import { useMemoizedFn } from '~/hooks'
+import { formatLanguageName } from '~/utils/intl'
 
 const Languages = [
   'en',
   'zh-Hans',
-  'zh-Hant',
-  'hi',
   'es',
-  'fr',
   'ar',
-  'bn',
-  'ru',
   'pt',
   'id',
-  'ur',
-  'mr',
+  'fr',
+  'ja',
+  'ru',
+  'de',
+  'fil',
   'tr',
-  'ta',
-  'th',
-  'vi',
   'it',
   'ko',
-  'de',
+  'vi',
+  'th',
   'fa',
-  'jv',
-  'gu',
-  'te',
-  'kn',
   'pl',
-  'or',
+  'nl',
+  'hi',
+  'ur',
+  'ro',
+  'uk',
+  'bn',
+  'ta',
+  'mr',
+  'te',
   'ms',
+  'zh-Hant',
+  'sv',
+  'cs',
+  'el',
+  'hu',
+  'he',
+  'gu',
+  'kn',
+  'pa',
+  'sr',
+  'jv',
   'my',
   'kk',
-  'sr',
   'ha',
   'am',
-  'uk',
   'ne',
-  'nl',
   'yo',
-  'pa',
   'si',
-  'ny',
+  'sw',
+  'or',
   'kmr',
+  'ny',
   'sdh',
 ]
 
@@ -83,8 +93,8 @@ function LanguageSelect({
     return Intl.DisplayNames.supportedLocalesOf(Languages, {
       localeMatcher: 'best fit',
     }).map((lang) => {
-      const nativeDisplayName = getLanguageDisplayName(lang, lang)
-      const displayName = getLanguageDisplayName(lang, language)
+      const nativeDisplayName = formatLanguageName(lang, { language: lang })
+      const displayName = formatLanguageName(lang, { language })
 
       return {
         value: lang,
@@ -178,28 +188,4 @@ function TimeNow({ language }: { language: string }) {
   }, [formatter])
 
   return <motion.time dateTime={dateTime}>{nowStr}</motion.time>
-}
-
-/**
- * @example
- * ```ts
- * const displayName = getLanguageDisplayName('zh-Hans', 'en-US')
- * //    ^ "Chinese (Simplified)"
- * ```
- */
-function getLanguageDisplayName(
-  language: string,
-  toLanguage: string,
-  options: Omit<Intl.DisplayNamesOptions, 'type'> = {
-    fallback: 'code',
-  },
-) {
-  try {
-    return new Intl.DisplayNames([toLanguage], {
-      type: 'language',
-      ...options,
-    }).of(language)
-  } catch {
-    return language
-  }
 }
