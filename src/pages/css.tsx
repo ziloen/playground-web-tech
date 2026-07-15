@@ -63,206 +63,7 @@ export default function CSSPage() {
 
       <GridLastItemFlexGrow />
 
-      <div className="@container-size flex h-96 max-w-3/4 flex-col overflow-y-auto overscroll-y-contain bg-dark-gray-600">
-        <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 py-3 text-sm">
-          <div className="flex items-center gap-2 font-semibold">
-            <div className="size-5 rounded bg-blue-500/60"></div>
-            My App
-          </div>
-          <nav className="flex gap-3 text-light-gray-700">
-            <span className="cursor-pointer hover:text-white">Home</span>
-            <span className="cursor-pointer hover:text-white">About</span>
-            <span className="cursor-pointer hover:text-white">Docs</span>
-            <span className="cursor-pointer hover:text-white">Blog</span>
-          </nav>
-          <div className="ms-auto text-xs text-light-gray-700">v2.4.1</div>
-        </header>
-
-        <section className="flex flex-1">
-          {/* TODO: stikcy top and sticky bottom at the same time */}
-          <nav className="relative flex w-28 shrink-0 flex-col border-r border-white/10 p-3 text-xs text-light-gray-700">
-            <div
-              className="sticky top-0 h-1 bg-blue"
-              style={{
-                anchorName: '--nav-top',
-              }}
-            ></div>
-
-            <div
-              className="sticky bottom-0 mt-auto h-1 bg-red"
-              style={{
-                anchorName: '--nav-bottom',
-              }}
-            ></div>
-
-            <div
-              className="flex flex-1 flex-col"
-              style={{
-                position: 'absolute',
-                top: 'anchor(--nav-top bottom)',
-                bottom: 'anchor(--nav-bottom top)',
-              }}
-            >
-              <div>
-                <div className="rounded bg-white/10 px-2 py-1.5 font-medium text-white">
-                  Dashboard
-                </div>
-                <div className="rounded px-2 py-1.5 hover:bg-white/5">Analytics</div>
-                <div className="rounded px-2 py-1.5 hover:bg-white/5">Projects</div>
-                <div className="rounded px-2 py-1.5 hover:bg-white/5">Team</div>
-                <div className="rounded px-2 py-1.5 hover:bg-white/5">Settings</div>
-              </div>
-
-              <div className="mt-auto">
-                <div className="mt-3 border-t border-white/10 pt-2 text-[10px] tracking-wider text-light-gray-700/60 uppercase">
-                  Resources
-                </div>
-                <div className="rounded px-2 py-1.5 hover:bg-white/5">Help</div>
-                <div className="rounded px-2 py-1.5 hover:bg-white/5">API</div>
-              </div>
-            </div>
-          </nav>
-
-          <article className="flex-1 p-4 text-sm leading-relaxed text-light-gray-800">
-            <div className="max-w-[65ch]">
-              <h3 className="mt-0 mb-2 text-base font-semibold text-white">Getting Started</h3>
-              <p className="mt-0">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-              </p>
-              <p>
-                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa
-                qui officia deserunt mollit anim id est laborum.
-              </p>
-
-              <h4 className="mt-4 mb-1 font-semibold text-white">Installation</h4>
-              <p className="mt-0">
-                At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis
-                praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias
-                excepturi sint occaecati cupiditate non provident.
-              </p>
-              <pre className="overflow-x-auto rounded border border-white/10 bg-white/5 p-3 text-xs leading-relaxed">
-                <code>{`npm install my-app
-# or
-yarn add my-app
-# or
-pnpm add my-app`}</code>
-              </pre>
-              <p>
-                Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo
-                minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis
-                dolor repellendus.
-              </p>
-
-              <h4 className="mt-4 mb-1 font-semibold text-white">Configuration</h4>
-              <p className="mt-0">
-                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
-                doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore
-                veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-              </p>
-              <ul className="my-2 list-inside list-disc space-y-1">
-                <li>Enable feature flags in the dashboard</li>
-                <li>Set up API keys with proper scopes</li>
-                <li>Configure webhook endpoints for real-time events</li>
-                <li>Adjust rate limits based on your plan tier</li>
-                <li>Review security settings and enable 2FA</li>
-              </ul>
-
-              <h4 className="mt-4 mb-1 font-semibold text-white">API Reference</h4>
-              <p className="mt-0">
-                Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
-                consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
-              </p>
-              <div className="my-3 overflow-x-auto">
-                <table className="w-full border-collapse text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="px-2 py-1.5 font-semibold text-light-gray-600">Method</th>
-                      <th className="px-2 py-1.5 font-semibold text-light-gray-600">Endpoint</th>
-                      <th className="px-2 py-1.5 font-semibold text-light-gray-600">Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-white/5">
-                      <td className="px-2 py-1.5 font-mono text-green-400">GET</td>
-                      <td className="px-2 py-1.5 font-mono">/api/v1/users</td>
-                      <td className="px-2 py-1.5">List all users</td>
-                    </tr>
-                    <tr className="border-b border-white/5">
-                      <td className="px-2 py-1.5 font-mono text-blue-400">POST</td>
-                      <td className="px-2 py-1.5 font-mono">/api/v1/users</td>
-                      <td className="px-2 py-1.5">Create a new user</td>
-                    </tr>
-                    <tr className="border-b border-white/5">
-                      <td className="px-2 py-1.5 font-mono text-yellow-400">PUT</td>
-                      <td className="px-2 py-1.5 font-mono">/api/v1/users/:id</td>
-                      <td className="px-2 py-1.5">Update user details</td>
-                    </tr>
-                    <tr>
-                      <td className="px-2 py-1.5 font-mono text-red-400">DELETE</td>
-                      <td className="px-2 py-1.5 font-mono">/api/v1/users/:id</td>
-                      <td className="px-2 py-1.5">Remove a user</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <h4 className="mt-4 mb-1 font-semibold text-white">Deployment</h4>
-              <p className="mt-0">
-                Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe
-                eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum
-                rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias
-                consequatur aut perferendis doloribus asperiores repellat.
-              </p>
-              <p>
-                Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum
-                soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime
-                placeat facere possimus, omnis voluptas assumenda est.
-              </p>
-
-              <h4 className="mt-4 mb-1 font-semibold text-white">Troubleshooting</h4>
-              <p className="mt-0">
-                Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur,
-                adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore
-                magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum
-                exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi
-                consequatur.
-              </p>
-              <p className="mb-0">
-                Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil
-                molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.
-              </p>
-            </div>
-          </article>
-        </section>
-
-        <footer className="border-t border-white/10 px-4 py-4 text-xs text-light-gray-700">
-          <div className="flex flex-wrap gap-x-8 gap-y-3">
-            <div>
-              <div className="mb-1 font-semibold text-light-gray-600">Product</div>
-              <div>Features</div>
-              <div>Pricing</div>
-              <div>Changelog</div>
-            </div>
-            <div>
-              <div className="mb-1 font-semibold text-light-gray-600">Company</div>
-              <div>About</div>
-              <div>Careers</div>
-              <div>Contact</div>
-            </div>
-            <div>
-              <div className="mb-1 font-semibold text-light-gray-600">Legal</div>
-              <div>Privacy</div>
-              <div>Terms</div>
-            </div>
-          </div>
-          <div className="mt-3 border-t border-white/5 pt-2 text-center">
-            &copy; 2026 My App. All rights reserved.
-          </div>
-        </footer>
-      </div>
+      <StickyNav />
 
       <div className="h-100"></div>
     </div>
@@ -1229,3 +1030,235 @@ function GridLastItemFlexGrow() {
 // 可以点击按钮设置列表项是否 sticky，可以多个 sticky
 // sticky 时，滚动出范围时，会自动堆叠到下一个 sticky 元素的下面
 function StickyStack() {}
+
+function StickyNav() {
+  return (
+    <div className="@container-size relative flex h-96 max-w-3/4 flex-col overflow-y-auto overscroll-y-contain bg-dark-gray-600">
+      <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 py-3 text-sm">
+        <div className="flex items-center gap-2 font-semibold">
+          <div className="size-5 rounded bg-blue-500/60"></div>
+          My App
+        </div>
+        <nav className="flex gap-3 text-light-gray-700">
+          <span className="cursor-pointer hover:text-white">Home</span>
+          <span className="cursor-pointer hover:text-white">About</span>
+          <span className="cursor-pointer hover:text-white">Docs</span>
+          <span className="cursor-pointer hover:text-white">Blog</span>
+        </nav>
+        <div className="ms-auto text-xs text-light-gray-700">v2.4.1</div>
+      </header>
+
+      <section className="flex flex-1">
+        {/* 将 sticky top 和 sticky bottom 分离，如果内容很多会出现问题 */}
+        <nav className="flex w-28 shrink-0 flex-col border-r border-white/10 p-3 text-xs text-light-gray-700">
+          <div className="sticky top-3">
+            <div className="rounded bg-white/10 px-2 py-1.5 font-medium text-white">Dashboard</div>
+            <div className="rounded px-2 py-1.5 hover:bg-white/5">Analytics</div>
+            <div className="rounded px-2 py-1.5 hover:bg-white/5">Projects</div>
+            <div className="rounded px-2 py-1.5 hover:bg-white/5">Team</div>
+            <div className="rounded px-2 py-1.5 hover:bg-white/5">Settings</div>
+            <div className="rounded px-2 py-1.5 hover:bg-white/5">Settings</div>
+            <div className="rounded px-2 py-1.5 hover:bg-white/5">Settings</div>
+          </div>
+
+          <div className="sticky bottom-2 mt-auto">
+            <div className="mt-3 border-t border-white/10 pt-2 text-[10px] tracking-wider text-light-gray-700/60 uppercase">
+              Resources
+            </div>
+            <div className="rounded px-2 py-1.5 hover:bg-white/5">Help</div>
+            <div className="rounded px-2 py-1.5 hover:bg-white/5">API</div>
+          </div>
+        </nav>
+
+        {/* 这种基于两个 anchor 的方法现在只在 Firefox + animate 有效 */}
+        {/* Chrome 按照规范只会追踪一个 default anchor */}
+        <nav className="flex w-28 shrink-0 flex-col border-r border-white/10 p-3 text-xs text-light-gray-700">
+          <div
+            className="sticky top-3 h-2 bg-red/30"
+            style={{
+              anchorName: '--sticky-top',
+            }}
+          ></div>
+
+          <div
+            className="sticky bottom-2 mt-auto h-2 bg-blue/30"
+            style={{
+              anchorName: '--sticky-bottom',
+            }}
+          ></div>
+
+          <div
+            className="absolute flex h-stretch animate-noop scrollbar-thin flex-col overflow-y-auto"
+            style={{
+              positionAnchor: '--sticky-top',
+              top: 'calc(anchor(--sticky-top top))',
+              bottom: 'calc(anchor(--sticky-bottom bottom))',
+              left: 'anchor(--sticky-top left)',
+              right: 'anchor(--sticky-top right)',
+            }}
+          >
+            <div className="">
+              <div className="rounded bg-white/10 px-2 py-1.5 font-medium text-white">
+                Dashboard
+              </div>
+              <div className="rounded px-2 py-1.5 hover:bg-white/5">Analytics</div>
+              <div className="rounded px-2 py-1.5 hover:bg-white/5">Projects</div>
+              <div className="rounded px-2 py-1.5 hover:bg-white/5">Team</div>
+              <div className="rounded px-2 py-1.5 hover:bg-white/5">Settings</div>
+              <div className="rounded px-2 py-1.5 hover:bg-white/5">Settings</div>
+              <div className="rounded px-2 py-1.5 hover:bg-white/5">Settings</div>
+            </div>
+
+            <div className="mt-auto">
+              <div className="mt-3 border-t border-white/10 pt-2 text-[10px] tracking-wider text-light-gray-700/60 uppercase">
+                Resources
+              </div>
+              <div className="rounded px-2 py-1.5 hover:bg-white/5">Help</div>
+              <div className="rounded px-2 py-1.5 hover:bg-white/5">API</div>
+            </div>
+          </div>
+
+          <div className="fixed"></div>
+        </nav>
+
+        <article className="flex-1 p-4 text-sm leading-relaxed text-light-gray-800">
+          <div className="max-w-[65ch]">
+            <h3 className="mt-0 mb-2 text-base font-semibold text-white">Getting Started</h3>
+            <p className="mt-0">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+              exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </p>
+            <p>
+              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+              officia deserunt mollit anim id est laborum.
+            </p>
+
+            <h4 className="mt-4 mb-1 font-semibold text-white">Installation</h4>
+            <p className="mt-0">
+              At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium
+              voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint
+              occaecati cupiditate non provident.
+            </p>
+            <pre className="overflow-x-auto rounded border border-white/10 bg-white/5 p-3 text-xs leading-relaxed">
+              <code>{`npm install my-app
+# or
+yarn add my-app
+# or
+pnpm add my-app`}</code>
+            </pre>
+            <p>
+              Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus
+              id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor
+              repellendus.
+            </p>
+
+            <h4 className="mt-4 mb-1 font-semibold text-white">Configuration</h4>
+            <p className="mt-0">
+              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
+              laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
+              architecto beatae vitae dicta sunt explicabo.
+            </p>
+            <ul className="my-2 list-inside list-disc space-y-1">
+              <li>Enable feature flags in the dashboard</li>
+              <li>Set up API keys with proper scopes</li>
+              <li>Configure webhook endpoints for real-time events</li>
+              <li>Adjust rate limits based on your plan tier</li>
+              <li>Review security settings and enable 2FA</li>
+            </ul>
+
+            <h4 className="mt-4 mb-1 font-semibold text-white">API Reference</h4>
+            <p className="mt-0">
+              Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
+              consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+            </p>
+            <div className="my-3 overflow-x-auto">
+              <table className="w-full border-collapse text-left text-xs">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="px-2 py-1.5 font-semibold text-light-gray-600">Method</th>
+                    <th className="px-2 py-1.5 font-semibold text-light-gray-600">Endpoint</th>
+                    <th className="px-2 py-1.5 font-semibold text-light-gray-600">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-white/5">
+                    <td className="px-2 py-1.5 font-mono text-green-400">GET</td>
+                    <td className="px-2 py-1.5 font-mono">/api/v1/users</td>
+                    <td className="px-2 py-1.5">List all users</td>
+                  </tr>
+                  <tr className="border-b border-white/5">
+                    <td className="px-2 py-1.5 font-mono text-blue-400">POST</td>
+                    <td className="px-2 py-1.5 font-mono">/api/v1/users</td>
+                    <td className="px-2 py-1.5">Create a new user</td>
+                  </tr>
+                  <tr className="border-b border-white/5">
+                    <td className="px-2 py-1.5 font-mono text-yellow-400">PUT</td>
+                    <td className="px-2 py-1.5 font-mono">/api/v1/users/:id</td>
+                    <td className="px-2 py-1.5">Update user details</td>
+                  </tr>
+                  <tr>
+                    <td className="px-2 py-1.5 font-mono text-red-400">DELETE</td>
+                    <td className="px-2 py-1.5 font-mono">/api/v1/users/:id</td>
+                    <td className="px-2 py-1.5">Remove a user</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h4 className="mt-4 mb-1 font-semibold text-white">Deployment</h4>
+            <p className="mt-0">
+              Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe
+              eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum
+              rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias
+              consequatur aut perferendis doloribus asperiores repellat.
+            </p>
+            <p>
+              Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum
+              soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat
+              facere possimus, omnis voluptas assumenda est.
+            </p>
+
+            <h4 className="mt-4 mb-1 font-semibold text-white">Troubleshooting</h4>
+            <p className="mt-0">
+              Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci
+              velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam
+              aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem
+              ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.
+            </p>
+            <p className="mb-0">
+              Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil
+              molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <footer className="border-t border-white/10 px-4 py-4 text-xs text-light-gray-700">
+        <div className="flex flex-wrap gap-x-8 gap-y-3">
+          <div>
+            <div className="mb-1 font-semibold text-light-gray-600">Product</div>
+            <div>Features</div>
+            <div>Pricing</div>
+            <div>Changelog</div>
+          </div>
+          <div>
+            <div className="mb-1 font-semibold text-light-gray-600">Company</div>
+            <div>About</div>
+            <div>Careers</div>
+            <div>Contact</div>
+          </div>
+          <div>
+            <div className="mb-1 font-semibold text-light-gray-600">Legal</div>
+            <div>Privacy</div>
+            <div>Terms</div>
+          </div>
+        </div>
+        <div className="mt-3 border-t border-white/5 pt-2 text-center">
+          &copy; 2026 My App. All rights reserved.
+        </div>
+      </footer>
+    </div>
+  )
+}
