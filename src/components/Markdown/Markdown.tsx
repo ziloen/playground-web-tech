@@ -4,6 +4,7 @@ import 'katex/dist/katex.css'
 import './Markdown.css'
 
 import clsx from 'clsx/lite'
+import { isNil } from 'es-toolkit'
 import type { ElementContent, Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { Root as HastRoot } from 'hast'
 import type { FootnoteDefinition, Link, Nodes as MdastNodes, Root, RootContent } from 'mdast'
@@ -22,12 +23,8 @@ import type { Merge } from 'type-fest'
 import type { PluggableList, Plugin, Processor } from 'unified'
 import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
-import { useAutoResetState } from '~/hooks'
-import { cn } from '~/utils'
-import CarbonCheckmark from '~icons/carbon/checkmark'
-import CarbonCopy from '~icons/carbon/copy'
 import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
-import { CodeHighlighter, StreamingCodeHighlighter } from './CodeHighlighter'
+import { CodeBlock } from './CodeBlock'
 
 // TODO: fix url space issue, e.g. [link](https://example.com/with space)
 
@@ -44,6 +41,11 @@ export function Markdown({
   className,
   ...props
 }: Merge<ComponentProps<'div'>, { children: string; streaming?: boolean }>) {
+  // streaming 时，去掉未完成的 code block 开始或者结束标记，减少高度跳动
+  if (streaming) {
+    children = children.replace(/[ \n]``?$/, '')
+  }
+
   const ctxValue = useMemo(() => ({ streaming }), [streaming])
 
   return (
@@ -82,8 +84,6 @@ const components: Components = {
     const language = node.properties.dataLanguage as string | null
     const complete = node.properties.dataComplete === 'true'
 
-    const [copied, setCopied] = useAutoResetState(false, 2_000)
-
     const { streaming } = use(MarkdownContext)
 
     if (inline) {
@@ -95,42 +95,7 @@ const components: Components = {
     }
 
     return (
-      <code className={cn('grid overflow-clip', className)}>
-        {/* Header */}
-        {/* Maybe click header to scroll to the top of code block */}
-        <div className="gap-2 px-4 py-1 area-[1/1]">
-          <span>{language}</span>
-        </div>
-
-        {/* 为使 sticky 生效，须要将 sticky 元素提升到 snap 容器的直接子元素 */}
-        {/* sticky top 和 bottom 无法同时生效，top 优先级更高 */}
-        <div className="@container-[scroll-state] sticky top-2 justify-self-end bg-inherit area-[1/1]">
-          <button
-            className="my-1 me-2 flex size-fit rounded-md border-none bg-transparent p-1 @stuck-top:shadow-md"
-            title="Copy code"
-            aria-label="Copy code"
-            onClick={() => {
-              navigator.clipboard.writeText(rawText).then(() => {
-                setCopied(true)
-              })
-            }}
-          >
-            {copied ? (
-              <CarbonCheckmark width={14} height={14} />
-            ) : (
-              <CarbonCopy width={14} height={14} />
-            )}
-          </button>
-        </div>
-
-        <div className="scrollbar-thin overflow-x-auto overflow-y-clip px-4 pb-3">
-          {streaming === null || streaming === undefined ? (
-            <CodeHighlighter code={rawText} language={language} />
-          ) : (
-            <StreamingCodeHighlighter code={rawText} language={language} />
-          )}
-        </div>
-      </code>
+      <CodeBlock code={rawText} language={language} streaming={streaming} className={className} />
     )
   },
   table({ children, node }) {
@@ -263,12 +228,12 @@ function serializeFootnoteDefinition(def: FootnoteDefinition): FootnoteMapValue 
 }
 
 function remarkPlugin(this: Processor) {
-  // disable `indentedCode` in micromark
   // https://github.com/micromark/micromark#case-turn-off-constructs
   // https://github.com/zestedesavoir/zmarkdown/issues/416#issuecomment-982812961
   // https://github.com/micromark/micromark/tree/main/packages/micromark-core-commonmark#api
   const data = this.data()
   const list = (data.micromarkExtensions ??= [])
+  // disable `indentedCode` and `setext` syntax
   list.push({ disable: { null: ['codeIndented', 'setextUnderline'] } })
 
   return (tree: MdastNodes, file: VFile) => {

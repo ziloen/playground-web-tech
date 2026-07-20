@@ -368,9 +368,7 @@ export default function MarkdownPage() {
         <div
           ref={listRef}
           className="relative mx-auto w-full max-w-[800px] overflow-clip"
-          style={{
-            height: computedListHeight,
-          }}
+          style={{ height: computedListHeight }}
         >
           {virtualItems.map((virtualItem) => {
             const message = path[virtualItem.index]!

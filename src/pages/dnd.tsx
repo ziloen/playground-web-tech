@@ -126,7 +126,7 @@ export default function DND() {
   })
 
   return (
-    <div className="relative size-full overflow-clip">
+    <div className="relative size-full overflow-x-clip overflow-y-auto">
       {/* FIXME: Add drag over outline/border */}
       <div ref={dropZoneRef} className="size-[200px] rounded-[6px] bg-dark-gray-50">
         <textarea
@@ -302,14 +302,16 @@ function VideoPlayer({ file }: { file: File }) {
     <div className="flex flex-col gap-4">
       <div className="text-sm text-dark-gray-400">{file.name}</div>
 
-      <video
-        ref={videoRef}
-        src={videoUrl}
-        controls
-        className="max-h-[400px] max-w-full"
-        onTimeUpdate={onTimeUpdate}
-        onLoadedMetadata={onLoadedMetadata}
-      />
+      <div className="h-[400px] resizable-y">
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          controls
+          className="block max-h-full max-w-full"
+          onTimeUpdate={onTimeUpdate}
+          onLoadedMetadata={onLoadedMetadata}
+        />
+      </div>
 
       {/* Frame nav & capture buttons */}
       <div className="flex items-center gap-3">

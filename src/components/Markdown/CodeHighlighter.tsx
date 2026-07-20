@@ -14,7 +14,7 @@ import {
 import type { HighlighterCore, LanguageRegistration, ThemedToken, ThemeInput } from 'shiki/core'
 import { createHighlighterCore, getTokenStyleObject } from 'shiki/core'
 import { createJavaScriptRawEngine } from 'shiki/engine/javascript'
-import { useMemoizedFn } from '~/hooks'
+import { useGetState, useMemoizedFn } from '~/hooks'
 import { intersperse } from '~/utils'
 
 let cachedHighlighter: HighlighterCore | null = null
@@ -62,6 +62,18 @@ async function loadLanguage(highlighter: HighlighterCore, lang: string): Promise
   return promise
 }
 
+function getSupportedLanguage(language: string | null): string | null {
+  if (!language) return null
+
+  const normalized = language.trim().toLowerCase()
+
+  if (languageNames.includes(normalized) || languageAliasNames.includes(normalized)) {
+    return normalized
+  }
+
+  return null
+}
+
 export const CodeHighlighter = memo(function CodeHighlighter({
   code,
   language,
@@ -69,14 +81,7 @@ export const CodeHighlighter = memo(function CodeHighlighter({
   code: string
   language: string | null
 }) {
-  const lang = useMemo(() => {
-    if (!language) return null
-    if (languageNames.includes(language) || languageAliasNames.includes(language)) {
-      return language
-    } else {
-      return null
-    }
-  }, [language])
+  const lang = useMemo(() => getSupportedLanguage(language), [language])
 
   const [highlighter, setHighlighter] = useState<HighlighterCore | null>(null)
 
@@ -121,26 +126,30 @@ export const StreamingCodeHighlighter = memo(function StreamingCodeHighlighter({
   language: string | null
 }) {
   const [tokens, setTokens] = useState<ThemedToken[]>([])
+  const [streamRevision, setStreamRevision, getStreamRevision] = useGetState(0)
 
   const controllerRef = useRef<ReadableStreamDefaultController<string> | null>(null)
-  const indexRef = useRef(0)
+  const streamedCodeRef = useRef('')
 
-  const lang = useMemo(() => {
-    if (!language) return null
-    if (languageNames.includes(language) || languageAliasNames.includes(language)) {
-      return language
-    } else {
-      return null
-    }
-  }, [language])
+  const lang = useMemo(() => getSupportedLanguage(language), [language])
 
-  // FIXME: 如果 code 不是增加而是减少，会导致不更新或者错误
   const enqueue = useMemoizedFn(() => {
     if (!controllerRef.current) return
-    if (code.length <= indexRef.current) return
+    if (code === streamedCodeRef.current) return
 
-    controllerRef.current.enqueue(code.slice(indexRef.current))
-    indexRef.current = code.length
+    // The Shiki stream only supports appending source text. Its recall tokens
+    // retract unstable output tokens, not source text that was already enqueued.
+    // Restart the stream when the code is shortened or otherwise rewritten.
+    if (!code.startsWith(streamedCodeRef.current)) {
+      setStreamRevision(getStreamRevision() + 1)
+      controllerRef.current.close()
+      controllerRef.current = null
+      streamedCodeRef.current = ''
+      return
+    }
+
+    controllerRef.current.enqueue(code.slice(streamedCodeRef.current.length))
+    streamedCodeRef.current = code
   })
 
   useEffect(() => {
@@ -165,6 +174,8 @@ export const StreamingCodeHighlighter = memo(function StreamingCodeHighlighter({
         },
       })
 
+      let tokens: ThemedToken[] = []
+
       textStream
         .pipeThrough(
           new CodeToTokenTransformStream({
@@ -177,12 +188,12 @@ export const StreamingCodeHighlighter = memo(function StreamingCodeHighlighter({
         .pipeTo(
           new WritableStream({
             write(token) {
+              if (canceled || streamRevision !== getStreamRevision()) return
+
+              tokens = 'recall' in token ? tokens.slice(0, -token.recall) : [...tokens, token]
+
               startTransition(() => {
-                if ('recall' in token) {
-                  setTokens((tokens) => tokens.slice(0, -token.recall))
-                } else {
-                  setTokens((tokens) => [...tokens, token])
-                }
+                setTokens(tokens)
               })
             },
           }),
@@ -193,9 +204,8 @@ export const StreamingCodeHighlighter = memo(function StreamingCodeHighlighter({
       canceled = true
       controllerRef.current?.close()
       controllerRef.current = null
-      indexRef.current = 0
     }
-  }, [lang])
+  }, [lang, streamRevision])
 
   useEffect(() => {
     enqueue()
@@ -206,7 +216,7 @@ export const StreamingCodeHighlighter = memo(function StreamingCodeHighlighter({
   }
 
   return tokens.map((token, i) => (
-    <span key={i} style={token.htmlStyle ?? getTokenStyleObject(token)}>
+    <span key={`${streamRevision}-${i}`} style={token.htmlStyle ?? getTokenStyleObject(token)}>
       {token.content}
     </span>
   ))

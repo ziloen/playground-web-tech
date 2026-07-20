@@ -223,6 +223,19 @@ function AspectRatio() {
           <div className="size-[99999px]">Hack</div>
         </div>
       </div>
+
+      {/* container query + known aspect ratio */}
+      <div className="@container-size grid size-[100px] resizable place-items-center bg-dark-gray-600">
+        <img
+          src="https://dummyjson.com/image/640x360/0f766e/ecfeff?text=640x360"
+          style={{
+            '--aspect-ratio': '640 / 360',
+            width: 'min(100cqw, calc(100cqh * var(--aspect-ratio)))',
+            height: 'auto',
+            aspectRatio: 'var(--aspect-ratio) auto',
+          }}
+        />
+      </div>
     </div>
   )
 }
