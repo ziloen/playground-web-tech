@@ -4,14 +4,7 @@ import { useAutoResetState } from '~/hooks'
 import { cn } from '~/utils'
 import CarbonCheckmark from '~icons/carbon/checkmark'
 import CarbonCopy from '~icons/carbon/copy'
-
-const CodeHighlighter = lazy(() =>
-  import('./CodeHighlighter').then((mod) => ({ default: mod.CodeHighlighter })),
-)
-
-const StreamingCodeHighlighter = lazy(() =>
-  import('./CodeHighlighter').then((mod) => ({ default: mod.StreamingCodeHighlighter })),
-)
+import { CodeHighlighter, StreamingCodeHighlighter } from './CodeHighlighter'
 
 export function CodeBlock({
   code,
@@ -57,13 +50,11 @@ export function CodeBlock({
       </div>
 
       <div className="scrollbar-thin overflow-x-auto overflow-y-clip px-4 pb-3">
-        <Suspense fallback={code}>
-          {isNil(streaming) ? (
-            <CodeHighlighter code={code} language={language} />
-          ) : (
-            <StreamingCodeHighlighter code={code} language={language} />
-          )}
-        </Suspense>
+        {isNil(streaming) ? (
+          <CodeHighlighter code={code} language={language} />
+        ) : (
+          <StreamingCodeHighlighter code={code} language={language} />
+        )}
       </div>
     </code>
   )
