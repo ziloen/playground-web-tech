@@ -3,6 +3,7 @@ import '@fontsource-variable/noto-sans-sc/index.css'
 import 'katex/dist/katex.css'
 import './Markdown.css'
 
+import remarkMath from '@ziloen/remark-math'
 import clsx from 'clsx/lite'
 import { isNil } from 'es-toolkit'
 import type { ElementContent, Element as HastElement, Nodes as HastNodes } from 'hast'
@@ -18,7 +19,6 @@ import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import remarkCjkFriendly from 'remark-cjk-friendly'
 import remarkGfm from 'remark-gfm-configurable'
-import remarkMath from 'remark-math'
 import type { Merge } from 'type-fest'
 import type { PluggableList, Plugin, Processor } from 'unified'
 import { visit } from 'unist-util-visit'
@@ -164,7 +164,7 @@ const remarkPlugins = pluginList([
       },
     },
   ],
-  [remarkMath, {}],
+  [remarkMath, { displayMathInText: true }],
   [remarkCjkFriendly],
   [remarkPlugin],
 ])
