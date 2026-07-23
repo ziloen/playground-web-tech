@@ -5,11 +5,8 @@ import './Markdown.css'
 
 import remarkMath from '@ziloen/remark-math'
 import clsx from 'clsx/lite'
-import { isNil } from 'es-toolkit'
-import type { ElementContent, Element as HastElement, Nodes as HastNodes } from 'hast'
-import type { Root as HastRoot } from 'hast'
+import type { Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { FootnoteDefinition, Link, Nodes as MdastNodes, Root, RootContent } from 'mdast'
-import { toHast } from 'mdast-util-to-hast'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { toString } from 'mdast-util-to-string'
 import { createContext, memo, use, useState } from 'react'
@@ -19,8 +16,10 @@ import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import remarkCjkFriendly from 'remark-cjk-friendly'
 import remarkGfm from 'remark-gfm-configurable'
+import remarkParse from 'remark-parse'
 import type { Merge } from 'type-fest'
 import type { PluggableList, Plugin, Processor } from 'unified'
+import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
@@ -51,7 +50,20 @@ export function Markdown({
   return (
     <div className={clsx('markdown-body', className)} {...props}>
       <MarkdownContext value={ctxValue}>
-        <MemoReactMarkdown>{children}</MemoReactMarkdown>
+        {streaming ? (
+          // FIXME: 在单个块中带有多个 math 时，还是会卡
+          unified()
+            .use(remarkParse)
+            .use(remarkPlugins)
+            .parse(children)
+            .children.map((node, i) => (
+              <MemoReactMarkdown key={i}>
+                {children.slice(node.position!.start.offset!, node.position!.end.offset!)}
+              </MemoReactMarkdown>
+            ))
+        ) : (
+          <MemoReactMarkdown>{children}</MemoReactMarkdown>
+        )}
       </MarkdownContext>
     </div>
   )
@@ -154,6 +166,13 @@ const components: Components = {
   },
 }
 
+/*#__NO_SIDE_EFFECTS__*/
+function pluginList<const T extends Plugin<any[], any, any>[]>(plugins: {
+  [K in keyof T]: [T[K], ...Parameters<NoInfer<T>[K]>]
+}): PluggableList {
+  return plugins
+}
+
 const remarkPlugins = pluginList([
   // keep-multiline
   [
@@ -175,13 +194,6 @@ const rehypePlugins = pluginList([
   // FIXME: 设置只额外解析 <think> 标签而不是任意的标签
   [rehypeRaw],
 ])
-
-/*#__NO_SIDE_EFFECTS__*/
-function pluginList<const T extends Plugin<any[], any, any>[]>(plugins: {
-  [K in keyof T]: [T[K], ...Parameters<NoInfer<T>[K]>]
-}): PluggableList {
-  return plugins
-}
 
 function rehypePlugin(this: Processor) {
   return (tree: HastNodes, file: VFile) => {

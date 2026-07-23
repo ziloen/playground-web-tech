@@ -32,5 +32,6 @@
     "^mermaid/dist",
     "^typescript$",
   ],
+  "oxc.enable.oxlint": false,
   "tailwindCSS.experimental.configFile": "src/styles/main.css"
 }

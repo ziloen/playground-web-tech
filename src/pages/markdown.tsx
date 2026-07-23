@@ -1,6 +1,6 @@
 import type { ScrollToOptions } from '@tanstack/react-virtual'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { button, buttonGroup, Leva, useControls, LevaPanel } from 'leva'
+import { button, buttonGroup, Leva, useControls } from 'leva'
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { LiteralUnion } from 'type-fest'
 import { Markdown } from '~/components/Markdown'
@@ -141,9 +141,10 @@ export default function MarkdownPage() {
   })
 
   const startAssistantStream = useMemoizedFn((assistantId: string) => {
-    const tokens = testMd.split('')
-    let nextTokenIndex = 0
-    let content = ''
+    const tokens = testMd
+    const initialCount = (tokens.length / 2) | 0
+    let nextTokenIndex = initialCount
+    let content = tokens.slice(0, initialCount)
 
     cancelAnimationFrame(streamingTimersRef.current.get(assistantId) ?? 0)
     setIsStreaming(true)

@@ -1,5 +1,4 @@
 import { isNil } from 'es-toolkit'
-import { lazy } from 'react'
 import { useAutoResetState } from '~/hooks'
 import { cn } from '~/utils'
 import CarbonCheckmark from '~icons/carbon/checkmark'
