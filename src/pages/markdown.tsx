@@ -263,22 +263,6 @@ export default function MarkdownPage() {
     }
   }, [displayMode])
 
-  virtualizer.shouldAdjustScrollPositionOnItemSizeChange = useMemoizedFn(
-    (item, delta, instance) => {
-      if (item.index >= path.length - 2) {
-        return false
-      } else {
-        // tanstack virtual default behavior
-        return (
-          // @ts-expect-error private property
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-unsafe-call
-          item.start < instance.getScrollOffset() + instance.scrollAdjustments &&
-          (!instance.itemSizeCache.has(item.key) || instance.scrollDirection !== 'backward')
-        )
-      }
-    },
-  )
-
   useLayoutEffect(() => {
     const scrollEl = scrollRef.current
     const listEl = listRef.current
