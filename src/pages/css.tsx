@@ -698,30 +698,32 @@ function ScrollClipMargin() {
             // FIXME: 使用 scroll-padding 来添加输入内边距时，手动添加的内容无效
             // 例如手动添加换行时
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                e.stopPropagation()
-
-                const sel = window.getSelection()
-                if (!sel || !sel.rangeCount) return
-                const range = sel.getRangeAt(0)
-
-                const p = document.createElement('p')
-                const br = document.createElement('br')
-                p.append(br)
-                editorRef.current?.append(p)
-                range.setStartAfter(br)
-                range.setEndAfter(br)
-                sel.removeAllRanges()
-
-                sel.addRange(range)
-
-                p.scrollIntoView({
-                  block: 'nearest',
-                  inline: 'nearest',
-                  behavior: 'instant',
-                })
+              if (!(e.key === 'Enter')) {
+                return
               }
+
+              e.preventDefault()
+              e.stopPropagation()
+
+              const sel = window.getSelection()
+              if (!sel || !sel.rangeCount) return
+              const range = sel.getRangeAt(0)
+
+              const p = document.createElement('p')
+              const br = document.createElement('br')
+              p.append(br)
+              editorRef.current?.append(p)
+              range.setStartAfter(br)
+              range.setEndAfter(br)
+              sel.removeAllRanges()
+
+              sel.addRange(range)
+
+              p.scrollIntoView({
+                block: 'nearest',
+                inline: 'nearest',
+                behavior: 'instant',
+              })
             }}
           ></div>
           {/* <textarea className="grow basis-max min-h-[300px] field-sizing-content"></textarea> */}

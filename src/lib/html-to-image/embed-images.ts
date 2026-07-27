@@ -72,9 +72,11 @@ async function embedChildren(clonedNode: HTMLElement, options: Options) {
 }
 
 export async function embedImages(clonedNode: HTMLElement, options: Options) {
-  if (isInstanceOfElement(clonedNode, Element)) {
-    await embedBackground(clonedNode, options)
-    await embedImageNode(clonedNode, options)
-    await embedChildren(clonedNode, options)
+  if (!isInstanceOfElement(clonedNode, Element)) {
+    return
   }
+
+  await embedBackground(clonedNode, options)
+  await embedImageNode(clonedNode, options)
+  await embedChildren(clonedNode, options)
 }

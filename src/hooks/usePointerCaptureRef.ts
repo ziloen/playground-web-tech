@@ -32,9 +32,7 @@ type Options<T> = {
   captureOn?: 'pointerdown' | 'pointermove' | undefined
 }
 
-export function usePointerCaptureRef<T extends HTMLElement>(
-  options: Options<T>,
-): RefCallback<T> {
+export function usePointerCaptureRef<T extends HTMLElement>(options: Options<T>): RefCallback<T> {
   const optionsRef = useRef(options)
   optionsRef.current = options
 

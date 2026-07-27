@@ -303,7 +303,9 @@ function optimizeJsonObject(value: JsonValue): JsonValue {
     if (value.startsWith('<svg')) {
       // 如果是 SVG 字符串，执行优化
       return optimizeSvg(value, { pretty: false }).data
-    } else if (value.startsWith('data:image/svg+xml,')) {
+    }
+
+    if (value.startsWith('data:image/svg+xml,')) {
       // 如果是 data url，提取出 SVG 字符串后执行优化
       return optimizeSvgToDataUri(dataUrlToSvg(value))
     }

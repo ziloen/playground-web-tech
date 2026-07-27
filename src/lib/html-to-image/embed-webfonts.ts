@@ -79,9 +79,9 @@ function parseCSS(source: string) {
       matches = unifiedRegex.exec(cssText)
       if (matches === null) {
         break
-      } else {
-        importRegex.lastIndex = unifiedRegex.lastIndex
       }
+
+      importRegex.lastIndex = unifiedRegex.lastIndex
     } else {
       unifiedRegex.lastIndex = importRegex.lastIndex
     }
@@ -103,35 +103,34 @@ async function getCSSRules(
     if ('cssRules' in sheet) {
       try {
         toArray<CSSRule>(sheet.cssRules || []).forEach((item, index) => {
-          if (item.type === CSSRule.IMPORT_RULE) {
-            let importIndex = index + 1
-            const url = (item as CSSImportRule).href
-            const deferred = fetchCSS(url)
-              .then((metadata) => embedFonts(metadata, options))
-              .then((cssText) =>
-                parseCSS(cssText).forEach((rule) => {
-                  try {
-                    sheet.insertRule(
-                      rule,
-                      rule.startsWith('@import') ? (importIndex += 1) : sheet.cssRules.length,
-                    )
-                  } catch (error: unknown) {
-                    console.error('Error inserting rule from remote css', {
-                      rule,
-                      error,
-                    })
-                  }
-                }),
-              )
-              .catch((e: unknown) => {
-                console.error(
-                  'Error loading remote css',
-                  e instanceof Error ? e.toString() : String(e),
-                )
-              })
-
-            deferreds.push(deferred)
+          if (!(item.type === CSSRule.IMPORT_RULE)) {
+            return
           }
+
+          let importIndex = index + 1
+          const url = (item as CSSImportRule).href
+          const deferred = fetchCSS(url)
+            .then((metadata) => embedFonts(metadata, options))
+            .then((cssText) =>
+              parseCSS(cssText).forEach((rule) => {
+                try {
+                  sheet.insertRule(
+                    rule,
+                    rule.startsWith('@import') ? (importIndex += 1) : sheet.cssRules.length,
+                  )
+                } catch (error: unknown) {
+                  console.error('Error inserting rule from remote css', {
+                    rule,
+                    error,
+                  })
+                }
+              }),
+            )
+            .catch((e: unknown) => {
+              console.error('Error loading remote css', Error.isError(e) ? e.toString() : String(e))
+            })
+
+          deferreds.push(deferred)
         })
       } catch (e) {
         const inline = styleSheets.find((a) => a.href == null) ?? document.styleSheets[0]

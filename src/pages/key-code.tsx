@@ -1,20 +1,17 @@
 import type { RefCallback } from 'react'
 import { useGetState } from '~/hooks'
 
-const properties: {
-  key: keyof KeyboardEvent
-  deprecated?: boolean
-}[] = [
-  { key: 'key' },
-  { key: 'code' },
-  { key: 'location' },
-  { key: 'shiftKey' },
-  { key: 'ctrlKey' },
-  { key: 'altKey' },
-  { key: 'metaKey' },
-  { key: 'keyCode', deprecated: true },
-  { key: 'charCode', deprecated: true },
-  { key: 'which', deprecated: true },
+const properties = [
+  { key: 'key' as const },
+  { key: 'code' as const },
+  { key: 'location' as const },
+  { key: 'shiftKey' as const },
+  { key: 'ctrlKey' as const },
+  { key: 'altKey' as const },
+  { key: 'metaKey' as const },
+  { key: 'keyCode' as const, deprecated: true },
+  { key: 'charCode' as const, deprecated: true },
+  { key: 'which' as const, deprecated: true },
 ]
 
 export default function KeyCode() {
@@ -99,7 +96,7 @@ export default function KeyCode() {
               <Item
                 key={item.key}
                 title={item.key}
-                value={event[item.key] as string | number | boolean}
+                value={event[item.key]}
                 deprecated={item.deprecated}
               />
             )

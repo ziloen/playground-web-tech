@@ -123,7 +123,7 @@ function calculateSpecificity(selector: string): SpecificityResult {
   } catch (error) {
     return {
       selector,
-      error: error instanceof Error ? error.message : '选择器解析失败',
+      error: Error.isError(error) ? error.message : '选择器解析失败',
     }
   }
 }

@@ -145,15 +145,17 @@ function cloneInputValue<T extends HTMLElement>(nativeNode: T, clonedNode: T) {
 }
 
 function cloneSelectValue<T extends HTMLElement>(nativeNode: T, clonedNode: T) {
-  if (isInstanceOfElement(nativeNode, HTMLSelectElement)) {
-    const clonedSelect = clonedNode as any as HTMLSelectElement
-    const selectedOption = Array.from(clonedSelect.children).find(
-      (child) => nativeNode.value === child.getAttribute('value'),
-    )
+  if (!isInstanceOfElement(nativeNode, HTMLSelectElement)) {
+    return
+  }
 
-    if (selectedOption) {
-      selectedOption.setAttribute('selected', '')
-    }
+  const clonedSelect = clonedNode as any as HTMLSelectElement
+  const selectedOption = Array.from(clonedSelect.children).find(
+    (child) => nativeNode.value === child.getAttribute('value'),
+  )
+
+  if (selectedOption) {
+    selectedOption.setAttribute('selected', '')
   }
 }
 

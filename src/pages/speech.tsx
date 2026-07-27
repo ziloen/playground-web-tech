@@ -90,11 +90,13 @@ export default function WebSpeechAPIPage() {
     let timer: ReturnType<typeof setTimeout> | undefined
     if (isChrome) {
       timer = setInterval(() => {
-        if (speechSynthesis.speaking && !pausedRef.current) {
-          console.log('Chrome bug fix')
-          speechSynthesis.pause()
-          speechSynthesis.resume()
+        if (!(speechSynthesis.speaking && !pausedRef.current)) {
+          return
         }
+
+        console.log('Chrome bug fix')
+        speechSynthesis.pause()
+        speechSynthesis.resume()
       }, 12_000)
     }
 
@@ -692,9 +694,8 @@ function AudioVisualization() {
   const end = useMemo(() => {
     if (recording) {
       return Math.floor(now / 125) * 125
-    } else {
-      return Math.floor(stopTimeMV.get() / 125) * 125
     }
+    return Math.floor(stopTimeMV.get() / 125) * 125
   }, [now, recording])
 
   const children = useMemo(() => {

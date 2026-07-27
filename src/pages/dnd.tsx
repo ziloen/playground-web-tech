@@ -247,10 +247,12 @@ function VideoPlayer({ file }: { file: File }) {
 
       // Fallback timeout
       setTimeout(() => {
-        if (!detected) {
-          detected = true
-          v.cancelVideoFrameCallback(handle)
+        if (detected) {
+          return
         }
+
+        detected = true
+        v.cancelVideoFrameCallback(handle)
       }, 2000)
     }
   })
