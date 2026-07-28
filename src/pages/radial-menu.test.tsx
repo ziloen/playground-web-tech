@@ -36,6 +36,77 @@ describe('RadialMenuPage', () => {
     }
   })
 
+  it('keeps spiral sectors on fixed spokes while the pointer moves clockwise', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const bounds = stage.getBoundingClientRect()
+    const center = {
+      x: bounds.left + bounds.width / 2,
+      y: bounds.top + bounds.height / 2,
+    }
+    const radius = bounds.width * 0.36
+
+    movePointer({ x: center.x, y: center.y - radius })
+    await nextFrame()
+    await nextFrame()
+    const before = readSectorAngle(stage, 2)
+
+    movePointer({ x: center.x + radius, y: center.y })
+    await nextFrame()
+    await nextFrame()
+    const after = readSectorAngle(stage, 2)
+
+    expect(before).toBeCloseTo(Math.PI / 2, 4)
+    expect(after).toBeCloseTo(Math.PI / 2, 4)
+  })
+
+  it('builds every finite-ring sector from the same 25/43-percent radii', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const countButton = screen.getByRole('button', { name: '08', exact: true }).element()
+    if (!(countButton instanceof HTMLButtonElement)) {
+      throw new TypeError('Expected the item count control to be a button')
+    }
+    countButton.click()
+    await nextFrame()
+    await nextFrame()
+
+    const stage = screen.getByLabelText('8 项径向菜单').element()
+    const stageBounds = stage.getBoundingClientRect()
+    const sectors = Array.from(stage.querySelectorAll<HTMLElement>('[data-index]'))
+    const radialDistances = sectors.map((sector) => {
+      const style = getComputedStyle(sector)
+      expect(Number.parseFloat(style.getPropertyValue('--sector-inner-radius'))).toBeCloseTo(
+        stageBounds.width * 0.25,
+        1,
+      )
+      expect(Number.parseFloat(style.getPropertyValue('--sector-outer-radius'))).toBeCloseTo(
+        stageBounds.width * 0.43,
+        1,
+      )
+      expect(style.clipPath).toContain(' A ')
+
+      const bounds = sector.getBoundingClientRect()
+      return Math.hypot(
+        bounds.left + bounds.width / 2 - (stageBounds.left + stageBounds.width / 2),
+        bounds.top + bounds.height / 2 - (stageBounds.top + stageBounds.height / 2),
+      )
+    })
+
+    expect(Math.max(...radialDistances) - Math.min(...radialDistances)).toBeLessThan(0.5)
+
+    const center = {
+      x: stageBounds.left + stageBounds.width / 2,
+      y: stageBounds.top + stageBounds.height / 2,
+    }
+    const hitAtRadius = (ratio: number) =>
+      document.elementFromPoint(center.x, center.y - stageBounds.width * ratio)?.closest('button')
+
+    expect(hitAtRadius(0.24)).not.toBe(sectors[0])
+    expect(hitAtRadius(0.26)).toBe(sectors[0])
+    expect(hitAtRadius(0.42)).toBe(sectors[0])
+    expect(hitAtRadius(0.44)).not.toBe(sectors[0])
+  })
+
   it('anchors the pointer indicator to the center and current pointer angle', async () => {
     const screen = await render(<RadialMenuPage />)
     const stage = screen.getByLabelText('10 项径向菜单').element()
@@ -253,7 +324,7 @@ describe('RadialMenuPage', () => {
           Number.parseFloat(getComputedStyle(sector).opacity),
         ),
       ),
-    ).toBeLessThan(0.3)
+    ).toBeLessThanOrEqual(0.36)
 
     await traceClockwise(stage, 0, 1.25)
     const focusedBlank = stage.querySelector<HTMLElement>('[data-empty-slot="10"]')
@@ -285,7 +356,7 @@ describe('RadialMenuPage', () => {
     { loopMode: '补满整圈', controlName: null, sectorCount: 16 },
     { loopMode: '紧接末项', controlName: '紧接末项', sectorCount: 10 },
   ])(
-    'keeps at most eight sectors fully opaque across repeated turns in $loopMode mode',
+    'keeps at most seven sectors fully opaque across repeated turns in $loopMode mode',
     async ({ controlName, sectorCount }) => {
       const screen = await render(<RadialMenuPage />)
 
@@ -316,13 +387,42 @@ describe('RadialMenuPage', () => {
           (sector) => Number.parseFloat(getComputedStyle(sector).opacity) >= 0.999,
         ).length
         highestOpaqueCount = Math.max(highestOpaqueCount, opaqueCount)
-        expect(opaqueCount).toBeLessThanOrEqual(8)
+        expect(opaqueCount).toBeLessThanOrEqual(7)
         fromTurns = toTurns
       }
 
-      expect(highestOpaqueCount).toBe(8)
+      expect(highestOpaqueCount).toBe(7)
     },
   )
+
+  it('keeps three sectors on either side opaque, then fades three more on each side', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const fourteenItems = screen.getByRole('button', { name: '14', exact: true }).element()
+    const immediateLoop = screen.getByRole('button', { name: '紧接末项', exact: true }).element()
+    if (
+      !(fourteenItems instanceof HTMLButtonElement) ||
+      !(immediateLoop instanceof HTMLButtonElement)
+    ) {
+      throw new TypeError('Expected item-count and loop controls')
+    }
+    fourteenItems.click()
+    immediateLoop.click()
+    await nextFrame()
+    await nextFrame()
+
+    const stage = screen.getByLabelText('14 项径向菜单').element()
+    const opacities = Array.from(stage.querySelectorAll<HTMLElement>('[data-index]'), (sector) =>
+      Number.parseFloat(getComputedStyle(sector).opacity),
+    )
+
+    expect(opacities.filter((opacity) => opacity === 1)).toHaveLength(7)
+    expect(opacities.filter((opacity) => opacity > 0 && opacity < 1)).toHaveLength(6)
+    expect(opacities[4]).toBeGreaterThan(opacities[5]!)
+    expect(opacities[5]).toBeGreaterThan(opacities[6]!)
+    expect(opacities[8]).toBeLessThan(opacities[9]!)
+    expect(opacities[9]).toBeLessThan(opacities[10]!)
+    expect(opacities[7]).toBe(0)
+  })
 
   it('can start the next spiral cycle immediately after the final item', async () => {
     const screen = await render(<RadialMenuPage />)
@@ -348,6 +448,37 @@ describe('RadialMenuPage', () => {
 
     const divider = stage.querySelector<HTMLElement>('[data-cycle-divider]')
     expect(Number.parseFloat(getComputedStyle(divider!).opacity)).toBeGreaterThan(0.9)
+  })
+
+  it('crossfades repeated items without teleporting them across an immediate-loop seam', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const immediateLoop = screen.getByRole('button', { name: '紧接末项', exact: true }).element()
+    if (!(immediateLoop instanceof HTMLButtonElement)) {
+      throw new TypeError('Expected the loop strategy control to be a button')
+    }
+    immediateLoop.click()
+    await nextFrame()
+    await nextFrame()
+
+    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const seamPosition = 5
+    await traceClockwise(stage, 0, (seamPosition - 0.01) / 8)
+    const before = readVisibleItemCopies(stage, 0)
+    await traceClockwise(stage, (seamPosition - 0.01) / 8, (seamPosition + 0.01) / 8)
+    const after = readVisibleItemCopies(stage, 0)
+
+    expect(before).toHaveLength(2)
+    expect(after).toHaveLength(2)
+    expect(before.map((copy) => copy.angle)).toEqual([
+      expect.closeTo(0, 3),
+      expect.closeTo(Math.PI / 2, 3),
+    ])
+    expect(after.map((copy) => copy.angle)).toEqual([
+      expect.closeTo(0, 3),
+      expect.closeTo(Math.PI / 2, 3),
+    ])
+    expect(Math.abs(before[0]!.opacity - after[0]!.opacity)).toBeLessThan(0.02)
+    expect(Math.abs(before[1]!.opacity - after[1]!.opacity)).toBeLessThan(0.02)
   })
 
   it('uses a restrained six-percent scale step around the focused spiral item', async () => {
@@ -422,29 +553,33 @@ describe('RadialMenuPage', () => {
   })
 
   it.each([
-    { count: '06', itemCount: 6, mode: 'ring', label: '等分圆环' },
-    { count: '08', itemCount: 8, mode: 'ring', label: '等分圆环' },
-    { count: '10', itemCount: 10, mode: 'spiral', label: '连续螺旋' },
-    { count: '14', itemCount: 14, mode: 'spiral', label: '连续螺旋' },
-  ])('uses $label for $count items', async ({ count, itemCount, mode, label }) => {
-    const screen = await render(<RadialMenuPage />)
-    const countButton = screen.getByRole('button', { name: count, exact: true }).element()
-    if (!(countButton instanceof HTMLButtonElement)) {
-      throw new TypeError('Expected the item count control to be a button')
-    }
-    countButton.click()
-    await nextFrame()
-    await nextFrame()
+    { count: '06', itemCount: 6, blankCount: 2, mode: 'ring', label: '等分圆环' },
+    { count: '08', itemCount: 8, blankCount: 0, mode: 'ring', label: '等分圆环' },
+    { count: '10', itemCount: 10, blankCount: 6, mode: 'spiral', label: '连续螺旋' },
+    { count: '14', itemCount: 14, blankCount: 2, mode: 'spiral', label: '连续螺旋' },
+  ])(
+    'uses $label for $count items and pads it with $blankCount blank slots',
+    async ({ count, itemCount, blankCount, mode, label }) => {
+      const screen = await render(<RadialMenuPage />)
+      const countButton = screen.getByRole('button', { name: count, exact: true }).element()
+      if (!(countButton instanceof HTMLButtonElement)) {
+        throw new TypeError('Expected the item count control to be a button')
+      }
+      countButton.click()
+      await nextFrame()
+      await nextFrame()
 
-    const stage = screen.getByLabelText(`${itemCount} 项径向菜单`).element()
-    const modeReadout = screen.getByText('轨道模式').element().nextElementSibling
+      const stage = screen.getByLabelText(`${itemCount} 项径向菜单`).element()
+      const modeReadout = screen.getByText('轨道模式').element().nextElementSibling
 
-    expect(stage.dataset.mode).toBe(mode)
-    expect(stage.querySelectorAll('[data-index]')).toHaveLength(itemCount)
-    expect(modeReadout).toHaveTextContent(label)
-  })
+      expect(stage.dataset.mode).toBe(mode)
+      expect(stage.querySelectorAll('[data-index]')).toHaveLength(itemCount)
+      expect(stage.querySelectorAll('[data-empty-slot]')).toHaveLength(blankCount)
+      expect(modeReadout).toHaveTextContent(label)
+    },
+  )
 
-  it('starts a ten-item spiral with seven and eight fading while nine and ten stay hidden', async () => {
+  it('starts a ten-item spiral with three fading sectors before the hidden range', async () => {
     const screen = await render(<RadialMenuPage />)
     const stage = screen.getByLabelText('10 项径向菜单').element()
     await nextFrame()
@@ -459,18 +594,18 @@ describe('RadialMenuPage', () => {
       }
     }
 
+    const four = opacity(3)
+    const five = opacity(4)
+    const six = opacity(5)
     const seven = opacity(6)
     const eight = opacity(7)
-    const nine = opacity(8)
-    const ten = opacity(9)
 
-    expect(seven.value).toBeGreaterThan(eight.value)
-    expect(seven.value).toBeLessThan(1)
-    expect(eight.value).toBeGreaterThan(0)
-    expect(nine.value).toBeLessThan(0.02)
-    expect(ten.value).toBe(0)
-    expect(nine.pointerEvents).toBe('none')
-    expect(ten.pointerEvents).toBe('none')
+    expect(four.value).toBe(1)
+    expect(five.value).toBeGreaterThan(six.value)
+    expect(six.value).toBeGreaterThan(seven.value)
+    expect(seven.value).toBeGreaterThan(0)
+    expect(eight.value).toBe(0)
+    expect(eight.pointerEvents).toBe('none')
   })
 
   it('confirms on Q release only outside the safe zone and lets Escape cancel', async () => {
@@ -639,6 +774,44 @@ function readRadialDistance(stage: Element, index: number) {
     itemBounds.left + itemBounds.width / 2 - (stageBounds.left + stageBounds.width / 2),
     itemBounds.top + itemBounds.height / 2 - (stageBounds.top + stageBounds.height / 2),
   )
+}
+
+function readSectorAngle(stage: Element, index: number) {
+  const item = stage.querySelector<HTMLElement>(`[data-index="${index}"]`)
+  if (!item) throw new TypeError(`Expected menu item ${index + 1}`)
+  const stageBounds = stage.getBoundingClientRect()
+  const itemBounds = item.getBoundingClientRect()
+  const dx = itemBounds.left + itemBounds.width / 2 - (stageBounds.left + stageBounds.width / 2)
+  const dy = itemBounds.top + itemBounds.height / 2 - (stageBounds.top + stageBounds.height / 2)
+  return Math.atan2(dx, -dy)
+}
+
+function readVisibleItemCopies(stage: Element, index: number) {
+  const stageBounds = stage.getBoundingClientRect()
+  const center = {
+    x: stageBounds.left + stageBounds.width / 2,
+    y: stageBounds.top + stageBounds.height / 2,
+  }
+  const copies = stage.querySelectorAll<HTMLElement>(
+    `[data-item-index="${index}"], [data-index="${index}"]`,
+  )
+
+  return Array.from(copies)
+    .map((copy) => {
+      const bounds = copy.getBoundingClientRect()
+      const dx = bounds.left + bounds.width / 2 - center.x
+      const dy = bounds.top + bounds.height / 2 - center.y
+      return {
+        angle: positiveTestModulo(Math.atan2(dx, -dy), Math.PI * 2),
+        opacity: Number.parseFloat(getComputedStyle(copy).opacity),
+      }
+    })
+    .filter((copy) => copy.opacity > 0.05)
+    .sort((left, right) => left.angle - right.angle)
+}
+
+function positiveTestModulo(value: number, divisor: number) {
+  return ((value % divisor) + divisor) % divisor
 }
 
 function nextFrame() {

@@ -8,7 +8,7 @@ export {}
 declare global {
   const AnimatePresence: typeof import('motion/react').AnimatePresence
   const Suspense: typeof import('react').Suspense
-  const clsx: typeof import('clsx').clsx
+  const clsx: typeof import('cnfast').clsx
   const motion: typeof import('motion/react').motion
   const useCallback: typeof import('react').useCallback
   const useEffect: typeof import('react').useEffect

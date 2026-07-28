@@ -1,11 +1,10 @@
-import type { ClassValue } from 'clsx'
-import clsx from 'clsx'
-import { extendTailwindMerge } from 'tailwind-merge'
+import { createCn } from 'cnfast'
 
-export { LRUCache } from './LRUCache'
 export { isInstanceofElement } from './isInstanceofElement'
+export { LRUCache } from './LRUCache'
 
-const twMerge = /* #__PURE__ */ extendTailwindMerge({
+/*#__NO_SIDE_EFFECTS__*/
+export const cn = /* #__PURE__ */ createCn({
   override: {
     conflictingClassGroups: {
       // In the default config the value is ['leading']
@@ -14,11 +13,6 @@ const twMerge = /* #__PURE__ */ extendTailwindMerge({
     },
   },
 })
-
-/*#__NO_SIDE_EFFECTS__*/
-export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(...inputs))
-}
 
 /*#__NO_SIDE_EFFECTS__*/
 export function formatBytes(bytes: number): string {

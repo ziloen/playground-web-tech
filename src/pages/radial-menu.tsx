@@ -20,11 +20,17 @@ type MenuItem = {
 const TAU = Math.PI * 2
 const SLOTS_PER_LAP = 8
 const SLOT_ANGLE = TAU / SLOTS_PER_LAP
-const SPIRAL_ANGLE = SLOT_ANGLE * 0.92
-const SECTOR_BASE_WIDTH = 200
-const SECTOR_REFERENCE_SIZE = 720
+const SECTOR_INNER_RADIUS_RATIO = 0.25
+const SECTOR_OUTER_RADIUS_RATIO = 0.43
+const SECTOR_ANGULAR_FILL = 0.96
 const EMPTY_SLOT_OPACITY = 0.36
+const FULLY_VISIBLE_SLOT_DISTANCE = 3
+const FADING_SLOT_COUNT = 3
+const SPIRAL_COPY_OFFSETS = [-1, 0, 1] as const
 const COUNT_OPTIONS = [6, 8, 10, 14] as const
+
+type SpiralCopyOffset = (typeof SPIRAL_COPY_OFFSETS)[number]
+type ItemElementCopies = Partial<Record<SpiralCopyOffset, HTMLButtonElement | null>>
 
 const MENU_ITEMS: MenuItem[] = [
   { id: 'pulse', label: '脉冲信标', detail: '标记当前位置并广播短距信号', quantity: '03' },
@@ -257,7 +263,7 @@ function RadialWheel({
   onConfirm: (item: MenuItem) => void
 }) {
   const stageRef = useRef<HTMLDivElement>(null)
-  const itemRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const itemRefs = useRef<ItemElementCopies[]>([])
   const blankRefs = useRef<Array<HTMLDivElement | null>>([])
   const dividerRef = useRef<HTMLDivElement>(null)
   const focusLabelRef = useRef<HTMLDivElement>(null)
@@ -267,9 +273,13 @@ function RadialWheel({
   const [confirmedItem, setConfirmedItem] = useState<MenuItem | null>(null)
   const [phase, setPhase] = useState<WheelPhase>('idle')
   const blankSlotCount =
-    items.length > SLOTS_PER_LAP && loopMode === 'padded'
-      ? Math.ceil(items.length / SLOTS_PER_LAP) * SLOTS_PER_LAP - items.length
-      : 0
+    items.length < SLOTS_PER_LAP
+      ? SLOTS_PER_LAP - items.length
+      : items.length > SLOTS_PER_LAP && loopMode === 'padded'
+        ? Math.ceil(items.length / SLOTS_PER_LAP) * SLOTS_PER_LAP - items.length
+        : 0
+  const itemCopyOffsets: readonly SpiralCopyOffset[] =
+    items.length > SLOTS_PER_LAP ? SPIRAL_COPY_OFFSETS : [0]
 
   const confirmItem = useCallback(
     (index: number) => {
@@ -303,10 +313,12 @@ function RadialWheel({
     const abortController = new AbortController()
     const { signal } = abortController
     const isSpiral = items.length > SLOTS_PER_LAP
+    const ringSlotCount = Math.max(items.length, SLOTS_PER_LAP)
     const cycleSlotCount =
       loopMode === 'immediate'
         ? items.length
         : Math.ceil(items.length / SLOTS_PER_LAP) * SLOTS_PER_LAP
+    const focusStep = isSpiral ? SLOT_ANGLE : TAU / ringSlotCount
 
     let animationFrame = 0
     let active = null as number | null
@@ -331,25 +343,19 @@ function RadialWheel({
       animationFrame = 0
       const rect = stage.getBoundingClientRect()
       const size = Math.min(rect.width, rect.height)
-      const baseRadius = size * (isSpiral ? 0.315 : 0.33)
+      const outerRadius = size * SECTOR_OUTER_RADIUS_RATIO
       const deadZone = Math.max(50, size * 0.105)
-      const focusPosition = isSpiral
-        ? unwrappedAngle / SLOT_ANGLE
-        : unwrappedAngle / (TAU / items.length)
+      const focusPosition = unwrappedAngle / focusStep
       const nearestSlot = Math.round(focusPosition)
-      const logicalSlot = positiveModulo(nearestSlot, isSpiral ? cycleSlotCount : items.length)
-      const nextActive =
-        pointerInDeadZone || (isSpiral && logicalSlot >= items.length) ? null : logicalSlot
+      const logicalSlot = positiveModulo(nearestSlot, isSpiral ? cycleSlotCount : ringSlotCount)
+      const nextActive = pointerInDeadZone || logicalSlot >= items.length ? null : logicalSlot
 
       updateActive(nextActive)
       stage.dataset.focus = pointerInDeadZone ? 'dead' : nextActive === null ? 'blank' : 'item'
       stage.dataset.pointer = hasPointer ? 'tracking' : 'none'
       stage.style.setProperty('--dead-zone', `${deadZone}px`)
       stage.style.setProperty('--pointer-angle', `${positiveModulo(unwrappedAngle, TAU)}rad`)
-      stage.style.setProperty(
-        '--pointer-length',
-        `${Math.min(pointerDistance, baseRadius + size * 0.11)}px`,
-      )
+      stage.style.setProperty('--pointer-length', `${Math.min(pointerDistance, outerRadius)}px`)
       if (lastPointer) {
         const tiltX = Math.max(
           -4,
@@ -378,10 +384,8 @@ function RadialWheel({
           blankElements: blankRefs.current,
           divider,
           focusPosition,
-          unwrappedAngle,
           itemCount: items.length,
           paddedSlotCount: cycleSlotCount,
-          baseRadius,
           size,
           activeIndex: nextActive,
           leadingScaleRatio,
@@ -390,8 +394,9 @@ function RadialWheel({
       } else {
         renderRingItems({
           elements: itemRefs.current,
+          blankElements: blankRefs.current,
           itemCount: items.length,
-          baseRadius,
+          slotCount: ringSlotCount,
           size,
           activeIndex: nextActive,
         })
@@ -527,9 +532,8 @@ function RadialWheel({
 
       if (direction !== 0) {
         event.preventDefault()
-        const step = isSpiral ? SLOT_ANGLE : TAU / items.length
-        const currentSlot = Math.round(unwrappedAngle / step)
-        unwrappedAngle = (currentSlot + direction) * step
+        const currentSlot = Math.round(unwrappedAngle / focusStep)
+        unwrappedAngle = (currentSlot + direction) * focusStep
         lastWrappedAngle = positiveModulo(unwrappedAngle, TAU)
         pointerInDeadZone = false
         pointerDistance = stage.getBoundingClientRect().width * 0.34
@@ -610,28 +614,38 @@ function RadialWheel({
               <span>LOOP</span>
             </div>
 
-            {items.map((item, index) => (
-              <button
-                type="button"
-                ref={(element) => {
-                  itemRefs.current[index] = element
-                }}
-                className={styles.item}
-                key={item.id}
-                data-index={index}
-                data-focused={activeIndex === index}
-                aria-label={`${item.label}，余量 ${item.quantity}`}
-                onClick={() => confirmItem(index)}
-              >
-                <span className={styles.itemContent}>
-                  <span className={styles.itemIndex}>{String(index + 1).padStart(2, '0')}</span>
-                  <span className={styles.itemGlyph} aria-hidden="true">
-                    <ItemGlyph index={index} />
+            {items.flatMap((item, index) =>
+              itemCopyOffsets.map((cycleOffset) => (
+                <button
+                  type="button"
+                  ref={(element) => {
+                    const copies = itemRefs.current[index] ?? {}
+                    copies[cycleOffset] = element
+                    itemRefs.current[index] = copies
+                  }}
+                  className={styles.item}
+                  key={`${item.id}-${cycleOffset}`}
+                  data-index={cycleOffset === 0 ? index : undefined}
+                  data-item-index={index}
+                  data-cycle-copy={cycleOffset}
+                  data-focused={activeIndex === index && cycleOffset === 0}
+                  aria-hidden={cycleOffset === 0 ? undefined : true}
+                  aria-label={
+                    cycleOffset === 0 ? `${item.label}，余量 ${item.quantity}` : undefined
+                  }
+                  tabIndex={cycleOffset === 0 ? undefined : -1}
+                  onClick={() => confirmItem(index)}
+                >
+                  <span className={styles.itemContent}>
+                    <span className={styles.itemIndex}>{String(index + 1).padStart(2, '0')}</span>
+                    <span className={styles.itemGlyph} aria-hidden="true">
+                      <ItemGlyph index={index} />
+                    </span>
+                    <span className={styles.itemQuantity}>{item.quantity}</span>
                   </span>
-                  <span className={styles.itemQuantity}>{item.quantity}</span>
-                </span>
-              </button>
-            ))}
+                </button>
+              )),
+            )}
 
             {Array.from({ length: blankSlotCount }, (_, index) => (
               <div
@@ -674,32 +688,42 @@ function RadialWheel({
 
 function renderRingItems({
   elements,
+  blankElements,
   itemCount,
-  baseRadius,
+  slotCount,
   size,
   activeIndex,
 }: {
-  elements: Array<HTMLButtonElement | null>
+  elements: ItemElementCopies[]
+  blankElements: Array<HTMLDivElement | null>
   itemCount: number
-  baseRadius: number
+  slotCount: number
   size: number
   activeIndex: number | null
 }) {
-  const responsiveScale = size / SECTOR_REFERENCE_SIZE
-  const angularSpan = (TAU / itemCount) * 0.98
-  const targetWidth = 2 * baseRadius * Math.tan(angularSpan / 2)
-  const spanScale = targetWidth / (SECTOR_BASE_WIDTH * responsiveScale)
+  const angularSpan = (TAU / slotCount) * SECTOR_ANGULAR_FILL
+  const geometry = createSectorGeometry(size, angularSpan)
 
   for (let index = 0; index < itemCount; index += 1) {
-    const element = elements[index]
+    const element = elements[index]?.[0]
     if (!element) continue
-    const angle = (index / itemCount) * TAU
-    const x = Math.sin(angle) * baseRadius
-    const y = -Math.cos(angle) * baseRadius
-    setSectorTransform(element, x, y, angle, 1, spanScale, responsiveScale)
+    const angle = (index / slotCount) * TAU
+    setSectorTransform(element, geometry, angle, 1)
     element.style.opacity = '1'
     element.style.zIndex = activeIndex === index ? '20' : '10'
     element.style.pointerEvents = 'auto'
+    element.dataset.direction = 'current'
+  }
+
+  for (let index = 0; index < blankElements.length; index += 1) {
+    const element = blankElements[index]
+    if (!element) continue
+    const slotIndex = itemCount + index
+    const angle = (slotIndex / slotCount) * TAU
+    setSectorTransform(element, geometry, angle, 1)
+    element.style.opacity = EMPTY_SLOT_OPACITY.toFixed(3)
+    element.style.zIndex = '8'
+    element.style.pointerEvents = 'none'
     element.dataset.direction = 'current'
   }
 }
@@ -709,50 +733,48 @@ function renderSpiralItems({
   blankElements,
   divider,
   focusPosition,
-  unwrappedAngle,
   itemCount,
   paddedSlotCount,
-  baseRadius,
   size,
   activeIndex,
   leadingScaleRatio,
   trailingScaleRatio,
 }: {
-  elements: Array<HTMLButtonElement | null>
+  elements: ItemElementCopies[]
   blankElements: Array<HTMLDivElement | null>
   divider: HTMLElement
   focusPosition: number
-  unwrappedAngle: number
   itemCount: number
   paddedSlotCount: number
-  baseRadius: number
   size: number
   activeIndex: number | null
   leadingScaleRatio: number
   trailingScaleRatio: number
 }) {
-  for (let index = 0; index < itemCount; index += 1) {
-    const element = elements[index]
-    if (!element) continue
-    const nearestCycle = Math.round((focusPosition - index) / paddedSlotCount)
-    const trackPosition = index + nearestCycle * paddedSlotCount
-    const distance = trackPosition - focusPosition
-    const angle = unwrappedAngle + distance * SPIRAL_ANGLE
-    const scale = spiralScale(distance, leadingScaleRatio, trailingScaleRatio)
-    const radius = baseRadius * scale
-    const opacity = spiralVisibility(distance)
-    const x = Math.sin(angle) * radius
-    const y = -Math.cos(angle) * radius
-    const responsiveScale = size / SECTOR_REFERENCE_SIZE
-    const targetWidth = 2 * radius * Math.tan(SPIRAL_ANGLE / 2) * 0.9
-    const spanScale = targetWidth / (SECTOR_BASE_WIDTH * responsiveScale)
+  const geometry = createSectorGeometry(size, SLOT_ANGLE * SECTOR_ANGULAR_FILL)
 
-    setSectorTransform(element, x, y, angle, scale, spanScale, responsiveScale)
-    element.style.opacity = opacity.toFixed(3)
-    element.style.zIndex = String(Math.round(scale * 10) + (activeIndex === index ? 20 : 0))
-    element.style.pointerEvents = opacity > 0.16 ? 'auto' : 'none'
-    element.dataset.direction =
-      Math.abs(distance) < 0.5 ? 'current' : distance < 0 ? 'before' : 'after'
+  for (let index = 0; index < itemCount; index += 1) {
+    const nearestCycle = Math.round((focusPosition - index) / paddedSlotCount)
+
+    for (const cycleOffset of SPIRAL_COPY_OFFSETS) {
+      const element = elements[index]?.[cycleOffset]
+      if (!element) continue
+      const trackPosition = index + (nearestCycle + cycleOffset) * paddedSlotCount
+      const distance = trackPosition - focusPosition
+      const angle = trackPosition * SLOT_ANGLE
+      const scale = spiralScale(distance, leadingScaleRatio, trailingScaleRatio)
+      const opacity = spiralVisibility(distance)
+      const isPrimaryCopy = cycleOffset === 0
+
+      setSectorTransform(element, geometry, angle, scale)
+      element.style.opacity = opacity.toFixed(3)
+      element.style.zIndex = String(
+        Math.round(scale * 10) + (isPrimaryCopy && activeIndex === index ? 20 : 0),
+      )
+      element.style.pointerEvents = opacity > 0.16 ? 'auto' : 'none'
+      element.dataset.direction =
+        Math.abs(distance) < 0.5 ? 'current' : distance < 0 ? 'before' : 'after'
+    }
   }
 
   for (let index = 0; index < blankElements.length; index += 1) {
@@ -762,20 +784,11 @@ function renderSpiralItems({
     const nearestCycle = Math.round((focusPosition - slotIndex) / paddedSlotCount)
     const trackPosition = slotIndex + nearestCycle * paddedSlotCount
     const distance = trackPosition - focusPosition
-    const angle = unwrappedAngle + distance * SPIRAL_ANGLE
+    const angle = trackPosition * SLOT_ANGLE
     const scale = spiralScale(distance, leadingScaleRatio, trailingScaleRatio)
-    const radius = baseRadius * scale
-    const opacity =
-      spiralVisibility(distance) *
-      (distance < 0 ? smoothstep(-1.5, 0, distance) : 1) *
-      EMPTY_SLOT_OPACITY
-    const x = Math.sin(angle) * radius
-    const y = -Math.cos(angle) * radius
-    const responsiveScale = size / SECTOR_REFERENCE_SIZE
-    const targetWidth = 2 * radius * Math.tan(SPIRAL_ANGLE / 2) * 0.9
-    const spanScale = targetWidth / (SECTOR_BASE_WIDTH * responsiveScale)
+    const opacity = spiralVisibility(distance) * EMPTY_SLOT_OPACITY
 
-    setSectorTransform(element, x, y, angle, scale, spanScale, responsiveScale)
+    setSectorTransform(element, geometry, angle, scale)
     element.style.opacity = opacity.toFixed(3)
     element.style.zIndex = String(Math.round(scale * 10))
     element.style.pointerEvents = 'none'
@@ -786,9 +799,9 @@ function renderSpiralItems({
   const dividerTrackPosition =
     Math.round((focusPosition + 0.48) / paddedSlotCount) * paddedSlotCount - 0.48
   const dividerDistance = dividerTrackPosition - focusPosition
-  const dividerAngle = unwrappedAngle + dividerDistance * SPIRAL_ANGLE
+  const dividerAngle = dividerTrackPosition * SLOT_ANGLE
   const dividerScale = spiralScale(dividerDistance, leadingScaleRatio, trailingScaleRatio)
-  const dividerRadius = baseRadius * dividerScale
+  const dividerRadius = geometry.centerRadius * dividerScale
   const dividerX = Math.sin(dividerAngle) * dividerRadius
   const dividerY = -Math.cos(dividerAngle) * dividerRadius
   const dividerOpacity = spiralVisibility(dividerDistance)
@@ -797,28 +810,103 @@ function renderSpiralItems({
   divider.style.opacity = dividerOpacity.toFixed(3)
 }
 
+type SectorGeometry = {
+  width: number
+  height: number
+  centerRadius: number
+  clipPath: string
+  fillClipPath: string
+  innerRadius: number
+  outerRadius: number
+}
+
+function createSectorGeometry(size: number, angularSpan: number): SectorGeometry {
+  const innerRadius = size * SECTOR_INNER_RADIUS_RATIO
+  const outerRadius = size * SECTOR_OUTER_RADIUS_RATIO
+  const halfAngle = angularSpan / 2
+  const halfWidth = outerRadius * Math.sin(halfAngle)
+  const width = halfWidth * 2
+  const height = outerRadius - innerRadius * Math.cos(halfAngle)
+  const centerRadius = outerRadius - height / 2
+  const clipPath = sectorPath({
+    boxCenterX: halfWidth,
+    circleCenterY: outerRadius,
+    innerRadius,
+    outerRadius,
+    halfAngle,
+  })
+  const strokeInset = Math.max(1, size / 720)
+  const fillHalfAngle = Math.max(0, halfAngle - strokeInset / centerRadius)
+  const fillClipPath = sectorPath({
+    boxCenterX: halfWidth,
+    circleCenterY: outerRadius,
+    innerRadius: innerRadius + strokeInset,
+    outerRadius: outerRadius - strokeInset,
+    halfAngle: fillHalfAngle,
+  })
+
+  return {
+    width,
+    height,
+    centerRadius,
+    clipPath,
+    fillClipPath,
+    innerRadius,
+    outerRadius,
+  }
+}
+
+function sectorPath({
+  boxCenterX,
+  circleCenterY,
+  innerRadius,
+  outerRadius,
+  halfAngle,
+}: {
+  boxCenterX: number
+  circleCenterY: number
+  innerRadius: number
+  outerRadius: number
+  halfAngle: number
+}) {
+  const outerOffsetX = outerRadius * Math.sin(halfAngle)
+  const outerY = circleCenterY - outerRadius * Math.cos(halfAngle)
+  const innerOffsetX = innerRadius * Math.sin(halfAngle)
+  const innerY = circleCenterY - innerRadius * Math.cos(halfAngle)
+
+  return `path("M ${(boxCenterX - outerOffsetX).toFixed(2)} ${outerY.toFixed(2)} A ${outerRadius.toFixed(2)} ${outerRadius.toFixed(2)} 0 0 1 ${(boxCenterX + outerOffsetX).toFixed(2)} ${outerY.toFixed(2)} L ${(boxCenterX + innerOffsetX).toFixed(2)} ${innerY.toFixed(2)} A ${innerRadius.toFixed(2)} ${innerRadius.toFixed(2)} 0 0 0 ${(boxCenterX - innerOffsetX).toFixed(2)} ${innerY.toFixed(2)} Z")`
+}
+
 function setSectorTransform(
   element: HTMLElement,
-  x: number,
-  y: number,
+  geometry: SectorGeometry,
   angle: number,
   visualScale: number,
-  spanScale: number,
-  responsiveScale: number,
 ) {
-  element.style.transform = `translate3d(calc(-50% + ${x.toFixed(2)}px), calc(-50% + ${y.toFixed(2)}px), 0) rotate(${angle}rad) scale(${(visualScale * responsiveScale).toFixed(3)}) scaleX(${spanScale.toFixed(3)})`
+  const radius = geometry.centerRadius * visualScale
+  const x = Math.sin(angle) * radius
+  const y = -Math.cos(angle) * radius
+
+  element.style.width = `${geometry.width.toFixed(2)}px`
+  element.style.height = `${geometry.height.toFixed(2)}px`
+  element.style.clipPath = geometry.clipPath
+  element.style.setProperty('--sector-fill-clip', geometry.fillClipPath)
+  element.style.setProperty('--sector-inner-radius', `${geometry.innerRadius.toFixed(2)}px`)
+  element.style.setProperty('--sector-outer-radius', `${geometry.outerRadius.toFixed(2)}px`)
+  element.style.transform = `translate3d(calc(-50% + ${x.toFixed(2)}px), calc(-50% + ${y.toFixed(2)}px), 0) rotate(${angle}rad) scale(${visualScale.toFixed(3)})`
 
   const content = element.firstElementChild
   if (content instanceof HTMLElement) {
-    content.style.transform = `scaleX(${(1 / spanScale).toFixed(3)}) rotate(${-angle}rad)`
+    content.style.transform = `rotate(${-angle}rad)`
   }
 }
 
 function spiralVisibility(distance: number) {
-  if (distance < -5.7 || distance > 8.05) return 0
-  if (distance < -3.25) return smoothstep(-5.7, -3.25, distance)
-  if (distance > 4.25) return 1 - smoothstep(4.25, 8.05, distance)
-  return 1
+  const absoluteDistance = Math.abs(distance)
+  const hiddenDistance = FULLY_VISIBLE_SLOT_DISTANCE + FADING_SLOT_COUNT + 1
+  if (absoluteDistance <= FULLY_VISIBLE_SLOT_DISTANCE) return 1
+  if (absoluteDistance >= hiddenDistance) return 0
+  return 1 - smoothstep(FULLY_VISIBLE_SLOT_DISTANCE, hiddenDistance, absoluteDistance)
 }
 
 function spiralScale(distance: number, leadingScaleRatio: number, trailingScaleRatio: number) {

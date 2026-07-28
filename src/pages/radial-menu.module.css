@@ -528,16 +528,14 @@
 .item {
   --sector-stroke: var(--rule);
   --sector-fill: color-mix(in srgb, var(--surface-raised) 92%, transparent);
+  --sector-fill-clip: none;
 
-  width: 200px;
-  height: 150px;
   padding: 0;
   overflow: visible;
   border: 0;
   background: var(--sector-stroke);
   color: var(--muted);
   cursor: pointer;
-  clip-path: path("M 0 22 Q 100 -10 200 22 L 162 142 Q 100 112 38 142 Z");
   pointer-events: auto;
 }
 
@@ -551,12 +549,11 @@
 .item::before {
   inset: 0;
   background: var(--sector-fill);
-  clip-path: inherit;
-  transform: scale(0.985);
+  clip-path: var(--sector-fill-clip);
 }
 
 .item::after {
-  top: 19px;
+  top: 13%;
   left: calc(50% - 6px);
   z-index: 1;
   width: 12px;
@@ -604,7 +601,7 @@
 .itemContent {
   position: absolute;
   z-index: 2;
-  inset: 23px 40px 19px;
+  inset: 16% 18% 13%;
   display: grid;
   grid-template-rows: auto 1fr auto;
   will-change: transform;
