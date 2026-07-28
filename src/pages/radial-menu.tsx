@@ -4,7 +4,8 @@ import '@fontsource-variable/noto-sans-sc/index.css'
 import styles from './radial-menu.module.css'
 
 import type { CSSProperties, ReactNode } from 'react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { useMemoizedFn } from '~/hooks'
 
 type ThemeMode = 'auto' | 'light' | 'dark'
 type WheelPhase = 'idle' | 'holding' | 'confirmed' | 'cancelled'
@@ -33,34 +34,104 @@ type SpiralCopyOffset = (typeof SPIRAL_COPY_OFFSETS)[number]
 type ItemElementCopies = Partial<Record<SpiralCopyOffset, HTMLButtonElement | null>>
 
 const MENU_ITEMS: MenuItem[] = [
-  { id: 'pulse', label: '脉冲信标', detail: '标记当前位置并广播短距信号', quantity: '03' },
-  { id: 'veil', label: '折光帷幕', detail: '展开一层短时光学遮蔽', quantity: '01' },
-  { id: 'drone', label: '侦察浮标', detail: '释放自动测绘单元', quantity: '04' },
-  { id: 'capsule', label: '修复胶囊', detail: '恢复附近装置的结构完整度', quantity: '12' },
-  { id: 'prism', label: '棱镜扫描', detail: '解析目标表面与能量特征', quantity: '08' },
-  { id: 'anchor', label: '重力锚点', detail: '稳定局部空间中的移动目标', quantity: '02' },
-  { id: 'flare', label: '冷焰照明', detail: '投射无热高亮标记', quantity: '06' },
-  { id: 'relay', label: '远距中继', detail: '建立一次性加密传输链路', quantity: '02' },
-  { id: 'phase', label: '相位钥匙', detail: '开启受保护的轨道接口', quantity: '01' },
-  { id: 'echo', label: '回声诱饵', detail: '复现最近记录的运动信号', quantity: '05' },
-  { id: 'shield', label: '偏转阵列', detail: '部署定向防护屏障', quantity: '02' },
-  { id: 'vector', label: '矢量推进', detail: '提供一次受控的方向脉冲', quantity: '07' },
-  { id: 'archive', label: '现场归档', detail: '保存当前环境的传感器快照', quantity: '24' },
-  { id: 'beacon', label: '返航坐标', detail: '设置下一次回收的导航原点', quantity: '01' },
+  {
+    id: 'pulse',
+    label: 'Pulse Beacon',
+    detail: 'Marks this position and broadcasts a short-range signal',
+    quantity: '03',
+  },
+  {
+    id: 'veil',
+    label: 'Refraction Veil',
+    detail: 'Deploys a short-lived optical shroud',
+    quantity: '01',
+  },
+  {
+    id: 'drone',
+    label: 'Survey Drone',
+    detail: 'Releases an autonomous mapping unit',
+    quantity: '04',
+  },
+  {
+    id: 'capsule',
+    label: 'Repair Capsule',
+    detail: 'Restores structural integrity to nearby devices',
+    quantity: '12',
+  },
+  {
+    id: 'prism',
+    label: 'Prism Scan',
+    detail: 'Resolves surface and energy signatures',
+    quantity: '08',
+  },
+  {
+    id: 'anchor',
+    label: 'Gravity Anchor',
+    detail: 'Stabilizes moving targets within local space',
+    quantity: '02',
+  },
+  {
+    id: 'flare',
+    label: 'Cold Flare',
+    detail: 'Projects a high-visibility marker without heat',
+    quantity: '06',
+  },
+  {
+    id: 'relay',
+    label: 'Long-Range Relay',
+    detail: 'Opens a one-use encrypted transmission link',
+    quantity: '02',
+  },
+  {
+    id: 'phase',
+    label: 'Phase Key',
+    detail: 'Unlocks protected orbital interfaces',
+    quantity: '01',
+  },
+  {
+    id: 'echo',
+    label: 'Echo Decoy',
+    detail: 'Replays the latest recorded motion signature',
+    quantity: '05',
+  },
+  {
+    id: 'shield',
+    label: 'Deflection Array',
+    detail: 'Deploys a directional defense barrier',
+    quantity: '02',
+  },
+  {
+    id: 'vector',
+    label: 'Vector Thruster',
+    detail: 'Delivers one controlled directional pulse',
+    quantity: '07',
+  },
+  {
+    id: 'archive',
+    label: 'Field Archive',
+    detail: 'Stores a sensor snapshot of the current environment',
+    quantity: '24',
+  },
+  {
+    id: 'beacon',
+    label: 'Return Beacon',
+    detail: 'Sets the navigation origin for the next extraction',
+    quantity: '01',
+  },
 ]
 
 export default function RadialMenuPage() {
   const [itemCount, setItemCount] = useState<(typeof COUNT_OPTIONS)[number]>(10)
   const [theme, setTheme] = useState<ThemeMode>('dark')
   const [loopMode, setLoopMode] = useState<LoopMode>('padded')
-  const [leadingScalePercent, setLeadingScalePercent] = useState(6)
-  const [trailingScalePercent, setTrailingScalePercent] = useState(6)
+  const [spiralDepthPercent, setSpiralDepthPercent] = useState(6)
   const [lastSelection, setLastSelection] = useState<MenuItem | null>(null)
-  const visibleItems = MENU_ITEMS.slice(0, itemCount)
+  const visibleItems = useMemo(() => MENU_ITEMS.slice(0, itemCount), [itemCount])
 
   return (
     <main
       className={styles.page}
+      lang="en"
       style={
         {
           colorScheme: theme === 'auto' ? 'light dark' : theme,
@@ -78,7 +149,7 @@ export default function RadialMenuPage() {
           </div>
         </div>
 
-        <div className={styles.themeControl} aria-label="颜色模式">
+        <div className={styles.themeControl} role="group" aria-label="Color scheme">
           {(['auto', 'light', 'dark'] as const).map((mode) => (
             <button
               type="button"
@@ -86,7 +157,7 @@ export default function RadialMenuPage() {
               aria-pressed={theme === mode}
               onClick={() => setTheme(mode)}
             >
-              {{ auto: '自动', light: '亮色', dark: '暗色' }[mode]}
+              {{ auto: 'Auto', light: 'Light', dark: 'Dark' }[mode]}
             </button>
           ))}
         </div>
@@ -96,15 +167,16 @@ export default function RadialMenuPage() {
         <aside className={styles.intro}>
           <p className={styles.kicker}>Continuous angular input</p>
           <h1 id="radial-menu-title">
-            轨道
-            <span>指令环</span>
+            Orbital
+            <span>Command ring</span>
           </h1>
           <p className={styles.introCopy}>
-            以圆心为原点移动鼠标。八项以内保持等分圆环，超过八项后，指针的展开弧度会把菜单拉成连续螺旋。
+            Move the pointer around the center. Up to eight actions form an even ring; larger sets
+            unfold into a continuous spiral driven by pointer angle.
           </p>
 
           <fieldset className={styles.countControl}>
-            <legend>项目数量</legend>
+            <legend>Item count</legend>
             <div>
               {COUNT_OPTIONS.map((count) => (
                 <button
@@ -120,62 +192,43 @@ export default function RadialMenuPage() {
           </fieldset>
 
           <fieldset className={styles.loopControl}>
-            <legend>循环方式</legend>
+            <legend>Loop sequence</legend>
             <div>
               <button
                 type="button"
                 aria-pressed={loopMode === 'immediate'}
                 onClick={() => setLoopMode('immediate')}
               >
-                紧接末项
+                Continue after last
               </button>
               <button
                 type="button"
                 aria-pressed={loopMode === 'padded'}
                 onClick={() => setLoopMode('padded')}
               >
-                补满整圈
+                Complete the lap
               </button>
             </div>
           </fieldset>
 
-          <div className={styles.scaleControls} aria-label="螺旋层级强度">
+          <div className={styles.scaleControls} role="group" aria-label="Spiral depth control">
             <label>
               <span>
                 <span className={styles.scaleDescriptor}>
-                  <strong>前向展开</strong>
-                  <small>放大 · 外移</small>
+                  <strong>Spiral depth</strong>
+                  <small>Scale + radial offset</small>
                 </span>
-                <output>+{leadingScalePercent}% / 槽</output>
+                <output>{spiralDepthPercent}% / slot</output>
               </span>
               <input
                 type="range"
                 min="0"
                 max="12"
                 step="1"
-                value={leadingScalePercent}
-                aria-label="前向展开强度"
-                aria-valuetext={`每槽放大并外移 ${leadingScalePercent}%`}
-                onChange={(event) => setLeadingScalePercent(Number(event.currentTarget.value))}
-              />
-            </label>
-            <label>
-              <span>
-                <span className={styles.scaleDescriptor}>
-                  <strong>后向收束</strong>
-                  <small>缩小 · 内移</small>
-                </span>
-                <output>−{trailingScalePercent}% / 槽</output>
-              </span>
-              <input
-                type="range"
-                min="0"
-                max="12"
-                step="1"
-                value={trailingScalePercent}
-                aria-label="后向收束强度"
-                aria-valuetext={`每槽缩小并内移 ${trailingScalePercent}%`}
-                onChange={(event) => setTrailingScalePercent(Number(event.currentTarget.value))}
+                value={spiralDepthPercent}
+                aria-label="Spiral depth"
+                aria-valuetext={`${spiralDepthPercent}% expansion ahead and contraction behind per slot`}
+                onChange={(event) => setSpiralDepthPercent(Number(event.currentTarget.value))}
               />
             </label>
           </div>
@@ -183,8 +236,8 @@ export default function RadialMenuPage() {
           <div className={styles.primaryHint}>
             <kbd>Q</kbd>
             <span>
-              <strong>按住选择</strong>
-              <small>松开确认 · Esc 取消</small>
+              <strong>Hold to select</strong>
+              <small>Release to confirm · Esc to cancel</small>
             </span>
           </div>
         </aside>
@@ -193,12 +246,11 @@ export default function RadialMenuPage() {
           key={itemCount}
           items={visibleItems}
           loopMode={loopMode}
-          leadingScaleRatio={leadingScalePercent / 100}
-          trailingScaleRatio={trailingScalePercent / 100}
-          onConfirm={(item) => setLastSelection(item)}
+          spiralDepthRatio={spiralDepthPercent / 100}
+          onConfirm={setLastSelection}
         />
 
-        <aside className={styles.telemetry} aria-label="菜单信息">
+        <aside className={styles.telemetry} aria-label="Menu telemetry">
           <div className={styles.telemetryHeader}>
             <span aria-hidden="true" />
             <p>Input telemetry</p>
@@ -206,27 +258,27 @@ export default function RadialMenuPage() {
 
           <dl>
             <div>
-              <dt>轨道模式</dt>
-              <dd>{itemCount <= SLOTS_PER_LAP ? '等分圆环' : '连续螺旋'}</dd>
+              <dt>Track mode</dt>
+              <dd>{itemCount <= SLOTS_PER_LAP ? 'Even ring' : 'Continuous spiral'}</dd>
             </div>
             <div>
-              <dt>单圈槽位</dt>
+              <dt>Slots per lap</dt>
               <dd>08</dd>
             </div>
             <div>
-              <dt>展开弧度</dt>
+              <dt>Accumulated angle</dt>
               <dd data-angle-readout>0.00 rad</dd>
             </div>
             <div>
-              <dt>当前槽位</dt>
+              <dt>Current slot</dt>
               <dd data-slot-readout>—</dd>
             </div>
           </dl>
 
           <div className={styles.lastSelection} data-empty={!lastSelection}>
-            <span>最近确认</span>
-            <strong>{lastSelection?.label ?? '尚未选择'}</strong>
-            <small>{lastSelection?.detail ?? '松开 Q 或点击项目后显示'}</small>
+            <span>Last confirmed</span>
+            <strong>{lastSelection?.label ?? 'No selection'}</strong>
+            <small>{lastSelection?.detail ?? 'Release Q or click an item to confirm'}</small>
           </div>
         </aside>
       </section>
@@ -234,32 +286,30 @@ export default function RadialMenuPage() {
       <footer className={styles.footer}>
         <p>
           <span>Pointer</span>
-          绕圆心连续旋转
+          Orbit continuously around the center
         </p>
         <p>
           <span>Keyboard</span>
-          方向键移动 · Enter 确认
+          Arrow keys move · Enter confirms
         </p>
         <p>
           <span>Touch</span>
-          按住中心并向外拖动
+          Press the center and drag outward
         </p>
       </footer>
     </main>
   )
 }
 
-function RadialWheel({
+const RadialWheel = memo(function RadialWheel({
   items,
   loopMode,
-  leadingScaleRatio,
-  trailingScaleRatio,
+  spiralDepthRatio,
   onConfirm,
 }: {
   items: MenuItem[]
   loopMode: LoopMode
-  leadingScaleRatio: number
-  trailingScaleRatio: number
+  spiralDepthRatio: number
   onConfirm: (item: MenuItem) => void
 }) {
   const stageRef = useRef<HTMLDivElement>(null)
@@ -269,9 +319,12 @@ function RadialWheel({
   const focusLabelRef = useRef<HTMLDivElement>(null)
   const neutralLabelRef = useRef<HTMLDivElement>(null)
   const confirmTimerRef = useRef(0)
+  const activeIndexRef = useRef<number | null>(null)
+  const finishSelectionRef = useRef<((index: number) => void) | null>(null)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [confirmedItem, setConfirmedItem] = useState<MenuItem | null>(null)
   const [phase, setPhase] = useState<WheelPhase>('idle')
+  const itemCount = items.length
   const blankSlotCount =
     items.length < SLOTS_PER_LAP
       ? SLOTS_PER_LAP - items.length
@@ -281,21 +334,28 @@ function RadialWheel({
   const itemCopyOffsets: readonly SpiralCopyOffset[] =
     items.length > SLOTS_PER_LAP ? SPIRAL_COPY_OFFSETS : [0]
 
-  const confirmItem = useCallback(
-    (index: number) => {
-      const item = items[index]
-      if (!item) return
+  const renderConfigRef = useRef({ items, loopMode, spiralDepthRatio })
+  const scheduleRenderRef = useRef<() => void>(() => {})
+  renderConfigRef.current = { items, loopMode, spiralDepthRatio }
 
-      window.clearTimeout(confirmTimerRef.current)
-      setConfirmedItem(item)
-      setPhase('confirmed')
-      onConfirm(item)
-      confirmTimerRef.current = window.setTimeout(() => {
-        setPhase('idle')
-      }, 520)
-    },
-    [items, onConfirm],
-  )
+  const confirmItem = useMemoizedFn((index: number) => {
+    const item = items[index]
+    if (!item) return
+
+    window.clearTimeout(confirmTimerRef.current)
+    setConfirmedItem(item)
+    setPhase('confirmed')
+    onConfirm(item)
+    confirmTimerRef.current = window.setTimeout(() => {
+      setPhase('idle')
+    }, 520)
+  })
+
+  const selectItem = (index: number) => {
+    const finishSelection = finishSelectionRef.current
+    if (finishSelection) finishSelection(index)
+    else confirmItem(index)
+  }
 
   useEffect(() => {
     return () => window.clearTimeout(confirmTimerRef.current)
@@ -306,22 +366,19 @@ function RadialWheel({
     const divider = dividerRef.current
     const focusLabel = focusLabelRef.current
     const neutralLabel = neutralLabelRef.current
-    const angleReadout = document.querySelector<HTMLElement>('[data-angle-readout]')
-    const slotReadout = document.querySelector<HTMLElement>('[data-slot-readout]')
     if (!stage || !divider || !focusLabel || !neutralLabel) return
+    const page = stage.closest('main')
+    const angleReadout = page?.querySelector<HTMLElement>('[data-angle-readout]')
+    const slotReadout = page?.querySelector<HTMLElement>('[data-slot-readout]')
 
     const abortController = new AbortController()
     const { signal } = abortController
-    const isSpiral = items.length > SLOTS_PER_LAP
-    const ringSlotCount = Math.max(items.length, SLOTS_PER_LAP)
-    const cycleSlotCount =
-      loopMode === 'immediate'
-        ? items.length
-        : Math.ceil(items.length / SLOTS_PER_LAP) * SLOTS_PER_LAP
+    const isSpiral = itemCount > SLOTS_PER_LAP
+    const ringSlotCount = Math.max(itemCount, SLOTS_PER_LAP)
     const focusStep = isSpiral ? SLOT_ANGLE : TAU / ringSlotCount
 
     let animationFrame = 0
-    let active = null as number | null
+    let active = activeIndexRef.current
     let unwrappedAngle = 0
     let lastWrappedAngle = null as number | null
     let lastPointer = null as { x: number; y: number } | null
@@ -329,18 +386,28 @@ function RadialWheel({
     let pointerInDeadZone = true
     let hasPointer = false
     let qHeld = false
-    let qCancelled = false
     let dragPointerId = null as number | null
     let displayedLabelSlot = null as number | null
+    let syncingItemFocus = false
 
     const updateActive = (nextActive: number | null) => {
       if (active === nextActive) return
       active = nextActive
+      activeIndexRef.current = nextActive
       setActiveIndex(nextActive)
     }
 
     const render = () => {
       animationFrame = 0
+      const {
+        items: currentItems,
+        loopMode: currentLoopMode,
+        spiralDepthRatio: currentSpiralDepthRatio,
+      } = renderConfigRef.current
+      const cycleSlotCount =
+        currentLoopMode === 'immediate'
+          ? currentItems.length
+          : Math.ceil(currentItems.length / SLOTS_PER_LAP) * SLOTS_PER_LAP
       const rect = stage.getBoundingClientRect()
       const size = Math.min(rect.width, rect.height)
       const outerRadius = size * SECTOR_OUTER_RADIUS_RATIO
@@ -348,7 +415,8 @@ function RadialWheel({
       const focusPosition = unwrappedAngle / focusStep
       const nearestSlot = Math.round(focusPosition)
       const logicalSlot = positiveModulo(nearestSlot, isSpiral ? cycleSlotCount : ringSlotCount)
-      const nextActive = pointerInDeadZone || logicalSlot >= items.length ? null : logicalSlot
+      const nextActive =
+        pointerInDeadZone || logicalSlot >= currentItems.length ? null : logicalSlot
 
       updateActive(nextActive)
       stage.dataset.focus = pointerInDeadZone ? 'dead' : nextActive === null ? 'blank' : 'item'
@@ -384,18 +452,17 @@ function RadialWheel({
           blankElements: blankRefs.current,
           divider,
           focusPosition,
-          itemCount: items.length,
+          itemCount: currentItems.length,
           paddedSlotCount: cycleSlotCount,
           size,
           activeIndex: nextActive,
-          leadingScaleRatio,
-          trailingScaleRatio,
+          spiralDepthRatio: currentSpiralDepthRatio,
         })
       } else {
         renderRingItems({
           elements: itemRefs.current,
           blankElements: blankRefs.current,
-          itemCount: items.length,
+          itemCount: currentItems.length,
           slotCount: ringSlotCount,
           size,
           activeIndex: nextActive,
@@ -404,17 +471,25 @@ function RadialWheel({
       }
 
       if (displayedLabelSlot !== logicalSlot) {
-        updateFocusLabel(focusLabel, items, logicalSlot)
+        updateFocusLabel(focusLabel, currentItems, logicalSlot)
         displayedLabelSlot = logicalSlot
       }
       focusLabel.style.opacity = pointerInDeadZone ? '0' : '1'
-      neutralLabel.textContent = pointerInDeadZone ? '中心安全区' : '轨道留白'
+      neutralLabel.textContent = pointerInDeadZone ? 'Center safe zone' : 'Empty slot'
     }
 
     const scheduleRender = () => {
       if (animationFrame) return
       animationFrame = requestAnimationFrame(render)
     }
+
+    const flushRender = () => {
+      if (!animationFrame) return
+      cancelAnimationFrame(animationFrame)
+      render()
+    }
+
+    scheduleRenderRef.current = scheduleRender
 
     const setPointerPosition = (clientX: number, clientY: number) => {
       lastPointer = { x: clientX, y: clientY }
@@ -457,9 +532,39 @@ function RadialWheel({
       scheduleRender()
     }
 
+    const releaseDragPointer = () => {
+      const pointerId = dragPointerId
+      dragPointerId = null
+      if (pointerId !== null && stage.hasPointerCapture(pointerId)) {
+        stage.releasePointerCapture(pointerId)
+      }
+    }
+
+    const beginSelection = () => {
+      window.clearTimeout(confirmTimerRef.current)
+      setPhase('holding')
+      resetWheel()
+    }
+
+    const finishSelection = (explicitIndex?: number) => {
+      flushRender()
+      const nextActive = explicitIndex ?? active
+      qHeld = false
+      releaseDragPointer()
+
+      if (nextActive === null) {
+        setPhase('idle')
+        return false
+      }
+
+      confirmItem(nextActive)
+      return true
+    }
+    finishSelectionRef.current = finishSelection
+
     const cancelSelection = () => {
       qHeld = false
-      qCancelled = true
+      releaseDragPointer()
       setPhase('cancelled')
       resetWheel()
       window.clearTimeout(confirmTimerRef.current)
@@ -476,50 +581,70 @@ function RadialWheel({
         event.clientY >= rect.top &&
         event.clientY <= rect.bottom
 
-      if (!qHeld && dragPointerId === null && !isInsideStage) return
+      if (!qHeld && dragPointerId === null && !isInsideStage) {
+        if (hasPointer) resetWheel()
+        return
+      }
       setPointerPosition(event.clientX, event.clientY)
     }
 
     const onPointerDown = (event: PointerEvent) => {
-      if (event.pointerType !== 'touch') return
+      if (event.pointerType !== 'touch' || qHeld || dragPointerId !== null) return
       event.preventDefault()
       dragPointerId = event.pointerId
       stage.setPointerCapture(event.pointerId)
-      resetWheel()
-      setPhase('holding')
+      beginSelection()
       setPointerPosition(event.clientX, event.clientY)
     }
 
     const onPointerUp = (event: PointerEvent) => {
       if (dragPointerId !== event.pointerId) return
       event.preventDefault()
-      dragPointerId = null
-      if (stage.hasPointerCapture(event.pointerId)) stage.releasePointerCapture(event.pointerId)
-      if (active !== null) confirmItem(active)
-      else setPhase('idle')
+      finishSelection()
+    }
+
+    const onPointerCancel = (event: PointerEvent) => {
+      if (dragPointerId !== event.pointerId) return
+      event.preventDefault()
+      cancelSelection()
+    }
+
+    const onFocusIn = (event: FocusEvent) => {
+      const target = event.target
+      if (!(target instanceof HTMLButtonElement) || target.dataset.cycleCopy !== '0') return
+      if (syncingItemFocus) {
+        syncingItemFocus = false
+        return
+      }
+      const index = Number(target.dataset.itemIndex)
+      if (!Number.isInteger(index)) return
+
+      unwrappedAngle = index * focusStep
+      lastWrappedAngle = positiveModulo(unwrappedAngle, TAU)
+      lastPointer = null
+      pointerInDeadZone = false
+      pointerDistance = stage.getBoundingClientRect().width * 0.34
+      hasPointer = true
+      scheduleRender()
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
-      const target = event.target
-      const isTextInput =
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLTextAreaElement ||
-        (target instanceof HTMLElement && target.isContentEditable)
-      if (isTextInput) return
-
-      if (event.key.toLowerCase() === 'q') {
-        if (event.repeat || qHeld) return
-        event.preventDefault()
-        qHeld = true
-        qCancelled = false
-        setPhase('holding')
-        resetWheel()
+      if (event.key === 'Escape') {
+        if (qHeld || dragPointerId !== null) {
+          event.preventDefault()
+          cancelSelection()
+        } else if (hasPointer) {
+          resetWheel()
+        }
         return
       }
 
-      if (event.key === 'Escape') {
+      if (event.key.toLowerCase() === 'q') {
+        if (isEditableKeyboardTarget(event.target)) return
+        if (event.repeat || qHeld || dragPointerId !== null) return
         event.preventDefault()
-        cancelSelection()
+        qHeld = true
+        beginSelection()
         return
       }
 
@@ -531,29 +656,58 @@ function RadialWheel({
             : 0
 
       if (direction !== 0) {
+        const movesFocusedItem = isPrimaryRadialItemTarget(stage, event.target)
+        if (isInteractiveKeyboardTarget(event.target) && !movesFocusedItem) {
+          return
+        }
         event.preventDefault()
         const currentSlot = Math.round(unwrappedAngle / focusStep)
-        unwrappedAngle = (currentSlot + direction) * focusStep
+        const cycleSlotCount = isSpiral
+          ? renderConfigRef.current.loopMode === 'immediate'
+            ? itemCount
+            : Math.ceil(itemCount / SLOTS_PER_LAP) * SLOTS_PER_LAP
+          : ringSlotCount
+        let nextSlot = currentSlot + direction
+        if (movesFocusedItem) {
+          while (positiveModulo(nextSlot, cycleSlotCount) >= itemCount) {
+            nextSlot += direction
+          }
+        }
+        unwrappedAngle = nextSlot * focusStep
         lastWrappedAngle = positiveModulo(unwrappedAngle, TAU)
         pointerInDeadZone = false
         pointerDistance = stage.getBoundingClientRect().width * 0.34
         hasPointer = true
         scheduleRender()
+        if (movesFocusedItem) {
+          flushRender()
+          const nextIndex = positiveModulo(nextSlot, cycleSlotCount)
+          const nextItem = itemRefs.current[nextIndex]?.[0]
+          if (nextItem && nextItem !== document.activeElement) {
+            syncingItemFocus = true
+            nextItem.focus({ preventScroll: true })
+          }
+        }
         return
       }
 
-      if (event.key === 'Enter' && active !== null) {
+      if (event.key === 'Enter') {
+        if (event.repeat) {
+          if (isPrimaryRadialItemTarget(stage, event.target)) event.preventDefault()
+          return
+        }
+        if (isInteractiveKeyboardTarget(event.target)) return
+        flushRender()
+        if (active === null) return
         event.preventDefault()
-        confirmItem(active)
+        finishSelection()
       }
     }
 
     const onKeyUp = (event: KeyboardEvent) => {
       if (event.key.toLowerCase() !== 'q' || !qHeld) return
       event.preventDefault()
-      qHeld = false
-      if (!qCancelled && active !== null) confirmItem(active)
-      else setPhase('idle')
+      finishSelection()
     }
 
     const onWindowBlur = () => {
@@ -563,7 +717,8 @@ function RadialWheel({
     window.addEventListener('pointermove', onPointerMove, { passive: true, signal })
     stage.addEventListener('pointerdown', onPointerDown, { signal })
     stage.addEventListener('pointerup', onPointerUp, { signal })
-    stage.addEventListener('pointercancel', onPointerUp, { signal })
+    stage.addEventListener('pointercancel', onPointerCancel, { signal })
+    stage.addEventListener('focusin', onFocusIn, { signal })
     document.addEventListener('keydown', onKeyDown, { signal })
     document.addEventListener('keyup', onKeyUp, { signal })
     window.addEventListener('blur', onWindowBlur, { signal })
@@ -573,9 +728,17 @@ function RadialWheel({
 
     return () => {
       abortController.abort()
+      qHeld = false
+      releaseDragPointer()
+      finishSelectionRef.current = null
+      scheduleRenderRef.current = () => {}
       if (animationFrame) cancelAnimationFrame(animationFrame)
     }
-  }, [confirmItem, items, leadingScaleRatio, loopMode, trailingScaleRatio])
+  }, [itemCount])
+
+  useEffect(() => {
+    scheduleRenderRef.current()
+  }, [loopMode, spiralDepthRatio])
 
   return (
     <div className={styles.wheelFrame}>
@@ -591,7 +754,8 @@ function RadialWheel({
         data-phase={phase}
         data-focus="dead"
         data-mode={items.length > SLOTS_PER_LAP ? 'spiral' : 'ring'}
-        aria-label={`${items.length} 项径向菜单`}
+        role="group"
+        aria-label={`${items.length}-item radial menu`}
       >
         <div className={styles.tiltPlane} data-tilt-plane>
           <div className={styles.orbitLines} aria-hidden="true">
@@ -631,10 +795,12 @@ function RadialWheel({
                   data-focused={activeIndex === index && cycleOffset === 0}
                   aria-hidden={cycleOffset === 0 ? undefined : true}
                   aria-label={
-                    cycleOffset === 0 ? `${item.label}，余量 ${item.quantity}` : undefined
+                    cycleOffset === 0
+                      ? `${String(index + 1).padStart(2, '0')} ${item.label}, ${item.quantity} remaining`
+                      : undefined
                   }
-                  tabIndex={cycleOffset === 0 ? undefined : -1}
-                  onClick={() => confirmItem(index)}
+                  tabIndex={cycleOffset === 0 && items.length <= SLOTS_PER_LAP ? undefined : -1}
+                  onClick={() => selectItem(index)}
                 >
                   <span className={styles.itemContent}>
                     <span className={styles.itemIndex}>{String(index + 1).padStart(2, '0')}</span>
@@ -669,22 +835,22 @@ function RadialWheel({
               aria-hidden="true"
             />
             <div ref={neutralLabelRef} className={styles.neutralLabel}>
-              中心安全区
+              Center safe zone
             </div>
             <span className={styles.coreInstruction}>
-              {phase === 'holding' ? '松开 Q 确认' : '移出圆心以选择'}
+              {phase === 'holding' ? 'Release Q to confirm' : 'Move beyond center to select'}
             </span>
           </div>
 
           <div className={styles.confirmation} aria-live="polite">
-            <span>已选择</span>
+            <span>Selected</span>
             <strong>{confirmedItem?.label ?? ''}</strong>
           </div>
         </div>
       </div>
     </div>
   )
-}
+})
 
 function renderRingItems({
   elements,
@@ -712,6 +878,7 @@ function renderRingItems({
     element.style.opacity = '1'
     element.style.zIndex = activeIndex === index ? '20' : '10'
     element.style.pointerEvents = 'auto'
+    element.tabIndex = 0
     element.dataset.direction = 'current'
   }
 
@@ -737,8 +904,7 @@ function renderSpiralItems({
   paddedSlotCount,
   size,
   activeIndex,
-  leadingScaleRatio,
-  trailingScaleRatio,
+  spiralDepthRatio,
 }: {
   elements: ItemElementCopies[]
   blankElements: Array<HTMLDivElement | null>
@@ -748,8 +914,7 @@ function renderSpiralItems({
   paddedSlotCount: number
   size: number
   activeIndex: number | null
-  leadingScaleRatio: number
-  trailingScaleRatio: number
+  spiralDepthRatio: number
 }) {
   const geometry = createSectorGeometry(size, SLOT_ANGLE * SECTOR_ANGULAR_FILL)
 
@@ -762,7 +927,7 @@ function renderSpiralItems({
       const trackPosition = index + (nearestCycle + cycleOffset) * paddedSlotCount
       const distance = trackPosition - focusPosition
       const angle = trackPosition * SLOT_ANGLE
-      const scale = spiralScale(distance, leadingScaleRatio, trailingScaleRatio)
+      const scale = spiralScale(distance, spiralDepthRatio)
       const opacity = spiralVisibility(distance)
       const isPrimaryCopy = cycleOffset === 0
 
@@ -772,6 +937,7 @@ function renderSpiralItems({
         Math.round(scale * 10) + (isPrimaryCopy && activeIndex === index ? 20 : 0),
       )
       element.style.pointerEvents = opacity > 0.16 ? 'auto' : 'none'
+      element.tabIndex = isPrimaryCopy && opacity > 0.16 ? 0 : -1
       element.dataset.direction =
         Math.abs(distance) < 0.5 ? 'current' : distance < 0 ? 'before' : 'after'
     }
@@ -785,7 +951,7 @@ function renderSpiralItems({
     const trackPosition = slotIndex + nearestCycle * paddedSlotCount
     const distance = trackPosition - focusPosition
     const angle = trackPosition * SLOT_ANGLE
-    const scale = spiralScale(distance, leadingScaleRatio, trailingScaleRatio)
+    const scale = spiralScale(distance, spiralDepthRatio)
     const opacity = spiralVisibility(distance) * EMPTY_SLOT_OPACITY
 
     setSectorTransform(element, geometry, angle, scale)
@@ -800,7 +966,7 @@ function renderSpiralItems({
     Math.round((focusPosition + 0.48) / paddedSlotCount) * paddedSlotCount - 0.48
   const dividerDistance = dividerTrackPosition - focusPosition
   const dividerAngle = dividerTrackPosition * SLOT_ANGLE
-  const dividerScale = spiralScale(dividerDistance, leadingScaleRatio, trailingScaleRatio)
+  const dividerScale = spiralScale(dividerDistance, spiralDepthRatio)
   const dividerRadius = geometry.centerRadius * dividerScale
   const dividerX = Math.sin(dividerAngle) * dividerRadius
   const dividerY = -Math.cos(dividerAngle) * dividerRadius
@@ -909,10 +1075,10 @@ function spiralVisibility(distance: number) {
   return 1 - smoothstep(FULLY_VISIBLE_SLOT_DISTANCE, hiddenDistance, absoluteDistance)
 }
 
-function spiralScale(distance: number, leadingScaleRatio: number, trailingScaleRatio: number) {
+function spiralScale(distance: number, spiralDepthRatio: number) {
   return distance < 0
-    ? Math.min(1.45, 1 + Math.min(-distance, 3) * leadingScaleRatio)
-    : Math.max(0.55, 1 - Math.min(distance, 5) * trailingScaleRatio)
+    ? Math.min(1.45, 1 + Math.min(-distance, 3) * spiralDepthRatio)
+    : Math.max(0.55, 1 - Math.min(distance, 5) * spiralDepthRatio)
 }
 
 function smoothstep(edgeStart: number, edgeEnd: number, value: number) {
@@ -924,11 +1090,34 @@ function positiveModulo(value: number, divisor: number) {
   return ((value % divisor) + divisor) % divisor
 }
 
+function isInteractiveKeyboardTarget(target: EventTarget | null) {
+  return (
+    target instanceof Element &&
+    target.closest(
+      'button, input, select, textarea, a[href], [contenteditable]:not([contenteditable="false"])',
+    ) !== null
+  )
+}
+
+function isEditableKeyboardTarget(target: EventTarget | null) {
+  return (
+    target instanceof Element &&
+    target.closest('input, select, textarea, [contenteditable]:not([contenteditable="false"])') !==
+      null
+  )
+}
+
+function isPrimaryRadialItemTarget(stage: HTMLElement, target: EventTarget | null) {
+  if (!(target instanceof Element)) return false
+  const item = target.closest<HTMLButtonElement>('button[data-cycle-copy="0"]')
+  return item !== null && stage.contains(item)
+}
+
 function updateFocusLabel(element: HTMLElement, items: MenuItem[], slot: number) {
   const item = items[slot]
   if (!item) {
     element.innerHTML =
-      '<span>EMPTY ARC</span><strong>轨道留白</strong><small>继续旋转以进入下一循环</small>'
+      '<span>EMPTY SLOT</span><strong>Empty slot</strong><small>Keep rotating to enter the next cycle</small>'
     return
   }
 

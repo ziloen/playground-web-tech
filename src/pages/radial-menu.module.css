@@ -5,7 +5,7 @@
   --ink: light-dark(#111817, #e6f2ef);
   --ink-strong: light-dark(#050908, #f7fffd);
   --muted: light-dark(#66736f, #82938f);
-  --faint: light-dark(#93a09c, #52635f);
+  --faint: light-dark(#56635f, #71827d);
   --rule: light-dark(#b8c2bd, #253331);
   --signal: light-dark(#087b77, #62d4c8);
   --signal-soft: light-dark(#b8ded7, #183c39);
@@ -118,7 +118,7 @@
 .countControl button,
 .loopControl button {
   min-width: 44px;
-  min-height: 36px;
+  min-height: 44px;
   border: 0;
   background: transparent;
   color: var(--muted);
@@ -136,8 +136,7 @@
 
 .themeControl button:focus-visible,
 .countControl button:focus-visible,
-.loopControl button:focus-visible,
-.item:focus-visible {
+.loopControl button:focus-visible {
   outline: 2px solid var(--brass);
   outline-offset: 3px;
 }
@@ -285,7 +284,7 @@
 
 .scaleControls input {
   width: 100%;
-  height: 12px;
+  height: 44px;
   margin: 0;
   appearance: none;
   background: transparent;
@@ -596,6 +595,13 @@
 
   color: var(--signal);
   filter: drop-shadow(0 0 18px color-mix(in srgb, var(--signal) 18%, transparent));
+}
+
+.item:focus-visible {
+  --sector-stroke: var(--brass);
+
+  outline: none;
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--brass) 48%, transparent));
 }
 
 .itemContent {
@@ -1044,10 +1050,6 @@
     grid-column: 1 / -1;
   }
 
-  .scaleControls {
-    grid-template-columns: 1fr 1fr;
-  }
-
   .wheelFrame {
     width: 100%;
     margin-top: 8px;
@@ -1092,6 +1094,16 @@
   }
 }
 
+@media (max-width: 760px) and (pointer: coarse) {
+  .footer p:first-child {
+    display: none;
+  }
+
+  .footer p:last-child {
+    display: flex;
+  }
+}
+
 @media (max-width: 440px) {
   .identity strong {
     font-size: 10px;
@@ -1103,8 +1115,8 @@
   }
 
   .themeControl button {
-    min-width: 34px;
-    min-height: 32px;
+    min-width: 44px;
+    min-height: 44px;
     font-size: 9px;
   }
 
@@ -1117,6 +1129,16 @@
   .wheel[data-mode="ring"] .tiltPlane {
     transform: none;
     will-change: auto;
+  }
+
+  .wheel[data-phase="confirmed"] .track {
+    animation: none;
+  }
+
+  .wheel[data-phase="confirmed"] .confirmation {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    animation: none;
   }
 
   .page *,

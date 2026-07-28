@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-react'
-import { cdp } from 'vitest/browser'
+import { cdp, userEvent } from 'vitest/browser'
 import RadialMenuPage from './radial-menu'
 
 describe('RadialMenuPage', () => {
@@ -15,8 +15,8 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     await nextFrame()
 
-    const stage = screen.getByLabelText('8 项径向菜单').element()
-    const firstItem = screen.getByRole('button', { name: /脉冲信标，余量 03/ }).element()
+    const stage = screen.getByLabelText('8-item radial menu').element()
+    const firstItem = screen.getByRole('button', { name: /Pulse Beacon, 03 remaining/ }).element()
     const stageBounds = stage.getBoundingClientRect()
     const itemBounds = firstItem.getBoundingClientRect()
     const center = {
@@ -38,7 +38,7 @@ describe('RadialMenuPage', () => {
 
   it('keeps spiral sectors on fixed spokes while the pointer moves clockwise', async () => {
     const screen = await render(<RadialMenuPage />)
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
     const bounds = stage.getBoundingClientRect()
     const center = {
       x: bounds.left + bounds.width / 2,
@@ -70,7 +70,7 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     await nextFrame()
 
-    const stage = screen.getByLabelText('8 项径向菜单').element()
+    const stage = screen.getByLabelText('8-item radial menu').element()
     const stageBounds = stage.getBoundingClientRect()
     const sectors = Array.from(stage.querySelectorAll<HTMLElement>('[data-index]'))
     const radialDistances = sectors.map((sector) => {
@@ -109,7 +109,7 @@ describe('RadialMenuPage', () => {
 
   it('anchors the pointer indicator to the center and current pointer angle', async () => {
     const screen = await render(<RadialMenuPage />)
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
     const stageBounds = stage.getBoundingClientRect()
     const center = {
       x: stageBounds.left + stageBounds.width / 2,
@@ -148,7 +148,7 @@ describe('RadialMenuPage', () => {
       await nextFrame()
       await nextFrame()
 
-      const stage = screen.getByLabelText(`${itemCount} 项径向菜单`).element()
+      const stage = screen.getByLabelText(`${itemCount}-item radial menu`).element()
       const stageBounds = stage.getBoundingClientRect()
       const center = {
         x: stageBounds.left + stageBounds.width / 2,
@@ -183,7 +183,7 @@ describe('RadialMenuPage', () => {
 
   it('switches the center information discretely when the nearest focus changes', async () => {
     const screen = await render(<RadialMenuPage />)
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
     const bounds = stage.getBoundingClientRect()
     const center = {
       x: bounds.left + bounds.width / 2,
@@ -213,10 +213,10 @@ describe('RadialMenuPage', () => {
         .map((label) => label.textContent)
 
     await moveToSlotPosition(0.49)
-    expect(visibleCenterLabels()).toEqual(['脉冲信标'])
+    expect(visibleCenterLabels()).toEqual(['Pulse Beacon'])
 
     await moveToSlotPosition(0.51)
-    expect(visibleCenterLabels()).toEqual(['折光帷幕'])
+    expect(visibleCenterLabels()).toEqual(['Refraction Veil'])
   })
 
   it('tilts only finite rings toward the pointer within four degrees', async () => {
@@ -229,7 +229,7 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     await nextFrame()
 
-    let stage = screen.getByLabelText('8 项径向菜单').element()
+    let stage = screen.getByLabelText('8-item radial menu').element()
     let tiltPlane = stage.querySelector<HTMLElement>('[data-tilt-plane]')
     expect(tiltPlane).not.toBeNull()
 
@@ -275,7 +275,7 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     await nextFrame()
 
-    stage = screen.getByLabelText('10 项径向菜单').element()
+    stage = screen.getByLabelText('10-item radial menu').element()
     tiltPlane = stage.querySelector<HTMLElement>('[data-tilt-plane]')
     bounds = stage.getBoundingClientRect()
     movePointer({
@@ -290,7 +290,7 @@ describe('RadialMenuPage', () => {
 
   it('pads the unfinished spiral lap before starting a visibly divided new cycle', async () => {
     const screen = await render(<RadialMenuPage />)
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
 
     await traceClockwise(stage, 0, 1)
     expect(readAngle()).toBeCloseTo(Math.PI * 2, 1)
@@ -311,7 +311,7 @@ describe('RadialMenuPage', () => {
 
   it('renders padded blank slots as distinct non-interactive sectors', async () => {
     const screen = await render(<RadialMenuPage />)
-    let stage = screen.getByLabelText('10 项径向菜单').element()
+    let stage = screen.getByLabelText('10-item radial menu').element()
     let blankSectors = stage.querySelectorAll<HTMLElement>('[data-empty-slot]')
 
     expect(blankSectors).toHaveLength(6)
@@ -339,7 +339,9 @@ describe('RadialMenuPage', () => {
       getComputedStyle(contentSector!, '::before').backgroundImage,
     )
 
-    const immediateLoop = screen.getByRole('button', { name: '紧接末项', exact: true }).element()
+    const immediateLoop = screen
+      .getByRole('button', { name: 'Continue after last', exact: true })
+      .element()
     if (!(immediateLoop instanceof HTMLButtonElement)) {
       throw new TypeError('Expected the loop strategy control to be a button')
     }
@@ -347,14 +349,14 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     await nextFrame()
 
-    stage = screen.getByLabelText('10 项径向菜单').element()
+    stage = screen.getByLabelText('10-item radial menu').element()
     blankSectors = stage.querySelectorAll<HTMLElement>('[data-empty-slot]')
     expect(blankSectors).toHaveLength(0)
   })
 
   it.each([
-    { loopMode: '补满整圈', controlName: null, sectorCount: 16 },
-    { loopMode: '紧接末项', controlName: '紧接末项', sectorCount: 10 },
+    { loopMode: 'complete lap', controlName: null, sectorCount: 16 },
+    { loopMode: 'continue after last', controlName: 'Continue after last', sectorCount: 10 },
   ])(
     'keeps at most seven sectors fully opaque across repeated turns in $loopMode mode',
     async ({ controlName, sectorCount }) => {
@@ -370,7 +372,7 @@ describe('RadialMenuPage', () => {
         await nextFrame()
       }
 
-      const stage = screen.getByLabelText('10 项径向菜单').element()
+      const stage = screen.getByLabelText('10-item radial menu').element()
       const sectors = stage.querySelectorAll<HTMLElement>('[data-index], [data-empty-slot]')
       expect(sectors).toHaveLength(sectorCount)
 
@@ -398,7 +400,9 @@ describe('RadialMenuPage', () => {
   it('keeps three sectors on either side opaque, then fades three more on each side', async () => {
     const screen = await render(<RadialMenuPage />)
     const fourteenItems = screen.getByRole('button', { name: '14', exact: true }).element()
-    const immediateLoop = screen.getByRole('button', { name: '紧接末项', exact: true }).element()
+    const immediateLoop = screen
+      .getByRole('button', { name: 'Continue after last', exact: true })
+      .element()
     if (
       !(fourteenItems instanceof HTMLButtonElement) ||
       !(immediateLoop instanceof HTMLButtonElement)
@@ -410,7 +414,7 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     await nextFrame()
 
-    const stage = screen.getByLabelText('14 项径向菜单').element()
+    const stage = screen.getByLabelText('14-item radial menu').element()
     const opacities = Array.from(stage.querySelectorAll<HTMLElement>('[data-index]'), (sector) =>
       Number.parseFloat(getComputedStyle(sector).opacity),
     )
@@ -426,7 +430,9 @@ describe('RadialMenuPage', () => {
 
   it('can start the next spiral cycle immediately after the final item', async () => {
     const screen = await render(<RadialMenuPage />)
-    const immediateLoop = screen.getByRole('button', { name: '紧接末项', exact: true }).element()
+    const immediateLoop = screen
+      .getByRole('button', { name: 'Continue after last', exact: true })
+      .element()
     if (!(immediateLoop instanceof HTMLButtonElement)) {
       throw new TypeError('Expected the loop strategy control to be a button')
     }
@@ -434,7 +440,7 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     await nextFrame()
 
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
 
     await traceClockwise(stage, 0, 1)
     expect(document.querySelector('[data-slot-readout]')?.textContent).toBe('09')
@@ -452,7 +458,9 @@ describe('RadialMenuPage', () => {
 
   it('crossfades repeated items without teleporting them across an immediate-loop seam', async () => {
     const screen = await render(<RadialMenuPage />)
-    const immediateLoop = screen.getByRole('button', { name: '紧接末项', exact: true }).element()
+    const immediateLoop = screen
+      .getByRole('button', { name: 'Continue after last', exact: true })
+      .element()
     if (!(immediateLoop instanceof HTMLButtonElement)) {
       throw new TypeError('Expected the loop strategy control to be a button')
     }
@@ -460,7 +468,7 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     await nextFrame()
 
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
     const seamPosition = 5
     await traceClockwise(stage, 0, (seamPosition - 0.01) / 8)
     const before = readVisibleItemCopies(stage, 0)
@@ -483,7 +491,7 @@ describe('RadialMenuPage', () => {
 
   it('uses a restrained six-percent scale step around the focused spiral item', async () => {
     const screen = await render(<RadialMenuPage />)
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
     const bounds = stage.getBoundingClientRect()
     const angle = (Math.PI * 2 * 3) / 8
     const radius = bounds.width * 0.34
@@ -508,25 +516,22 @@ describe('RadialMenuPage', () => {
     expect(afterDistance / currentDistance).toBeCloseTo(0.94, 2)
   })
 
-  it('configures forward expansion and trailing convergence independently', async () => {
+  it('uses one spiral depth control for forward expansion and trailing convergence', async () => {
     const screen = await render(<RadialMenuPage />)
-    const enlargement = screen.getByRole('slider', { name: '前向展开强度' }).element()
-    const reduction = screen.getByRole('slider', { name: '后向收束强度' }).element()
-    if (!(enlargement instanceof HTMLInputElement) || !(reduction instanceof HTMLInputElement)) {
-      throw new TypeError('Expected two spiral depth controls')
+    const depthControl = screen.getByRole('slider', { name: 'Spiral depth' }).element()
+    if (!(depthControl instanceof HTMLInputElement)) {
+      throw new TypeError('Expected one spiral depth control')
     }
 
-    expect(screen.getByLabelText('螺旋层级强度')).toBeVisible()
-    expect(screen.getByText('放大 · 外移')).toBeVisible()
-    expect(screen.getByText('缩小 · 内移')).toBeVisible()
-    expect(enlargement.value).toBe('6')
-    expect(reduction.value).toBe('6')
-    setRangeValue(enlargement, 10)
-    setRangeValue(reduction, 3)
+    expect(document.querySelectorAll('input[type="range"]')).toHaveLength(1)
+    expect(screen.getByLabelText('Spiral depth control')).toBeVisible()
+    expect(screen.getByText('Scale + radial offset')).toBeVisible()
+    expect(depthControl.value).toBe('6')
+    setRangeValue(depthControl, 10)
     await nextFrame()
     await nextFrame()
 
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
     const bounds = stage.getBoundingClientRect()
     const angle = (Math.PI * 2 * 3) / 8
     const radius = bounds.width * 0.34
@@ -545,18 +550,26 @@ describe('RadialMenuPage', () => {
     const afterDistance = readRadialDistance(stage, 4)
 
     expect(before / current).toBeCloseTo(1.1, 2)
-    expect(after / current).toBeCloseTo(0.97, 2)
+    expect(after / current).toBeCloseTo(0.9, 2)
     expect(beforeDistance / currentDistance).toBeCloseTo(1.1, 2)
-    expect(afterDistance / currentDistance).toBeCloseTo(0.97, 2)
-    expect(screen.getByText('+10% / 槽')).toBeVisible()
-    expect(screen.getByText('−3% / 槽')).toBeVisible()
+    expect(afterDistance / currentDistance).toBeCloseTo(0.9, 2)
+    expect(screen.getByText('10% / slot')).toBeVisible()
+  })
+
+  it('renders the radial menu page entirely in English', async () => {
+    await render(<RadialMenuPage />)
+    const page = document.querySelector('main')
+
+    expect(page).not.toBeNull()
+    expect(page).toHaveAttribute('lang', 'en')
+    expect(page?.textContent).not.toMatch(/\p{Script=Han}/u)
   })
 
   it.each([
-    { count: '06', itemCount: 6, blankCount: 2, mode: 'ring', label: '等分圆环' },
-    { count: '08', itemCount: 8, blankCount: 0, mode: 'ring', label: '等分圆环' },
-    { count: '10', itemCount: 10, blankCount: 6, mode: 'spiral', label: '连续螺旋' },
-    { count: '14', itemCount: 14, blankCount: 2, mode: 'spiral', label: '连续螺旋' },
+    { count: '06', itemCount: 6, blankCount: 2, mode: 'ring', label: 'Even ring' },
+    { count: '08', itemCount: 8, blankCount: 0, mode: 'ring', label: 'Even ring' },
+    { count: '10', itemCount: 10, blankCount: 6, mode: 'spiral', label: 'Continuous spiral' },
+    { count: '14', itemCount: 14, blankCount: 2, mode: 'spiral', label: 'Continuous spiral' },
   ])(
     'uses $label for $count items and pads it with $blankCount blank slots',
     async ({ count, itemCount, blankCount, mode, label }) => {
@@ -569,8 +582,8 @@ describe('RadialMenuPage', () => {
       await nextFrame()
       await nextFrame()
 
-      const stage = screen.getByLabelText(`${itemCount} 项径向菜单`).element()
-      const modeReadout = screen.getByText('轨道模式').element().nextElementSibling
+      const stage = screen.getByLabelText(`${itemCount}-item radial menu`).element()
+      const modeReadout = screen.getByText('Track mode').element().nextElementSibling
 
       expect(stage.dataset.mode).toBe(mode)
       expect(stage.querySelectorAll('[data-index]')).toHaveLength(itemCount)
@@ -581,7 +594,7 @@ describe('RadialMenuPage', () => {
 
   it('starts a ten-item spiral with three fading sectors before the hidden range', async () => {
     const screen = await render(<RadialMenuPage />)
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
     await nextFrame()
     await nextFrame()
 
@@ -608,15 +621,35 @@ describe('RadialMenuPage', () => {
     expect(eight.pointerEvents).toBe('none')
   })
 
+  it('removes fully hidden spiral sectors from the tab order', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const fourteenItems = screen.getByRole('button', { name: '14', exact: true }).element()
+    if (!(fourteenItems instanceof HTMLButtonElement)) {
+      throw new TypeError('Expected the item count control to be a button')
+    }
+    fourteenItems.click()
+    await nextFrame()
+    await nextFrame()
+
+    const stage = screen.getByLabelText('14-item radial menu').element()
+    const primarySectors = stage.querySelectorAll<HTMLElement>('[data-cycle-copy="0"]')
+    const hiddenSectors = Array.from(primarySectors).filter(
+      (sector) => Number.parseFloat(getComputedStyle(sector).opacity) <= 0.16,
+    )
+
+    expect(hiddenSectors.length).toBeGreaterThan(0)
+    expect(hiddenSectors.every((sector) => sector.tabIndex === -1)).toBe(true)
+  })
+
   it('confirms on Q release only outside the safe zone and lets Escape cancel', async () => {
     const screen = await render(<RadialMenuPage />)
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
     const bounds = stage.getBoundingClientRect()
     const center = {
       x: bounds.left + bounds.width / 2,
       y: bounds.top + bounds.height / 2,
     }
-    const lastSelection = screen.getByText('最近确认').element().nextElementSibling
+    const lastSelection = screen.getByText('Last confirmed').element().nextElementSibling
 
     dispatchKey('keydown', 'q')
     movePointer({ x: center.x, y: center.y - bounds.height * 0.34 })
@@ -624,7 +657,7 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     dispatchKey('keyup', 'q')
     await nextFrame()
-    expect(lastSelection).toHaveTextContent('脉冲信标')
+    expect(lastSelection).toHaveTextContent('Pulse Beacon')
 
     dispatchKey('keydown', 'q')
     movePointer({ x: center.x + bounds.width * 0.04, y: center.y })
@@ -633,7 +666,7 @@ describe('RadialMenuPage', () => {
     dispatchKey('keyup', 'q')
     await nextFrame()
     expect(stage.dataset.focus).toBe('dead')
-    expect(lastSelection).toHaveTextContent('脉冲信标')
+    expect(lastSelection).toHaveTextContent('Pulse Beacon')
 
     dispatchKey('keydown', 'q')
     movePointer({ x: center.x + bounds.width * 0.34, y: center.y })
@@ -644,12 +677,57 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     expect(stage.dataset.phase).toBe('cancelled')
     expect(stage.dataset.focus).toBe('dead')
-    expect(lastSelection).toHaveTextContent('脉冲信标')
+    expect(lastSelection).toHaveTextContent('Pulse Beacon')
+  })
+
+  it('cancels an interrupted touch gesture without confirming it', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const stage = screen.getByLabelText('10-item radial menu').element()
+    const bounds = stage.getBoundingClientRect()
+    let capturedPointerId: number | null = null
+
+    stage.setPointerCapture = (pointerId) => {
+      capturedPointerId = pointerId
+    }
+    stage.hasPointerCapture = (pointerId) => capturedPointerId === pointerId
+    stage.releasePointerCapture = (pointerId) => {
+      if (capturedPointerId === pointerId) capturedPointerId = null
+    }
+
+    stage.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        pointerId: 7,
+        pointerType: 'touch',
+        clientX: bounds.left + bounds.width / 2,
+        clientY: bounds.top + bounds.height * 0.16,
+        bubbles: true,
+        cancelable: true,
+      }),
+    )
+    await nextFrame()
+    await nextFrame()
+    expect(stage.dataset.focus).toBe('item')
+
+    stage.dispatchEvent(
+      new PointerEvent('pointercancel', {
+        pointerId: 7,
+        pointerType: 'touch',
+        bubbles: true,
+        cancelable: true,
+      }),
+    )
+    await nextFrame()
+
+    expect(capturedPointerId).toBeNull()
+    expect(stage.dataset.phase).toBe('cancelled')
+    expect(screen.getByText('Last confirmed').element().nextElementSibling).toHaveTextContent(
+      'No selection',
+    )
   })
 
   it('supports arrow-key selection followed by Enter confirmation', async () => {
     const screen = await render(<RadialMenuPage />)
-    const stage = screen.getByLabelText('10 项径向菜单').element()
+    const stage = screen.getByLabelText('10-item radial menu').element()
 
     dispatchKey('keydown', 'ArrowRight')
     await nextFrame()
@@ -661,7 +739,241 @@ describe('RadialMenuPage', () => {
     dispatchKey('keydown', 'Enter')
     await nextFrame()
 
-    expect(screen.getByText('最近确认').element().nextElementSibling).toHaveTextContent('折光帷幕')
+    expect(screen.getByText('Last confirmed').element().nextElementSibling).toHaveTextContent(
+      'Refraction Veil',
+    )
+  })
+
+  it('syncs native item focus with the active slot and exposes labelled control groups', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const stage = screen.getByRole('group', { name: '10-item radial menu' }).element()
+    const firstItem = screen
+      .getByRole('button', { name: '01 Pulse Beacon, 03 remaining', exact: true })
+      .element()
+    if (!(firstItem instanceof HTMLButtonElement)) {
+      throw new TypeError('Expected the first radial-menu item to be a button')
+    }
+
+    expect(screen.getByRole('group', { name: 'Color scheme' }).element()).toBeInstanceOf(
+      HTMLDivElement,
+    )
+    expect(screen.getByRole('group', { name: 'Spiral depth control' }).element()).toBeInstanceOf(
+      HTMLDivElement,
+    )
+
+    firstItem.focus()
+    await nextFrame()
+    await nextFrame()
+
+    expect(stage).toHaveAttribute('data-focus', 'item')
+    expect(firstItem).toHaveAttribute('data-focused', 'true')
+    expect(stage.querySelector('[data-focus-label]')).toHaveTextContent('Pulse Beacon')
+
+    firstItem.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }),
+    )
+    await nextFrame()
+    await nextFrame()
+
+    const secondItem = screen
+      .getByRole('button', { name: '02 Refraction Veil, 01 remaining', exact: true })
+      .element()
+    expect(document.activeElement).toBe(secondItem)
+    expect(secondItem).toHaveAttribute('data-focused', 'true')
+    expect(document.querySelector('[data-slot-readout]')).toHaveTextContent('02')
+  })
+
+  it('keeps the active slot when unrelated page state changes', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const stage = screen.getByLabelText('10-item radial menu').element()
+    const bounds = stage.getBoundingClientRect()
+
+    movePointer({
+      x: bounds.left + bounds.width / 2,
+      y: bounds.top + bounds.height * 0.16,
+    })
+    await nextFrame()
+    await nextFrame()
+    expect(stage.dataset.focus).toBe('item')
+
+    const lightButton = screen.getByRole('button', { name: 'Light', exact: true }).element()
+    if (!(lightButton instanceof HTMLButtonElement)) {
+      throw new TypeError('Expected the light theme control to be a button')
+    }
+    lightButton.click()
+    await nextFrame()
+    await nextFrame()
+
+    expect(stage.dataset.focus).toBe('item')
+    dispatchKey('keydown', 'Enter')
+    await nextFrame()
+    expect(screen.getByText('Last confirmed').element().nextElementSibling).toHaveTextContent(
+      'Pulse Beacon',
+    )
+  })
+
+  it('confirms the latest pointer position even before the next animation frame', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const stage = screen.getByLabelText('10-item radial menu').element()
+    const bounds = stage.getBoundingClientRect()
+    const center = {
+      x: bounds.left + bounds.width / 2,
+      y: bounds.top + bounds.height / 2,
+    }
+
+    dispatchKey('keydown', 'q')
+    movePointer({ x: center.x, y: center.y - bounds.height * 0.34 })
+    await nextFrame()
+    await nextFrame()
+
+    movePointer({ x: center.x + bounds.width * 0.34, y: center.y })
+    dispatchKey('keyup', 'q')
+    await nextFrame()
+
+    expect(screen.getByText('Last confirmed').element().nextElementSibling).toHaveTextContent(
+      'Survey Drone',
+    )
+  })
+
+  it('does not let the global shortcut consume Enter from another control', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const stage = screen.getByLabelText('10-item radial menu').element()
+    const bounds = stage.getBoundingClientRect()
+
+    movePointer({
+      x: bounds.left + bounds.width / 2,
+      y: bounds.top + bounds.height * 0.16,
+    })
+    await nextFrame()
+    await nextFrame()
+
+    const lightButton = screen.getByRole('button', { name: 'Light', exact: true }).element()
+    if (!(lightButton instanceof HTMLButtonElement)) {
+      throw new TypeError('Expected the light theme control to be a button')
+    }
+    lightButton.focus()
+    lightButton.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
+    )
+    await nextFrame()
+
+    expect(screen.getByText('Last confirmed').element().nextElementSibling).toHaveTextContent(
+      'No selection',
+    )
+  })
+
+  it('keeps Q available when a non-editable control has focus', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const stage = screen.getByLabelText('10-item radial menu').element()
+    const lightButton = screen.getByRole('button', { name: 'Light', exact: true }).element()
+    if (!(lightButton instanceof HTMLButtonElement)) {
+      throw new TypeError('Expected the light theme control to be a button')
+    }
+    lightButton.focus()
+
+    lightButton.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'q', bubbles: true, cancelable: true }),
+    )
+    await nextFrame()
+    expect(stage.dataset.phase).toBe('holding')
+
+    lightButton.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'q', bubbles: true, cancelable: true }),
+    )
+    await nextFrame()
+    expect(stage.dataset.phase).toBe('idle')
+  })
+
+  it('ignores repeated global Enter keydown events', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const stage = screen.getByLabelText('10-item radial menu').element()
+    const bounds = stage.getBoundingClientRect()
+
+    movePointer({
+      x: bounds.left + bounds.width / 2,
+      y: bounds.top + bounds.height * 0.16,
+    })
+    await nextFrame()
+    await nextFrame()
+
+    const repeatedEnter = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      repeat: true,
+      bubbles: true,
+      cancelable: true,
+    })
+    expect(document.dispatchEvent(repeatedEnter)).toBe(true)
+    await nextFrame()
+    expect(screen.getByText('Last confirmed').element().nextElementSibling).toHaveTextContent(
+      'No selection',
+    )
+  })
+
+  it('prevents a held Enter key from repeatedly activating a focused radial item', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const firstItem = screen.getByRole('button', { name: /Pulse Beacon, 03 remaining/ }).element()
+    if (!(firstItem instanceof HTMLButtonElement)) {
+      throw new TypeError('Expected the first radial-menu item to be a button')
+    }
+    let clickCount = 0
+    firstItem.addEventListener('click', () => {
+      clickCount += 1
+    })
+    firstItem.focus()
+
+    await userEvent.keyboard('{Enter>3/}')
+    await nextFrame()
+
+    expect(clickCount).toBe(1)
+    expect(screen.getByText('Last confirmed').element().nextElementSibling).toHaveTextContent(
+      'Pulse Beacon',
+    )
+  })
+
+  it('ends a Q hold when an item is clicked instead of confirming again on Q release', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const stage = screen.getByLabelText('10-item radial menu').element()
+    const firstItem = screen.getByRole('button', { name: /Pulse Beacon, 03 remaining/ }).element()
+    if (!(firstItem instanceof HTMLButtonElement)) {
+      throw new TypeError('Expected the first radial-menu item to be a button')
+    }
+    const bounds = stage.getBoundingClientRect()
+
+    dispatchKey('keydown', 'q')
+    movePointer({
+      x: bounds.left + bounds.width / 2,
+      y: bounds.top + bounds.height * 0.16,
+    })
+    await nextFrame()
+    await nextFrame()
+    firstItem.click()
+    await nextFrame()
+
+    await wait(300)
+    dispatchKey('keyup', 'q')
+    await wait(250)
+
+    expect(stage.dataset.phase).toBe('idle')
+  })
+
+  it('does not let an earlier confirmation timer end a new hold', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const stage = screen.getByLabelText('10-item radial menu').element()
+    const firstItem = screen.getByRole('button', { name: /Pulse Beacon, 03 remaining/ }).element()
+    if (!(firstItem instanceof HTMLButtonElement)) {
+      throw new TypeError('Expected the first radial-menu item to be a button')
+    }
+
+    firstItem.click()
+    await nextFrame()
+    dispatchKey('keydown', 'q')
+    await nextFrame()
+    expect(stage.dataset.phase).toBe('holding')
+
+    await wait(540)
+    expect(stage.dataset.phase).toBe('holding')
+
+    dispatchKey('keyup', 'q')
   })
 
   it('switches light-dark tokens through the page color scheme', async () => {
@@ -672,7 +984,7 @@ describe('RadialMenuPage', () => {
     const darkBackground = getComputedStyle(page).backgroundColor
     expect(getComputedStyle(page).colorScheme).toBe('dark')
 
-    const lightButton = screen.getByRole('button', { name: '亮色', exact: true }).element()
+    const lightButton = screen.getByRole('button', { name: 'Light', exact: true }).element()
     if (!(lightButton instanceof HTMLButtonElement)) {
       throw new TypeError('Expected the light theme control to be a button')
     }
@@ -682,14 +994,14 @@ describe('RadialMenuPage', () => {
     expect(getComputedStyle(page).colorScheme).toBe('light')
     expect(lightBackground).not.toBe(darkBackground)
 
-    const autoButton = screen.getByRole('button', { name: '自动', exact: true }).element()
+    const autoButton = screen.getByRole('button', { name: 'Auto', exact: true }).element()
     if (!(autoButton instanceof HTMLButtonElement)) {
       throw new TypeError('Expected the automatic theme control to be a button')
     }
     autoButton.click()
     await nextFrame()
     expect(getComputedStyle(page).colorScheme).toBe('light dark')
-    expect(screen.getByRole('button', { name: '自动', exact: true })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Auto', exact: true })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
@@ -705,7 +1017,7 @@ describe('RadialMenuPage', () => {
     await nextFrame()
     await nextFrame()
 
-    const stage = screen.getByLabelText('8 项径向菜单').element()
+    const stage = screen.getByLabelText('8-item radial menu').element()
     const tiltPlane = stage.querySelector<HTMLElement>('[data-tilt-plane]')
     if (!tiltPlane) throw new TypeError('Expected a tilt plane')
     const bounds = stage.getBoundingClientRect()
@@ -724,6 +1036,26 @@ describe('RadialMenuPage', () => {
       await nextFrame()
 
       expect(getComputedStyle(tiltPlane).transform).toBe('none')
+    } finally {
+      await setReducedMotion('no-preference')
+    }
+  })
+
+  it('shows confirmation without animation when reduced motion is requested', async () => {
+    const screen = await render(<RadialMenuPage />)
+    const firstItem = screen.getByRole('button', { name: /Pulse Beacon, 03 remaining/ }).element()
+    const confirmation = screen.getByText('Selected').element().parentElement
+    if (!(firstItem instanceof HTMLButtonElement) || !(confirmation instanceof HTMLElement)) {
+      throw new TypeError('Expected a menu item and its confirmation panel')
+    }
+
+    try {
+      await setReducedMotion('reduce')
+      firstItem.click()
+      await nextFrame()
+
+      expect(getComputedStyle(confirmation).animationName).toBe('none')
+      expect(Number.parseFloat(getComputedStyle(confirmation).opacity)).toBe(1)
     } finally {
       await setReducedMotion('no-preference')
     }
@@ -817,6 +1149,12 @@ function positiveTestModulo(value: number, divisor: number) {
 function nextFrame() {
   return new Promise<void>((resolve) => {
     requestAnimationFrame(() => resolve())
+  })
+}
+
+function wait(milliseconds: number) {
+  return new Promise<void>((resolve) => {
+    window.setTimeout(resolve, milliseconds)
   })
 }
 

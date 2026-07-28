@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 
 /**
  * Waits for the next useEffect to execute a callback.
@@ -8,7 +8,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
  * const nextEffect = useNextEffect()
  *
  * async function onClick() {
- *   setEditing(true)
+ *   setIsEditing(true)
  *   nextEffect(() => {
  *     inputRef.current?.focus()
  *   })
@@ -20,16 +20,6 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
  */
 export function useNextEffect() {
   const callbacksRef = useRef<(() => void)[]>([])
-  const mountedRef = useRef(true)
-
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false
-
-      // Prevent stale callbacks after unmount
-      callbacksRef.current = []
-    }
-  }, [])
 
   useEffect(() => {
     if (!callbacksRef.current.length) return
@@ -43,36 +33,24 @@ export function useNextEffect() {
     }
   })
 
-  return useCallback((callback?: () => void) => {
+  return useRef((callback?: () => void) => {
     if (callback) {
       callbacksRef.current.push(callback)
     }
 
     return new Promise<void>((resolve) => {
-      callbacksRef.current.push(() => {
-        if (mountedRef.current) {
-          resolve()
-        }
-      })
+      callbacksRef.current.push(resolve)
     })
-  }, [])
+  }).current
 }
 
 /**
+ * useLayoutEffect version of {@link useNextEffect}.
+ *
  * @see {@link useNextEffect}
  */
 export function useNextLayoutEffect() {
   const callbacksRef = useRef<(() => void)[]>([])
-  const mountedRef = useRef(true)
-
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false
-
-      // Prevent stale callbacks after unmount
-      callbacksRef.current = []
-    }
-  }, [])
 
   useLayoutEffect(() => {
     if (!callbacksRef.current.length) return
@@ -86,17 +64,13 @@ export function useNextLayoutEffect() {
     }
   })
 
-  return useCallback((callback?: () => void) => {
+  return useRef((callback?: () => void) => {
     if (callback) {
       callbacksRef.current.push(callback)
     }
 
     return new Promise<void>((resolve) => {
-      callbacksRef.current.push(() => {
-        if (mountedRef.current) {
-          resolve()
-        }
-      })
+      callbacksRef.current.push(resolve)
     })
-  }, [])
+  }).current
 }
