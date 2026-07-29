@@ -76,7 +76,6 @@ export default function MarkdownPage() {
 
   const getItemKey = useMemoizedFn((index: number) => path[index]?.id ?? index)
 
-  // FIXME: 在使用鼠标中键进行向上滚动时，消息会出现跳动
   const virtualizer = useVirtualizer<HTMLElement, Element>({
     count: path.length,
     getScrollElement: () => scrollRef.current,
