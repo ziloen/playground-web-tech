@@ -738,13 +738,13 @@ function ScrollClipMargin() {
  * 将滚动容器默认滚动到中间位置
  */
 function ScrollDefaultCenter() {
-  const hideOnLoad = useCallback<RefCallback<HTMLElement>>((el) => {
+  const hideOnLoad = useRef<RefCallback<HTMLElement>>((el) => {
     if (!el) return
 
     requestAnimationFrame(() => {
       el.style.display = 'none'
     })
-  }, [])
+  }).current
 
   return (
     <div className="h-10 w-100 snap-x snap-mandatory overflow-x-auto">

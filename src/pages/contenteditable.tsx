@@ -19,7 +19,7 @@ export default function ContentEditableText() {
   const currentLength = useMotionValue(0)
   const messages = useMessages()
 
-  const inputRef = useCallback<RefCallback<HTMLDivElement>>((el) => {
+  const inputRef = useRef<RefCallback<HTMLDivElement>>((el) => {
     if (!el) return
 
     const ac = new AbortController()
@@ -60,7 +60,7 @@ export default function ContentEditableText() {
     el.addEventListener('compositionstart', (e) => {}, { signal: ac.signal })
 
     return () => ac.abort()
-  }, [])
+  }).current
 
   return (
     <div

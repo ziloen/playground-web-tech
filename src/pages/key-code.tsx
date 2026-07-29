@@ -20,7 +20,7 @@ export default function KeyCode() {
   const [stopPropagation, setStopPropagation, getStopPropagation] = useGetState(false)
   const [hideDeprecated, setHideDeprecated] = useState(true)
 
-  const ref = useCallback<RefCallback<HTMLDivElement>>((el) => {
+  const ref = useRef<RefCallback<HTMLDivElement>>((el) => {
     if (!el) return
 
     const ac = new AbortController()
@@ -39,7 +39,7 @@ export default function KeyCode() {
     )
 
     return () => ac.abort()
-  }, [])
+  }).current
 
   return (
     <div className="flex flex-col gap-2 p-2">

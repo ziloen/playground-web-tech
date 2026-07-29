@@ -3,6 +3,7 @@ import '@fontsource-variable/noto-sans-sc/index.css'
 
 import styles from './radial-menu.module.css'
 
+import { clamp } from 'es-toolkit/math'
 import type { CSSProperties, ReactNode } from 'react'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { useMemoizedFn } from '~/hooks'
@@ -425,13 +426,15 @@ const RadialWheel = memo(function RadialWheel({
       stage.style.setProperty('--pointer-angle', `${positiveModulo(unwrappedAngle, TAU)}rad`)
       stage.style.setProperty('--pointer-length', `${Math.min(pointerDistance, outerRadius)}px`)
       if (lastPointer) {
-        const tiltX = Math.max(
+        const tiltX = clamp(
+          ((rect.top + rect.height / 2 - lastPointer.y) / (rect.height / 2)) * 4,
           -4,
-          Math.min(4, ((rect.top + rect.height / 2 - lastPointer.y) / (rect.height / 2)) * 4),
+          4,
         )
-        const tiltY = Math.max(
+        const tiltY = clamp(
+          ((lastPointer.x - (rect.left + rect.width / 2)) / (rect.width / 2)) * 4,
           -4,
-          Math.min(4, ((lastPointer.x - (rect.left + rect.width / 2)) / (rect.width / 2)) * 4),
+          4,
         )
         stage.style.setProperty('--tilt-x', `${tiltX.toFixed(3)}deg`)
         stage.style.setProperty('--tilt-y', `${tiltY.toFixed(3)}deg`)
@@ -1082,7 +1085,7 @@ function spiralScale(distance: number, spiralDepthRatio: number) {
 }
 
 function smoothstep(edgeStart: number, edgeEnd: number, value: number) {
-  const normalized = Math.min(1, Math.max(0, (value - edgeStart) / (edgeEnd - edgeStart)))
+  const normalized = clamp((value - edgeStart) / (edgeEnd - edgeStart), 0, 1)
   return normalized * normalized * (3 - 2 * normalized)
 }
 
