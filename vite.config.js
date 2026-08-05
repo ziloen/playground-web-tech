@@ -132,6 +132,7 @@ export default defineConfig(({ command, mode }) => {
       },
       browser: {
         enabled: true,
+        ui: false,
         headless: true,
         provider: playwright({
           contextOptions: {

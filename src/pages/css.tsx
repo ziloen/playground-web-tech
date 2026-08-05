@@ -236,6 +236,33 @@ function AspectRatio() {
           }}
         />
       </div>
+
+      {/* 使用两张隐藏的相同图片分别定义不同维度以实现任意未知比例 */}
+      <div className="@container-size grid size-[100px] resizable place-content-center bg-dark-gray-600">
+        {/* 为 area-[1/1] 提供高度 */}
+        <div className="max-h-full w-0 area-[1/1]">
+          <img
+            className="h-max w-[100cqi] object-contain opacity-10"
+            src="https://dummyjson.com/image/300x200/0f766e/ecfeff?text=300x200"
+          />
+        </div>
+
+        {/* 为 area-[1/1] 提供宽度 */}
+        <div className="h-0 max-w-full area-[1/1]">
+          <img
+            className="h-[100cqb] w-max object-contain opacity-10"
+            src="https://dummyjson.com/image/300x200/0f766e/ecfeff?text=300x200"
+          />
+        </div>
+
+        {/* 消费 area-[1/1] */}
+        <div className="contain-size area-[1/1]">
+          <img
+            className="size-full object-contain"
+            src="https://dummyjson.com/image/300x200/0f766e/ecfeff?text=300x200"
+          />
+        </div>
+      </div>
     </div>
   )
 }
@@ -987,10 +1014,13 @@ function GridMinMaxColumns() {
   )
 }
 
-// TODO: grid 布局，不确定列数，不确定数量，最后一项撑满剩余空间
+// TODO: grid 布局，不确定列数，不确定数量，最后一项撑满剩余空间，只指定每列的最小宽度（但不能超过容器宽度），可能带有确定宽度的 gap。
+// 更激进的：任意一项撑满剩余列宽而不只是最后一项
 // 可能的实现1：grid-auto-columns: repeat(auto-fit, 100px) minmax(0, 1fr));
 // 可能的实现2：使用 anchor 元素，将最后一项和一个 absolute 的 column -1 的元素之间链接起来，视觉上达到效果
 // 可能的实现3：选择器选择 last-row，设置 colmn-start，last-child 设置 colmn-end: -1
+// 可能的实现4：使用 @container 手动计算然后根据 sibling-count() 给 last-child 设置 column-start
+// 可能的实现5：使用 subgrid 包装最后一个元素，父元素占据一列，子元素从父元素开始，span 到列尾。不可行，subgrid 只会继承父元素这一列。
 // +---+---+---+---+
 // | 1 | 2 | 3 | 4 |
 // +---+---+---+---+
