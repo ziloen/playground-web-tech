@@ -227,9 +227,9 @@ function AspectRatio() {
       {/* container query + known aspect ratio */}
       <div className="@container-size grid size-[100px] resizable place-items-center bg-dark-gray-600">
         <img
-          src="https://dummyjson.com/image/640x360/0f766e"
+          src="https://dummyjson.com/image/320x180/0f766e"
           style={{
-            '--aspect-ratio': '640 / 360',
+            '--aspect-ratio': '320 / 180',
             width: 'min(100cqw, calc(100cqh * var(--aspect-ratio)))',
             height: 'auto',
             aspectRatio: 'var(--aspect-ratio) auto',
@@ -243,13 +243,13 @@ function AspectRatio() {
         {/* 只提供宽度 */}
         <img
           aria-hidden="true"
-          className="pointer-events-none [margin-block:-50cqb] h-[100cqb] w-auto max-w-[100cqi] place-self-center opacity-10 area-[1/1]"
+          className="pointer-events-none -mb-[100cqb] h-[100cqb] w-max max-w-[100cqi] opacity-10 area-[1/1]"
           src="https://dummyjson.com/image/320x180/0f766e"
         />
 
         {/* 提供高度，同时作为最终可见图片 */}
         <img
-          className="[margin-inline:-50cqi] h-auto max-h-[100cqb] w-[100cqi] max-w-none place-self-center object-contain area-[1/1]"
+          className="-me-[100cqi] h-max max-h-[100cqb] w-[100cqi] max-w-full object-contain area-[1/1]"
           src="https://dummyjson.com/image/320x180/0f766e"
         />
       </div>
