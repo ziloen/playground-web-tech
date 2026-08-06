@@ -227,7 +227,7 @@ function AspectRatio() {
       {/* container query + known aspect ratio */}
       <div className="@container-size grid size-[100px] resizable place-items-center bg-dark-gray-600">
         <img
-          src="https://dummyjson.com/image/640x360/0f766e/ecfeff?text=640x360"
+          src="https://dummyjson.com/image/640x360/0f766e"
           style={{
             '--aspect-ratio': '640 / 360',
             width: 'min(100cqw, calc(100cqh * var(--aspect-ratio)))',
@@ -237,31 +237,21 @@ function AspectRatio() {
         />
       </div>
 
-      {/* 使用两张隐藏的相同图片分别定义不同维度以实现任意未知比例 */}
+      {/* 使用两张相同图片分别定义不同维度以实现任意未知比例 */}
+      {/* 未来可能可以使用 CSS Box Sizing Level 4 的 contain sizing keyword 来简化实现 */}
       <div className="@container-size grid size-[100px] resizable place-content-center bg-dark-gray-600">
-        {/* 为 area-[1/1] 提供高度 */}
-        <div className="max-h-full w-0 area-[1/1]">
-          <img
-            className="h-max w-[100cqi] object-contain opacity-10"
-            src="https://dummyjson.com/image/300x200/0f766e/ecfeff?text=300x200"
-          />
-        </div>
+        {/* 只提供宽度 */}
+        <img
+          aria-hidden="true"
+          className="pointer-events-none [margin-block:-50cqb] h-[100cqb] w-auto max-w-[100cqi] place-self-center opacity-10 area-[1/1]"
+          src="https://dummyjson.com/image/320x180/0f766e"
+        />
 
-        {/* 为 area-[1/1] 提供宽度 */}
-        <div className="h-0 max-w-full area-[1/1]">
-          <img
-            className="h-[100cqb] w-max object-contain opacity-10"
-            src="https://dummyjson.com/image/300x200/0f766e/ecfeff?text=300x200"
-          />
-        </div>
-
-        {/* 消费 area-[1/1] */}
-        <div className="contain-size area-[1/1]">
-          <img
-            className="size-full object-contain"
-            src="https://dummyjson.com/image/300x200/0f766e/ecfeff?text=300x200"
-          />
-        </div>
+        {/* 提供高度，同时作为最终可见图片 */}
+        <img
+          className="[margin-inline:-50cqi] h-auto max-h-[100cqb] w-[100cqi] max-w-none place-self-center object-contain area-[1/1]"
+          src="https://dummyjson.com/image/320x180/0f766e"
+        />
       </div>
     </div>
   )

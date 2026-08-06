@@ -1,14 +1,15 @@
+import { useQuery } from '@tanstack/react-query'
+import { asNonNullable } from '@wai-ri/core'
+import type { WorldState } from '~/api/warframe'
+import { getWorldStateApi } from '~/api/warframe'
+import { formatRelativeTime } from '~/utils/intl'
+
 // syndicateMissions: The Holdfasts, Cavia
 // globalUpgrades
 // duviriCycle
 // alerts
 // Riven trading
 // Ticker
-import { useQuery } from '@tanstack/react-query'
-import { asNonNullable } from '@wai-ri/core'
-import { Temporal } from 'temporal-polyfill'
-import type { WorldState } from '~/api/warframe'
-import { getWorldStateApi } from '~/api/warframe'
 
 // TODO:
 // 深度科研 deepArchimedea
@@ -69,13 +70,20 @@ function News({ data }: { data: WorldState }) {
                   decoding="async"
                   fetchPriority="low"
                   loading="lazy"
-                  crossOrigin="anonymous"
                 />
               </div>
             )}
 
             <div className="col-span-2 grid grid-cols-subgrid gap-1">
-              <span>{'[' + getRelativeString(news.date) + ']'}</span>
+              <span>
+                {'[' +
+                  formatRelativeTime(news.date, {
+                    style: 'narrow',
+                    numeric: 'always',
+                    language: 'en',
+                  }) +
+                  ']'}
+              </span>
 
               <span>{news.message}</span>
             </div>
@@ -84,28 +92,4 @@ function News({ data }: { data: WorldState }) {
       })}
     </div>
   )
-}
-
-function getRelativeString(date: string) {
-  const dateTime = Temporal.Instant.from(date).toZonedDateTimeISO('UTC')
-  const now = Temporal.Now.zonedDateTimeISO('UTC')
-  const diff = dateTime.since(now, {
-    largestUnit: 'years',
-    smallestUnit: 'minutes',
-  })
-
-  const rtf = new Intl.RelativeTimeFormat('en', {
-    style: 'narrow',
-    numeric: 'always',
-  })
-
-  const units = ['years', 'months', 'days', 'hours', 'minutes'] as const
-
-  for (const unit of units) {
-    if (diff[unit] !== 0) {
-      return rtf.format(diff[unit], unit)
-    }
-  }
-
-  return 'now'
 }
