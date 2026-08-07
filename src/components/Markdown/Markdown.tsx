@@ -178,9 +178,9 @@ const remarkPlugins = pluginList([
   [
     remarkGfm,
     {
-      plugins: {
-        autolinkLiteral: false,
-      },
+      plugins: { autolinkLiteral: false },
+      // 禁用单波浪线删除线语法
+      singleTilde: false,
     },
   ],
   [remarkMath, { displayMathInText: true }],

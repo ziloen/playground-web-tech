@@ -214,3 +214,19 @@ E_{\text{example}} &= \frac{500 \cdot \pi \cdot (1000)^3 \cdot (100000)^2}{12} \
 - [x] code
 - [x] math
 - [x] escaping
+
+今天天气晴转多云，气温28~34℃，体感闷热，湿度60%~80%，东南风2~3级，空气质量良。
+
+明天有雷阵雨，气温25~30℃，降水概率60%~70%，出门记得带伞。
+
+后天阴天转小雨，气温23~26℃，北风3~4级，路面积水湿滑，出行注意安全。
+
+周末冷空气南下，最低气温降至18~20℃，最高21~24℃，请适时增添衣物。
+
+Today will be sunny with some clouds, temperatures ranging from 28~34°C, humidity at 60%~80%, and a light southeast breeze of 2~3 on the Beaufort scale.
+
+Tomorrow brings scattered thunderstorms, with temperatures dropping to 25~30°C and a 60%~70% chance of rain. Don't forget your umbrella.
+
+Wednesday will be overcast turning to light drizzle, temperatures around 23~26°C, with a moderate north wind of 3~4. Roads may be slippery, so drive carefully.
+
+Over the weekend, a cold front moves in, pushing lows down to 18~20°C and highs to only 21~24°C. Time to layer up.
