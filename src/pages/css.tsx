@@ -1005,57 +1005,85 @@ function GridMinMaxColumns() {
 }
 
 // TODO: grid 布局，不确定列数，不确定数量，最后一项撑满剩余空间，只指定每列的最小宽度（但不能超过容器宽度），可能带有确定宽度的 gap。
-// 更激进的：任意一项撑满剩余列宽而不只是最后一项
-// 可能的实现1：grid-auto-columns: repeat(auto-fit, 100px) minmax(0, 1fr));
-// 可能的实现2：使用 anchor 元素，将最后一项和一个 absolute 的 column -1 的元素之间链接起来，视觉上达到效果
-// 可能的实现3：选择器选择 last-row，设置 colmn-start，last-child 设置 colmn-end: -1
-// 可能的实现4：使用 @container 手动计算然后根据 sibling-count() 给 last-child 设置 column-start
-// 可能的实现5：使用 subgrid 包装最后一个元素，父元素占据一列，子元素从父元素开始，span 到列尾。不可行，subgrid 只会继承父元素这一列。
-// +---+---+---+---+
-// | 1 | 2 | 3 | 4 |
-// +---+---+---+---+
-// |       5       |
-// +---------------+
+// 更激进的：任意一项撑满当前行剩余列宽而不只是最后一项
+// 可能的实现1：grid-auto-columns: repeat(auto-fit, 100px) minmax(0, 1fr));❌
+// 可能的实现2：使用 anchor 元素，将最后一项和一个 absolute 的 column -1 的元素之间链接起来，视觉上达到效果。❌
+// 可能的实现3：选择器选择 last-row，设置 colmn-start，last-child 设置 colmn-end: -1。❌，不存在此种选择器
+// 可能的实现4：使用 @container 手动计算然后根据 sibling-count() 给 last-child 设置 column-start/column-end。✅
+// 可能的实现5：使用 subgrid 包装最后一个元素，父元素占据一列，子元素从父元素开始，span 到列尾。❌，subgrid 只会继承父元素这一列。
+// +---+---+---+    +---+---+---+---+    +---+---+---+---+---+
+// | 1 | 2 | 3 |    | 1 | 2 | 3 | 4 |    | 1 | 2 | 3 | 4 | 5 |
+// +---+---+---+    +---+---+---+---+    +---+---+---+---+---+
+// | 4 |   5   |    |       5       |
+// +---+-------+    +---------------+
 //
-// +---+---+---+---+
-// | 1 | 2 | 3 | 4 |
-// +---+---+---+---+
-// | 5 |     6     |
-// +---------------+
+// +---+---+---+    +---+---+---+---+    +---+---+---+---+---+
+// | 1 | 2 | 3 |    | 1 | 2 | 3 | 4 |    | 1 | 2 | 3 | 4 | 5 |
+// +---+---+---+    +---+---+---+---+    +---+---+---+---+---+
+// | 4 | 5 | 6 |    | 5 |     6     |    |         6         |
+// +---+---+---+    +---+-----------+    +-------------------+
 //
-// +---+---+---+---+
-// | 1 | 2 | 3 | 4 |
-// +---+---+---+---+
-// | 5 | 6 |   7   |
-// +---------------+
+// +---+---+---+    +---+---+---+---+    +---+---+---+---+---+
+// | 1 | 2 | 3 |    | 1 | 2 | 3 | 4 |    | 1 | 2 | 3 | 4 | 5 |
+// +---+---+---+    +---+---+---+---+    +---+---+---+---+---+
+// | 4 | 5 | 6 |    | 5 | 6 |   7   |    | 6 |       7       |
+// +---+---+---+    +---+---+-------+    +---+---------------+
+// |     7     |
+// +-----------+
 //
-// +---+---+---+---+
-// | 1 | 2 | 3 | 4 |
-// +---+---+---+---+
-// | 5 | 6 | 7 | 8 |
-// +---------------+
+// +---+---+---+    +---+---+---+---+    +---+---+---+---+---+
+// | 1 | 2 | 3 |    | 1 | 2 | 3 | 4 |    | 1 | 2 | 3 | 4 | 5 |
+// +---+---+---+    +---+---+---+---+    +---+---+---+---+---+
+// | 4 | 5 | 6 |    | 5 | 6 | 7 | 8 |    | 6 | 7 |     8     |
+// +---+---+---+    +---+---+---+---+    +---+---+-----------+
+// | 7 |   8   |
+// +---+-------+
 function GridLastItemFlexGrow() {
   const [itemCount, setItemCount] = useState(5)
 
   return (
     <div className="w-[min(100%,400px)] resizable-x">
       <div>
-        <button onClick={() => setItemCount((v) => (v > 0 ? v - 1 : 0))}>-1</button>
+        <button onClick={() => setItemCount((v) => Math.max(0, v - 1))}>-1</button>
 
         {itemCount}
 
         <button onClick={() => setItemCount((v) => v + 1)}>+1</button>
       </div>
 
-      <div className="@container grid grid-cols-fit-[100px] gap-2">
-        {range(itemCount).map((i) => (
-          <div
-            key={i}
-            className="flex-center h-10 bg-red-300 last:col-start-auto last:col-end-[span_2]"
-          >
-            {i + 1}
+      <div
+        className="@container"
+        style={{
+          '--column-min': '100px',
+          '--gap': '10px',
+        }}
+      >
+        <div
+          className="grid"
+          style={{
+            '--column-step': 'calc(var(--column-min) + var(--gap))',
+            '--fitted-length': 'round(down, 100cqi + var(--gap) + .001px, var(--column-step))',
+            '--column-count': 'max(1, var(--fitted-length) / var(--column-step))',
+            gridTemplateColumns:
+              'repeat(var(--column-count), minmax(min(100%, var(--column-min)), 1fr))',
+            gap: 'var(--gap)',
+          }}
+        >
+          <div className="contents">
+            {range(itemCount).map((i) => (
+              <div
+                key={i}
+                className="flex-center h-10 bg-red-300 last:col-end-(--end)"
+                style={{
+                  '--end':
+                    'span calc(var(--column-count) - mod(calc(sibling-count() - 1), var(--column-count)))',
+                }}
+              >
+                {i + 1}
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   )
