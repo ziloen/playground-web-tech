@@ -8,12 +8,7 @@ export default function Slider() {
   }
 
   return (
-    <div
-      className="px-10 py-2"
-      style={{
-        '--value': value,
-      }}
-    >
+    <div className="px-10 py-2">
       <div className="flex flex-col items-start">
         <input
           className={styles.windows10}
@@ -23,6 +18,7 @@ export default function Slider() {
           max={1}
           dir="ltr"
           value={value}
+          data-value={value}
           onChange={handleChange}
         />
 
@@ -33,10 +29,8 @@ export default function Slider() {
           min={0}
           max={1}
           dir="rtl"
-          style={{
-            '--value': value,
-          }}
           value={value}
+          data-value={value}
           onChange={handleChange}
         />
       </div>
@@ -49,6 +43,7 @@ export default function Slider() {
         max={1}
         dir="ltr"
         value={value}
+        data-value={value}
         onChange={handleChange}
       />
 
@@ -60,6 +55,7 @@ export default function Slider() {
         max={1}
         dir="rtl"
         value={value}
+        data-value={value}
         onChange={handleChange}
       />
 
@@ -73,6 +69,7 @@ export default function Slider() {
         max={1}
         dir="ltr"
         value={value}
+        data-value={value}
         onChange={handleChange}
       />
 
@@ -86,6 +83,7 @@ export default function Slider() {
         max={1}
         dir="ltr"
         value={value}
+        data-value={value}
         onChange={handleChange}
       />
 

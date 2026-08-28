@@ -86,21 +86,20 @@ export async function resourceToDataURL(
     dataURL = makeDataUrl(content, contentType!)
   } catch (error) {
     dataURL = options.imagePlaceholder || ''
-
-    let msg = `Failed to fetch resource: ${resourceUrl}`
-    if (error) {
-      msg = Error.isError(error)
-        ? error.message
-        : typeof error === 'string'
-          ? error
-          : 'Unknown Error'
-    }
-
-    if (msg) {
-      console.warn(msg)
-    }
+    console.warn(formatResourceErrorMessage(error, resourceUrl))
   }
 
   cache[cacheKey] = dataURL
   return dataURL
+}
+
+function formatResourceErrorMessage(error: unknown, resourceUrl: string) {
+  if (error) {
+    return Error.isError(error)
+      ? error.message
+      : typeof error === 'string'
+        ? error
+        : 'Unknown Error'
+  }
+  return `Failed to fetch resource: ${resourceUrl}`
 }

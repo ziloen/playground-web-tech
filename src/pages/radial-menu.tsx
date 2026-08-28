@@ -425,29 +425,11 @@ const RadialWheel = memo(function RadialWheel({
       stage.style.setProperty('--dead-zone', `${deadZone}px`)
       stage.style.setProperty('--pointer-angle', `${positiveModulo(unwrappedAngle, TAU)}rad`)
       stage.style.setProperty('--pointer-length', `${Math.min(pointerDistance, outerRadius)}px`)
-      if (lastPointer) {
-        const tiltX = clamp(
-          ((rect.top + rect.height / 2 - lastPointer.y) / (rect.height / 2)) * 4,
-          -4,
-          4,
-        )
-        const tiltY = clamp(
-          ((lastPointer.x - (rect.left + rect.width / 2)) / (rect.width / 2)) * 4,
-          -4,
-          4,
-        )
-        stage.style.setProperty('--tilt-x', `${tiltX.toFixed(3)}deg`)
-        stage.style.setProperty('--tilt-y', `${tiltY.toFixed(3)}deg`)
-      } else {
-        stage.style.setProperty('--tilt-x', '0deg')
-        stage.style.setProperty('--tilt-y', '0deg')
-      }
+      const tilt = lastPointer ? computePointerTilt(lastPointer, rect) : { tiltX: 0, tiltY: 0 }
+      stage.style.setProperty('--tilt-x', `${tilt.tiltX.toFixed(3)}deg`)
+      stage.style.setProperty('--tilt-y', `${tilt.tiltY.toFixed(3)}deg`)
 
-      if (angleReadout) angleReadout.textContent = `${unwrappedAngle.toFixed(2)} rad`
-      if (slotReadout) {
-        slotReadout.textContent =
-          nextActive === null ? '—' : String(nextActive + 1).padStart(2, '0')
-      }
+      updateReadouts(angleReadout, slotReadout, unwrappedAngle, nextActive)
 
       if (isSpiral) {
         renderSpiralItems({
@@ -631,79 +613,90 @@ const RadialWheel = memo(function RadialWheel({
       scheduleRender()
     }
 
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (qHeld || dragPointerId !== null) {
+        event.preventDefault()
+        cancelSelection()
+      } else if (hasPointer) {
+        resetWheel()
+      }
+    }
+
+    const handleQKey = (event: KeyboardEvent) => {
+      if (isEditableKeyboardTarget(event.target)) return
+      if (event.repeat || qHeld || dragPointerId !== null) return
+      event.preventDefault()
+      qHeld = true
+      beginSelection()
+    }
+
+    const handleArrowKey = (event: KeyboardEvent, direction: number) => {
+      const movesFocusedItem = isPrimaryRadialItemTarget(stage, event.target)
+      if (isInteractiveKeyboardTarget(event.target) && !movesFocusedItem) {
+        return
+      }
+      event.preventDefault()
+      const currentSlot = Math.round(unwrappedAngle / focusStep)
+      const cycleSlotCount = isSpiral
+        ? renderConfigRef.current.loopMode === 'immediate'
+          ? itemCount
+          : Math.ceil(itemCount / SLOTS_PER_LAP) * SLOTS_PER_LAP
+        : ringSlotCount
+      let nextSlot = currentSlot + direction
+      if (movesFocusedItem) {
+        while (positiveModulo(nextSlot, cycleSlotCount) >= itemCount) {
+          nextSlot += direction
+        }
+      }
+      unwrappedAngle = nextSlot * focusStep
+      lastWrappedAngle = positiveModulo(unwrappedAngle, TAU)
+      pointerInDeadZone = false
+      pointerDistance = stage.getBoundingClientRect().width * 0.34
+      hasPointer = true
+      scheduleRender()
+      if (movesFocusedItem) {
+        flushRender()
+        const nextIndex = positiveModulo(nextSlot, cycleSlotCount)
+        const nextItem = itemRefs.current[nextIndex]?.[0]
+        if (nextItem && nextItem !== document.activeElement) {
+          syncingItemFocus = true
+          nextItem.focus({ preventScroll: true })
+        }
+      }
+    }
+
+    const handleEnterKey = (event: KeyboardEvent) => {
+      if (event.repeat) {
+        if (isPrimaryRadialItemTarget(stage, event.target)) event.preventDefault()
+        return
+      }
+      if (isInteractiveKeyboardTarget(event.target)) return
+      flushRender()
+      if (active === null) return
+      event.preventDefault()
+      finishSelection()
+    }
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (qHeld || dragPointerId !== null) {
-          event.preventDefault()
-          cancelSelection()
-        } else if (hasPointer) {
-          resetWheel()
-        }
+        handleEscapeKey(event)
         return
       }
 
       if (event.key.toLowerCase() === 'q') {
-        if (isEditableKeyboardTarget(event.target)) return
-        if (event.repeat || qHeld || dragPointerId !== null) return
-        event.preventDefault()
-        qHeld = true
-        beginSelection()
+        handleQKey(event)
         return
       }
 
-      const direction =
-        event.key === 'ArrowRight' || event.key === 'ArrowDown'
-          ? 1
-          : event.key === 'ArrowLeft' || event.key === 'ArrowUp'
-            ? -1
-            : 0
+      const direction = getArrowDirection(event.key)
 
       if (direction !== 0) {
-        const movesFocusedItem = isPrimaryRadialItemTarget(stage, event.target)
-        if (isInteractiveKeyboardTarget(event.target) && !movesFocusedItem) {
-          return
-        }
-        event.preventDefault()
-        const currentSlot = Math.round(unwrappedAngle / focusStep)
-        const cycleSlotCount = isSpiral
-          ? renderConfigRef.current.loopMode === 'immediate'
-            ? itemCount
-            : Math.ceil(itemCount / SLOTS_PER_LAP) * SLOTS_PER_LAP
-          : ringSlotCount
-        let nextSlot = currentSlot + direction
-        if (movesFocusedItem) {
-          while (positiveModulo(nextSlot, cycleSlotCount) >= itemCount) {
-            nextSlot += direction
-          }
-        }
-        unwrappedAngle = nextSlot * focusStep
-        lastWrappedAngle = positiveModulo(unwrappedAngle, TAU)
-        pointerInDeadZone = false
-        pointerDistance = stage.getBoundingClientRect().width * 0.34
-        hasPointer = true
-        scheduleRender()
-        if (movesFocusedItem) {
-          flushRender()
-          const nextIndex = positiveModulo(nextSlot, cycleSlotCount)
-          const nextItem = itemRefs.current[nextIndex]?.[0]
-          if (nextItem && nextItem !== document.activeElement) {
-            syncingItemFocus = true
-            nextItem.focus({ preventScroll: true })
-          }
-        }
+        handleArrowKey(event, direction)
         return
       }
 
       if (event.key === 'Enter') {
-        if (event.repeat) {
-          if (isPrimaryRadialItemTarget(stage, event.target)) event.preventDefault()
-          return
-        }
-        if (isInteractiveKeyboardTarget(event.target)) return
-        flushRender()
-        if (active === null) return
-        event.preventDefault()
-        finishSelection()
+        handleEnterKey(event)
       }
     }
 
@@ -921,48 +914,35 @@ function renderSpiralItems({
 }) {
   const geometry = createSectorGeometry(size, SLOT_ANGLE * SECTOR_ANGULAR_FILL)
 
-  for (let index = 0; index < itemCount; index += 1) {
-    const nearestCycle = Math.round((focusPosition - index) / paddedSlotCount)
-
-    for (const cycleOffset of SPIRAL_COPY_OFFSETS) {
-      const element = elements[index]?.[cycleOffset]
-      if (!element) continue
-      const trackPosition = index + (nearestCycle + cycleOffset) * paddedSlotCount
-      const distance = trackPosition - focusPosition
-      const angle = trackPosition * SLOT_ANGLE
-      const scale = spiralScale(distance, spiralDepthRatio)
-      const opacity = spiralVisibility(distance)
-      const isPrimaryCopy = cycleOffset === 0
-
-      setSectorTransform(element, geometry, angle, scale)
-      element.style.opacity = opacity.toFixed(3)
-      element.style.zIndex = String(
-        Math.round(scale * 10) + (isPrimaryCopy && activeIndex === index ? 20 : 0),
-      )
-      element.style.pointerEvents = opacity > 0.16 ? 'auto' : 'none'
-      element.tabIndex = isPrimaryCopy && opacity > 0.16 ? 0 : -1
-      element.dataset.direction =
-        Math.abs(distance) < 0.5 ? 'current' : distance < 0 ? 'before' : 'after'
-    }
+  for (const slot of collectSpiralItemSlots(elements, focusPosition, paddedSlotCount)) {
+    const distance = slot.trackPosition - focusPosition
+    applySpiralItemStyle({
+      element: slot.element,
+      geometry,
+      angle: slot.trackPosition * SLOT_ANGLE,
+      scale: spiralScale(distance, spiralDepthRatio),
+      opacity: spiralVisibility(distance),
+      isPrimaryCopy: slot.isPrimaryCopy,
+      isActive: activeIndex === slot.index,
+      distance,
+    })
   }
 
-  for (let index = 0; index < blankElements.length; index += 1) {
-    const element = blankElements[index]
-    if (!element) continue
-    const slotIndex = itemCount + index
-    const nearestCycle = Math.round((focusPosition - slotIndex) / paddedSlotCount)
-    const trackPosition = slotIndex + nearestCycle * paddedSlotCount
-    const distance = trackPosition - focusPosition
-    const angle = trackPosition * SLOT_ANGLE
-    const scale = spiralScale(distance, spiralDepthRatio)
-    const opacity = spiralVisibility(distance) * EMPTY_SLOT_OPACITY
-
-    setSectorTransform(element, geometry, angle, scale)
-    element.style.opacity = opacity.toFixed(3)
-    element.style.zIndex = String(Math.round(scale * 10))
-    element.style.pointerEvents = 'none'
-    element.dataset.direction =
-      Math.abs(distance) < 0.5 ? 'current' : distance < 0 ? 'before' : 'after'
+  for (const slot of collectBlankSpiralSlots(
+    blankElements,
+    itemCount,
+    focusPosition,
+    paddedSlotCount,
+  )) {
+    const distance = slot.trackPosition - focusPosition
+    applyBlankSpiralStyle({
+      element: slot.element,
+      geometry,
+      angle: slot.trackPosition * SLOT_ANGLE,
+      scale: spiralScale(distance, spiralDepthRatio),
+      opacity: spiralVisibility(distance) * EMPTY_SLOT_OPACITY,
+      distance,
+    })
   }
 
   const dividerTrackPosition =
@@ -1068,6 +1048,146 @@ function setSectorTransform(
   if (content instanceof HTMLElement) {
     content.style.transform = `rotate(${-angle}rad)`
   }
+}
+
+function computePointerTilt(
+  pointer: { x: number; y: number },
+  rect: DOMRect,
+): { tiltX: number; tiltY: number } {
+  const tiltX = clamp(
+    ((rect.top + rect.height / 2 - pointer.y) / (rect.height / 2)) * 4,
+    -4,
+    4,
+  )
+  const tiltY = clamp(
+    ((pointer.x - (rect.left + rect.width / 2)) / (rect.width / 2)) * 4,
+    -4,
+    4,
+  )
+  return { tiltX, tiltY }
+}
+
+function updateReadouts(
+  angleReadout: HTMLElement | null | undefined,
+  slotReadout: HTMLElement | null | undefined,
+  unwrappedAngle: number,
+  nextActive: number | null,
+) {
+  if (angleReadout) angleReadout.textContent = `${unwrappedAngle.toFixed(2)} rad`
+  if (slotReadout) {
+    slotReadout.textContent =
+      nextActive === null ? '—' : String(nextActive + 1).padStart(2, '0')
+  }
+}
+
+function getArrowDirection(key: string) {
+  if (key === 'ArrowRight' || key === 'ArrowDown') return 1
+  if (key === 'ArrowLeft' || key === 'ArrowUp') return -1
+  return 0
+}
+
+function spiralDirection(distance: number) {
+  if (Math.abs(distance) < 0.5) return 'current'
+  return distance < 0 ? 'before' : 'after'
+}
+
+function collectSpiralItemSlots(
+  elements: ItemElementCopies[],
+  focusPosition: number,
+  paddedSlotCount: number,
+) {
+  const slots: Array<{
+    element: HTMLElement
+    trackPosition: number
+    index: number
+    isPrimaryCopy: boolean
+  }> = []
+  for (let index = 0; index < elements.length; index += 1) {
+    const nearestCycle = Math.round((focusPosition - index) / paddedSlotCount)
+
+    for (const cycleOffset of SPIRAL_COPY_OFFSETS) {
+      const element = elements[index]?.[cycleOffset]
+      if (!element) continue
+      slots.push({
+        element,
+        trackPosition: index + (nearestCycle + cycleOffset) * paddedSlotCount,
+        index,
+        isPrimaryCopy: cycleOffset === 0,
+      })
+    }
+  }
+  return slots
+}
+
+function collectBlankSpiralSlots(
+  blankElements: Array<HTMLDivElement | null>,
+  itemCount: number,
+  focusPosition: number,
+  paddedSlotCount: number,
+) {
+  const slots: Array<{ element: HTMLElement; trackPosition: number }> = []
+  for (let index = 0; index < blankElements.length; index += 1) {
+    const element = blankElements[index]
+    if (!element) continue
+    const slotIndex = itemCount + index
+    const nearestCycle = Math.round((focusPosition - slotIndex) / paddedSlotCount)
+    slots.push({
+      element,
+      trackPosition: slotIndex + nearestCycle * paddedSlotCount,
+    })
+  }
+  return slots
+}
+
+function applySpiralItemStyle({
+  element,
+  geometry,
+  angle,
+  scale,
+  opacity,
+  isPrimaryCopy,
+  isActive,
+  distance,
+}: {
+  element: HTMLElement
+  geometry: SectorGeometry
+  angle: number
+  scale: number
+  opacity: number
+  isPrimaryCopy: boolean
+  isActive: boolean
+  distance: number
+}) {
+  setSectorTransform(element, geometry, angle, scale)
+  element.style.opacity = opacity.toFixed(3)
+  element.style.zIndex = String(
+    Math.round(scale * 10) + (isPrimaryCopy && isActive ? 20 : 0),
+  )
+  element.style.pointerEvents = opacity > 0.16 ? 'auto' : 'none'
+  element.tabIndex = isPrimaryCopy && opacity > 0.16 ? 0 : -1
+  element.dataset.direction = spiralDirection(distance)
+}
+
+function applyBlankSpiralStyle({
+  element,
+  geometry,
+  angle,
+  scale,
+  opacity,
+  distance,
+}: {
+  element: HTMLElement
+  geometry: SectorGeometry
+  angle: number
+  scale: number
+  opacity: number
+  distance: number
+}) {
+  setSectorTransform(element, geometry, angle, scale)
+  element.style.opacity = opacity.toFixed(3)
+  element.style.zIndex = String(Math.round(scale * 10))
+  element.style.pointerEvents = 'none'
+  element.dataset.direction = spiralDirection(distance)
 }
 
 function spiralVisibility(distance: number) {

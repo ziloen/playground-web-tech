@@ -16,10 +16,8 @@ import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import remarkCjkFriendly from 'remark-cjk-friendly'
 import remarkGfm from 'remark-gfm-configurable'
-import remarkParse from 'remark-parse'
 import type { Merge } from 'type-fest'
 import type { PluggableList, Plugin, Processor } from 'unified'
-import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 import OcticonChevronDown12 from '~icons/octicon/chevron-down-12'
@@ -50,20 +48,7 @@ export function Markdown({
   return (
     <div className={clsx('markdown-body', className)} {...props}>
       <MarkdownContext value={ctxValue}>
-        {streaming ? (
-          // FIXME: 在单个块中带有多个 math 时，还是会卡
-          unified()
-            .use(remarkParse)
-            .use(remarkPlugins)
-            .parse(children)
-            .children.map((node, i) => (
-              <MemoReactMarkdown key={i}>
-                {children.slice(node.position!.start.offset!, node.position!.end.offset!)}
-              </MemoReactMarkdown>
-            ))
-        ) : (
-          <MemoReactMarkdown>{children}</MemoReactMarkdown>
-        )}
+        <MemoReactMarkdown>{children}</MemoReactMarkdown>
       </MarkdownContext>
     </div>
   )

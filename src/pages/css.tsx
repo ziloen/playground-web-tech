@@ -237,13 +237,13 @@ function AspectRatio() {
         />
       </div>
 
-      {/* 使用两张相同图片分别定义不同维度以实现任意未知比例 */}
       {/* 未来可能可以使用 CSS Box Sizing Level 4 的 contain sizing keyword 来简化实现 */}
+      {/* 使用两张相同图片分别定义不同维度以实现任意未知比例 */}
       <div className="@container-size grid size-[100px] resizable place-content-center bg-dark-gray-600">
-        {/* 只提供宽度 */}
+        {/* 只提供宽度，不可见 */}
         <img
           aria-hidden="true"
-          className="pointer-events-none -mb-[100cqb] h-[100cqb] w-max max-w-[100cqi] opacity-10 area-[1/1]"
+          className="pointer-events-none invisible -mb-[100cqb] h-[100cqb] w-max max-w-[100cqi] area-[1/1]"
           src="https://dummyjson.com/image/320x180/0f766e"
         />
 
