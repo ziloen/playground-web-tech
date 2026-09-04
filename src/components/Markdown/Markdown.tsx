@@ -4,7 +4,7 @@ import 'katex/dist/katex.css'
 import './Markdown.css'
 
 import remarkMath from '@ziloen/remark-math'
-import { clsx } from 'cnfast'
+import { clsx } from 'cn'
 import type { Element as HastElement, Nodes as HastNodes } from 'hast'
 import type { FootnoteDefinition, Link, Nodes as MdastNodes, Root, RootContent } from 'mdast'
 import { toMarkdown } from 'mdast-util-to-markdown'

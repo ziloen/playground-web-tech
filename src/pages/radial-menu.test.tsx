@@ -767,7 +767,7 @@ describe('RadialMenuPage', () => {
 
     expect(stage).toHaveAttribute('data-focus', 'item')
     expect(firstItem).toHaveAttribute('data-focused', 'true')
-    expect(stage.querySelector('[data-focus-label]')).toHaveTextContent('Pulse Beacon')
+    expect(stage.querySelector('[data-focus-label]')).toMatchTextContent('Pulse Beacon')
 
     firstItem.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }),

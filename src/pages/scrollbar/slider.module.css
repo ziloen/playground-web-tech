@@ -86,7 +86,7 @@
       pointer-events: none;
       display: block;
       border-radius: var(--progress-radius, 0px);
-      inline-size: calc(attr(data-value type(<number>)) * (100% - var(--thumb-width)));
+      inline-size: calc(attr(data-value number) * (100% - var(--thumb-width)));
       background-color: var(--progress-background);
       block-size: var(--track-height);
     }

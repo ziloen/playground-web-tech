@@ -1,4 +1,4 @@
-import { createCn } from 'cnfast'
+import { createCn } from 'cn/config'
 
 export { isInstanceofElement } from './isInstanceofElement'
 export { LRUCache } from './LRUCache'
