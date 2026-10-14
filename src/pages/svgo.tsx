@@ -1,8 +1,8 @@
 import JSON5 from 'json5'
-import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import type { CustomPlugin, DataUri } from 'svgo/browser'
 import { builtinPlugins, optimize, VERSION } from 'svgo/browser'
 import type { JsonObject, JsonValue } from 'type-fest'
+import SvgPreview from '~/components/SvgPreview'
 import { useAutoResetState } from '~/hooks'
 import { formatBytes } from '~/utils'
 import CarbonCheckmark from '~icons/carbon/checkmark'
@@ -14,22 +14,57 @@ export default function SVGOPage() {
   const [originalSvg, setOriginalSvg] = useState<string | null>(null)
   const [optimizedSvg, setOptimizedSvg] = useState<string | null>(null)
   const [svgUri, setSvgUri] = useState<string | null>(null)
+  const [downloadName, setDownloadName] = useState('image.svg')
   const [dimensions, setDimensions] = useState({
     width: 0,
     height: 0,
   })
   const [copied, setCopied] = useAutoResetState(false, 2_000)
   const [showGridLines, setShowGridLines] = useState(false)
+  const [importError, setImportError] = useState<string | null>(null)
   // #endregion
 
   // #region useRef
-  const transformWrapperRef = useRef<ComponentRef<typeof TransformWrapper>>(null)
+  const previewRef = useRef<ComponentRef<typeof SvgPreview>>(null)
+  const importRequestRef = useRef(0)
   // #endregion
 
   // #region useMemo
   // #endregion
 
   // #region functions, useImperativeHandle
+  function loadSvg(value: string, fileName = 'image.svg') {
+    const { data, dimensions } = optimizeSvg(value, { pretty: true })
+    const uri = optimizeSvgToDataUri(value)
+
+    importRequestRef.current += 1
+    setOriginalSvg(value)
+    setOptimizedSvg(data)
+    setDimensions(dimensions)
+    setSvgUri(uri)
+    setDownloadName(fileName)
+    setImportError(null)
+    previewRef.current?.reset()
+  }
+
+  async function openSvgFiles(files: FileList) {
+    const request = ++importRequestRef.current
+
+    setImportError(null)
+    try {
+      const { value, name } = await readSvgFile(files)
+      if (request !== importRequestRef.current) return
+
+      loadSvg(value, name)
+    } catch (error: unknown) {
+      console.error('Unable to open SVG file:', error)
+      if (request === importRequestRef.current) {
+        const message =
+          typeof error === 'object' && error !== null && 'message' in error ? error.message : null
+        setImportError(typeof message === 'string' ? message : 'Unable to open this SVG file.')
+      }
+    }
+  }
   // #endregion
 
   // #region useHookEffect, useEffect
@@ -39,14 +74,7 @@ export default function SVGOPage() {
   // #endregion
 
   return (
-    <div
-      className="flex h-full"
-      style={{
-        backgroundImage: 'repeating-conic-gradient(#3b3b3b 0 25%, #333333 25% 50%)',
-        backgroundSize: '20px 20px',
-      }}
-    >
-      {/* TODO: support drop svg file */}
+    <SvgFileDropZone onFiles={openSvgFiles}>
       {/* Left side menus */}
       <div className="h-full w-60 bg-dark-gray-300">
         <div className="px-4 py-1">
@@ -57,7 +85,7 @@ export default function SVGOPage() {
           {VERSION}
         </div>
 
-        <div className="cursor-pointer px-4 py-3 hover:bg-dark-gray-400">Open SVG</div>
+        <SvgFileInput onFiles={openSvgFiles} error={importError} />
 
         <textarea
           className="w-full resize-none border-none bg-transparent px-4 py-3 placeholder:text-inherit placeholder:transition-opacity hover:bg-dark-gray-400 focus:outline-none focus:placeholder:opacity-40"
@@ -93,12 +121,7 @@ export default function SVGOPage() {
             if (value.startsWith('<svg')) {
               // SVG input
               try {
-                const { data: optimizedSvg, dimensions } = optimizeSvg(value, { pretty: true })
-                setOriginalSvg(value)
-                setOptimizedSvg(optimizedSvg)
-                setDimensions(dimensions)
-                setSvgUri(optimizeSvgToDataUri(value))
-                transformWrapperRef.current?.resetTransform()
+                loadSvg(value)
               } catch (error) {
                 console.error('Invalid SVG input:', error)
               }
@@ -106,14 +129,7 @@ export default function SVGOPage() {
               // Data URL input
               try {
                 const svgString = decodeURIComponent(value.slice('data:image/svg+xml,'.length))
-                const { data: optimizedSvg, dimensions } = optimizeSvg(svgString, {
-                  pretty: true,
-                })
-                setOriginalSvg(svgString)
-                setOptimizedSvg(optimizedSvg)
-                setDimensions(dimensions)
-                setSvgUri(optimizeSvgToDataUri(svgString))
-                transformWrapperRef.current?.resetTransform()
+                loadSvg(svgString)
               } catch (error) {
                 console.error('Invalid SVG data URL input:', error)
               }
@@ -125,13 +141,7 @@ export default function SVGOPage() {
           className="cursor-pointer px-4 py-3 hover:bg-dark-gray-400"
           onClick={() => {
             import('../assets/figma.svg?raw').then((v) => {
-              const { data: optimizedSvg, dimensions } = optimizeSvg(v.default, { pretty: true })
-
-              setOriginalSvg(v.default)
-              setOptimizedSvg(optimizedSvg)
-              setSvgUri(optimizeSvgToDataUri(v.default))
-              transformWrapperRef.current?.resetTransform()
-              setDimensions(dimensions)
+              loadSvg(v.default)
             })
           }}
         >
@@ -149,44 +159,12 @@ export default function SVGOPage() {
       {/* TODO: configuration */}
 
       {/* SVG preview */}
-      <TransformWrapper
-        ref={transformWrapperRef}
-        maxScale={10}
-        panning={{
-          velocityDisabled: true,
-        }}
-        limitToBounds={false}
-      >
-        <TransformComponent
-          wrapperStyle={{
-            // make the iframe transparent
-            // https://fvsch.com/transparent-iframes
-            colorScheme: 'light',
-            height: '100%',
-            flex: '1',
-          }}
-          contentStyle={{
-            height: '100%',
-            width: '100%',
-            display: 'grid',
-            placeItems: 'center',
-          }}
-        >
-          {/* TODO: Add text color: white to iframe */}
-          <iframe
-            src={svgUri || 'about:blank'}
-            frameBorder="0"
-            title="SVG preview"
-            scrolling="no"
-            className="pointer-events-none overflow-hidden border-none bg-transparent"
-            style={{
-              anchorName: '--a',
-              width: dimensions.width ? `${dimensions.width}px` : '100%',
-              height: dimensions.height ? `${dimensions.height}px` : '100%',
-            }}
-          />
-        </TransformComponent>
-      </TransformWrapper>
+      <SvgPreview
+        ref={previewRef}
+        src={svgUri}
+        width={dimensions.width}
+        height={dimensions.height}
+      />
 
       {/* FIXME: Firefox 和 Chrome 对待 anchor-position transform 行为不一致 */}
       {/* Chrome 会跟随 transform，Firefox 不会 */}
@@ -226,14 +204,121 @@ export default function SVGOPage() {
               {/* Copy as data url */}
               <CopyButton text={svgUri}>data URL</CopyButton>
 
-              <a href={svgUri} download="image.svg">
+              <a href={svgUri} download={downloadName}>
                 Download
               </a>
             </>
           )}
         </div>
       </div>
+    </SvgFileDropZone>
+  )
+}
+
+async function readSvgFile(files: FileList) {
+  if (files.length !== 1) {
+    throw new Error('Open one SVG file at a time.')
+  }
+
+  const file = files[0]
+  if (file.type !== 'image/svg+xml' && !file.name.toLowerCase().endsWith('.svg')) {
+    throw new Error('Choose an SVG file (.svg).')
+  }
+
+  const value = await file.text()
+  const svgDocument = new DOMParser().parseFromString(value, 'image/svg+xml')
+  if (svgDocument.querySelector('parsererror') || svgDocument.documentElement.localName !== 'svg') {
+    throw new Error('This file does not contain valid SVG markup.')
+  }
+
+  return { value, name: file.name }
+}
+
+function SvgFileDropZone({
+  children,
+  onFiles,
+}: {
+  children: React.ReactNode
+  onFiles: (files: FileList) => void
+}) {
+  const [isDraggingFile, setIsDraggingFile] = useState(false)
+  const dragDepthRef = useRef(0)
+
+  return (
+    <div
+      className="relative flex h-full"
+      style={{
+        backgroundImage: 'repeating-conic-gradient(#3b3b3b 0 25%, #333333 25% 50%)',
+        backgroundSize: '20px 20px',
+      }}
+      onDragEnter={(e) => {
+        if (!e.dataTransfer.types.includes('Files')) return
+        e.preventDefault()
+        dragDepthRef.current += 1
+        setIsDraggingFile(true)
+      }}
+      onDragOver={(e) => {
+        if (!e.dataTransfer.types.includes('Files')) return
+        e.preventDefault()
+        e.dataTransfer.dropEffect = 'copy'
+      }}
+      onDragLeave={() => {
+        dragDepthRef.current = Math.max(0, dragDepthRef.current - 1)
+        if (dragDepthRef.current === 0) setIsDraggingFile(false)
+      }}
+      onDrop={(e) => {
+        if (!e.dataTransfer.types.includes('Files')) return
+        e.preventDefault()
+        dragDepthRef.current = 0
+        setIsDraggingFile(false)
+        onFiles(e.dataTransfer.files)
+      }}
+    >
+      {isDraggingFile && (
+        <div className="bg-blue-950/80 pointer-events-none absolute inset-0 z-10 grid place-items-center border-2 border-dashed border-blue-300 text-xl text-white">
+          Drop an SVG file to optimize
+        </div>
+      )}
+      {children}
     </div>
+  )
+}
+
+function SvgFileInput({
+  onFiles,
+  error,
+}: {
+  onFiles: (files: FileList) => void
+  error: string | null
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  return (
+    <>
+      <button
+        type="button"
+        className="w-full cursor-pointer px-4 py-3 text-left hover:bg-dark-gray-400 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-300"
+        onClick={() => fileInputRef.current?.click()}
+      >
+        Open SVG
+      </button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".svg,image/svg+xml"
+        hidden
+        onChange={(e) => {
+          if (e.currentTarget.files?.length) {
+            onFiles(e.currentTarget.files)
+          }
+          e.currentTarget.value = ''
+        }}
+      />
+      <p className="px-4 pb-3 text-sm text-light-gray-800">Or drop an SVG file anywhere.</p>
+      <p className="px-4 text-sm text-red-300" aria-live="polite">
+        {error}
+      </p>
+    </>
   )
 }
 
