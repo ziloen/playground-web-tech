@@ -757,6 +757,21 @@ function ScrollDefaultCenter() {
     })
   }).current
 
+  // Chrome 133+
+  if (CSS.supports('scroll-initial-target: nearest')) {
+    return (
+      <div className="h-10 w-100 overflow-x-auto">
+        <div className="relative h-full w-200 bg-linear-to-r/oklch from-blue-400 to-green-400">
+          <div
+            aria-hidden
+            className="pointer-events-none invisible absolute inset-0 m-auto size-0 snap-center"
+            style={{ scrollInitialTarget: 'nearest' }}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="h-10 w-100 snap-x snap-mandatory overflow-x-auto">
       <div className="relative h-full w-200 bg-linear-to-r/oklch from-blue-400 to-green-400">
