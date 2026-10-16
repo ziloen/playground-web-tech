@@ -81,21 +81,6 @@ html {
 }
 
 
-/* 在使用 tan(atan2(var(--dividend), var(--divisor))) 实现除法时，在有些浏览器里混用单位会 bug */
-/* 所以使用这两个自定义属性将值转换为 px */
-/* https://dev.to/janeori/css-type-casting-to-numeric-tanatan2-scalars-582j */
-@property --dividend {
-  syntax: "<length>";
-  initial-value: 1px;
-  inherits: false;
-}
-
-@property --divisor {
-  syntax: "<length>";
-  initial-value: 1px;
-  inherits: false;
-}
-
 /* 用于给百分比数值做动画 */
 @property --percentage-1 {
   syntax: "<percentage>";

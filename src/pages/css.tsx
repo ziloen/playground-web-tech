@@ -509,10 +509,7 @@ function GridRepeat() {
         )}
         style={{
           // columns = round(up, (width + gap) / (item-max-width + gap))
-          '--dividend': 'calc(100cqi + 8px)',
-          '--divisor': 'calc(200px + 8px)',
-          '--columns': 'round(up, tan(atan2(var(--dividend), var(--divisor))), 1)',
-          // Chrome 139+: round(up, calc((100cqi + 8px) / (200px + 8px)), 1)
+          '--columns': 'round(up, (100cqi + 8px) / (200px + 8px), 1)',
           gridTemplateColumns: 'repeat(max(var(--columns), 2), minmax(0, 1fr))',
         }}
       >
@@ -552,10 +549,7 @@ function DynamicMultiLineClamp() {
         )}
         style={{
           // line-clamp = round(down, height / line-height)
-          '--dividend': '100cqb',
-          '--divisor': '1lh',
-          '--line-clamp': 'round(down, tan(atan2(var(--dividend), var(--divisor))), 1)',
-          // Chrome 139+: round(down, calc(100cqb / 1lh), 1)
+          '--line-clamp': 'round(down, 100cqb / 1lh, 1)',
         }}
       >
         {testString}
@@ -802,7 +796,7 @@ function TextFitToWidth() {
             inlineSize: 'var(--available-space)',
             '--captured-length': '100cqi',
             '--ratio':
-              'tan(atan2(var(--available-space), var(--available-space) - var(--captured-length)))',
+              'calc(var(--available-space) / (var(--available-space) - var(--captured-length)))',
             '--dynamic-font-size': 'calc(1em * (var(--ratio)))',
             fontSize: 'clamp(1em, var(--dynamic-font-size), 120px)',
           }}
@@ -1091,7 +1085,7 @@ function GridLastItemFlexGrow() {
 
 // TODO: multi dynamic sticky elments stack with dynamic height (or fixed height)
 // 可以点击按钮设置列表项是否 sticky，可以多个 sticky
-// sticky 时，滚动出范围时，会自动堆叠到下一个 sticky 元素的下面
+// sticky 时，滚动出范围时，会自动堆叠到下一个 sticky 元素的下面，可以通过选择器 + sibling-count 来计算有多少 sticky 元素，计算出当前 sticky 元素应该堆叠到哪个位置
 function StickyStack() {}
 
 function StickyNav() {
